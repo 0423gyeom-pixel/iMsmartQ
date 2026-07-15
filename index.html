@@ -1,0 +1,601 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>iM Bank 스마트 모바일 번호표</title>
+  <!-- Google Fonts: Inter & Noto Sans KR -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&family=Noto+Sans+KR:wght@300;400;500;700;900&display=swap" rel="stylesheet">
+  <!-- Pretendard web font -->
+  <link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.css" />
+  <!-- FontAwesome for icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="mobile-web-container">
+    <!-- 헤더 -->
+    <header class="app-header">
+      <!-- iOS 스마트 앱 배너 (App 다운로드 유도) -->
+      <div class="smart-app-banner">
+        <button class="close-banner-btn" id="close-app-banner">&times;</button>
+        <div class="app-icon-wrapper" style="overflow: hidden; border-radius: 10px;">
+          <img src="./imbank_app_icon.png" alt="iM Bank" style="width: 100%; height: 100%; object-fit: cover;">
+        </div>
+        <div class="app-banner-info">
+          <span class="app-banner-title">iM뱅크 (아이엠뱅크)</span>
+          <span class="app-banner-subtitle">iM뱅크 대기 시간 확인 및 서류 예비작성</span>
+        </div>
+        <a href="#" class="app-banner-action-btn">받기</a>
+      </div>
+
+      <!-- 웹사이트 타이틀 바 및 헤더 영역 -->
+      <div class="web-title-bar">
+        <h1 class="web-title-text"><i class="fa-solid fa-ticket-simple"></i> iM뱅크 모바일 번호표</h1>
+        <div class="header-bottom">
+          <div class="live-indicator"></div>
+          <span class="timestamp" id="live-timestamp">오후 3시 37분 기준 실시간 업데이트</span>
+        </div>
+      </div>
+    </header>
+
+    <!-- 메인 콘텐츠 영역 -->
+    <main class="app-content">
+      <!-- 메인 번호표 카드 -->
+      <section class="ticket-card animate-fade-in">
+        <div class="ticket-branch">
+          <i class="fa-solid fa-location-dot"></i>
+          <span>대구본점 영업부</span>
+        </div>
+        <div class="ticket-badge-group">
+          <div class="ticket-status-badge">대기 중</div>
+          <div class="qr-verify-badge"><i class="fa-solid fa-qrcode"></i> QR인증 완료</div>
+        </div>
+        <h2 class="ticket-number">내 번호: <span class="highlight-num">1004번</span></h2>
+        
+        <div class="accent-backdrop-container">
+          <div class="business-category">
+            <span class="label">업무 분야</span>
+            <span class="value">개인 수신</span>
+          </div>
+        </div>
+
+        <div class="ticket-stats-grid">
+          <div class="stat-box">
+            <span class="stat-label">내 앞 대기인원</span>
+            <span class="stat-value" id="waiting-count">5명</span>
+          </div>
+          <div class="stat-line"></div>
+          <div class="stat-box">
+            <span class="stat-label">총 예상 대기시간</span>
+            <span class="stat-value highlight-time" id="waiting-time">약 15분</span>
+          </div>
+        </div>
+
+        <!-- 알림/소리 토글 -->
+        <div class="notification-toggle-wrapper">
+          <div class="toggle-info">
+            <i class="fa-solid fa-bell sound-icon animated-bell"></i>
+            <span class="toggle-label">내 순서 알림음 및 진동 알림 받기</span>
+          </div>
+          <label class="switch">
+            <input type="checkbox" id="sound-toggle" checked>
+            <span class="slider round"></span>
+          </label>
+        </div>
+
+        <!-- 순번 미루기 영역 (1회 한정) -->
+        <div class="delay-queue-wrapper">
+          <div class="delay-status-info">
+            <div class="delay-badge-container">
+              <span class="delay-badge" id="delay-status-badge">미루기 가능 (1회 한정)</span>
+            </div>
+            <p class="delay-desc">호출 직전까지 창구에 오시기 힘든 경우, 순번을 1회 뒤로 미룰 수 있습니다. (3명 뒤로 이동)</p>
+          </div>
+          <button class="delay-btn" id="delay-queue-btn">
+            <i class="fa-solid fa-arrows-spin"></i>
+            <span>대기 순번 미루기</span>
+          </button>
+        </div>
+      </section>
+
+      <!-- 스마트 예비 작성 섹션 (KB국민은행 스타일) -->
+      <section class="pre-writing-section animate-fade-in">
+        <button class="pre-writing-banner" id="pre-writing-accordion-btn">
+          <div class="banner-title-group">
+            <span class="badge-new">미리작성</span>
+            <span class="banner-title">창구 가기 전, 업무 서류 미리작성하기</span>
+          </div>
+          <i class="fa-solid fa-chevron-down arrow-icon" id="accordion-arrow"></i>
+        </button>
+
+        <div class="pre-writing-content collapsed" id="pre-writing-form-container">
+          <!-- 작성 방식 선택 서브 탭 -->
+          <div class="pre-writing-tabs">
+            <button class="pre-tab-btn active" data-pre-tab="form">업무 서류 작성</button>
+            <button class="pre-tab-btn" data-pre-tab="scan">송금전표 스캔 제출</button>
+          </div>
+
+          <!-- 1. 서류 직접 작성 탭 내용 -->
+          <div class="pre-tab-content" id="pre-tab-content-form">
+            <form id="pre-writing-form" onsubmit="event.preventDefault();">
+              <p class="form-desc">창구 방문 전에 미리 작성하시면 업무 처리 시간이 절반으로 단축됩니다.</p>
+              
+              <div class="form-group">
+                <label class="form-label">거래 구분</label>
+                <div class="form-radio-group">
+                  <label class="radio-card">
+                    <input type="radio" name="transaction-type" value="deposit" checked>
+                    <span class="radio-content">
+                      <i class="fa-solid fa-money-bill-transfer"></i>
+                      <span>입금/출금</span>
+                    </span>
+                  </label>
+                  <label class="radio-card">
+                    <input type="radio" name="transaction-type" value="account">
+                    <span class="radio-content">
+                      <i class="fa-solid fa-folder-open"></i>
+                      <span>통장 개설</span>
+                    </span>
+                  </label>
+                  <label class="radio-card">
+                    <input type="radio" name="transaction-type" value="card">
+                    <span class="radio-content">
+                      <i class="fa-solid fa-credit-card"></i>
+                      <span>카드 신청</span>
+                    </span>
+                  </label>
+                </div>
+              </div>
+
+              <div class="form-group">
+                <label for="user-name" class="form-label">고객 성명</label>
+                <input type="text" id="user-name" class="form-input" placeholder="성명을 입력해 주세요" required>
+              </div>
+
+              <div class="form-group">
+                <label for="transaction-amount" class="form-label" id="amount-label">거래 금액 (원)</label>
+                <input type="text" inputmode="numeric" id="transaction-amount" class="form-input" placeholder="금액을 입력해 주세요 (예: 50000)" required>
+                <div class="quick-amount-buttons">
+                  <button type="button" class="quick-btn" data-value="100000">10만</button>
+                  <button type="button" class="quick-btn" data-value="500000">50만</button>
+                  <button type="button" class="quick-btn" data-value="1000000">100만</button>
+                  <button type="button" class="quick-btn" data-value="5000000">500만</button>
+                </div>
+              </div>
+
+              <div class="form-group" id="account-field">
+                <label for="account-number" class="form-label">연계 계좌번호</label>
+                <input type="text" id="account-number" class="form-input" placeholder="계좌번호를 입력해 주세요 (- 제외)">
+              </div>
+
+              <div class="form-group checkbox-group">
+                <label class="checkbox-container">
+                  <input type="checkbox" id="agree-terms" required>
+                  <span class="checkmark"></span>
+                  <span class="checkbox-label">본인 확인 및 사전 전송 동의 (필수)</span>
+                </label>
+              </div>
+
+              <button type="submit" class="submit-form-btn">
+                <span>서류 임시 제출 완료</span>
+                <i class="fa-solid fa-arrow-right"></i>
+              </button>
+            </form>
+
+            <!-- 서류 제출 성공 메시지 -->
+            <div class="success-message-container hidden" id="success-message">
+              <div class="success-icon-wrapper">
+                <i class="fa-solid fa-circle-check"></i>
+              </div>
+              <h3>서류 미리작성 완료!</h3>
+              <p>번호표 호출 시 직원에 알려주시면 <br>빠르게 처리가 완료됩니다.</p>
+              <div class="submitted-info">
+                <div class="info-row">
+                  <span>작성자</span>
+                  <span id="display-name">-</span>
+                </div>
+                <div class="info-row">
+                  <span>신청 업무</span>
+                  <span id="display-job">입금/출금</span>
+                </div>
+              </div>
+              <button type="button" class="btn-secondary" id="edit-form-btn">수정하기</button>
+            </div>
+          </div>
+
+          <!-- 2. 수기 송금전표 스캔제출 탭 내용 -->
+          <div class="pre-tab-content hidden" id="pre-tab-content-scan">
+            <p class="form-desc">수기로 작성하신 송금 전표를 휴대폰 카메라로 촬영하면, 업무 처리 시간을 크게 줄일 수 있습니다.</p>
+            
+            <div id="scan-view-step1">
+              <!-- 모의 카메라 화면 프레임 -->
+              <div class="camera-viewfinder">
+                <!-- 모의 송금 전표 이미지 -->
+                <div class="mock-voucher-img" id="mock-voucher">
+                  <div class="voucher-header">
+                    <span class="voucher-title">송금 의뢰서 (전표)</span>
+                    <span class="voucher-logo">iM Bank</span>
+                  </div>
+                  <div class="voucher-body">
+                    <div class="voucher-row">
+                      <span class="voucher-label">보내는 분</span>
+                      <span class="voucher-value">홍길동 (1004번 고객)</span>
+                    </div>
+                    <div class="voucher-row">
+                      <span class="voucher-label">받는 분</span>
+                      <span class="voucher-value">이몽룡</span>
+                    </div>
+                    <div class="voucher-row">
+                      <span class="voucher-label">받는 은행</span>
+                      <span class="voucher-value">iM Bank (대구은행)</span>
+                    </div>
+                    <div class="voucher-row">
+                      <span class="voucher-label">계좌 번호</span>
+                      <span class="voucher-value">508-12-345678-9</span>
+                    </div>
+                    <div class="voucher-row" style="border-bottom: none;">
+                      <span class="voucher-label">송금 금액</span>
+                      <span class="voucher-value">금 1,000,000 원 (일백만 원)</span>
+                    </div>
+                  </div>
+                  <div class="voucher-stamp">송금직인</div>
+                </div>
+
+                <!-- 카메라 가이드라인 브라켓 -->
+                <div class="camera-guide"></div>
+                <div class="camera-guide-extra"></div>
+                
+                <!-- 레이저 스캐닝 빔 라인 -->
+                <div class="scan-laser" id="scan-laser-line"></div>
+              </div>
+
+              <button class="btn-scan-action btn-scan-primary" id="start-scan-btn">
+                <i class="fa-solid fa-camera"></i>
+                <span>송금 전표 카메라로 스캔하기</span>
+              </button>
+            </div>
+
+            <!-- 스캔 완료 및 OCR 결과 확인 영역 -->
+            <div class="ocr-result-container hidden" id="ocr-result-container">
+              <div class="ocr-result-title">
+                <i class="fa-solid fa-circle-check"></i>
+                <span>스캔 분석 결과 (OCR 추출 정보)</span>
+              </div>
+              
+              <div class="ocr-field-grid">
+                <span class="ocr-field-label">송금인</span>
+                <span class="ocr-field-value" id="ocr-sender">홍길동</span>
+                
+                <span class="ocr-field-label">수취인</span>
+                <span class="ocr-field-value" id="ocr-receiver">이몽룡</span>
+                
+                <span class="ocr-field-label">수취은행</span>
+                <span class="ocr-field-value" id="ocr-bank">iM Bank (대구은행)</span>
+                
+                <span class="ocr-field-label">계좌번호</span>
+                <span class="ocr-field-value" id="ocr-account">508-12-345678-9</span>
+                
+                <span class="ocr-field-label">송금액</span>
+                <span class="ocr-field-value" id="ocr-amount">1,000,000 원</span>
+              </div>
+
+              <p style="font-size: 11px; color: var(--cool-gray); text-align: center; margin-top: 6px;">* 인식된 내용이 맞는지 확인 후 제출해 주세요.</p>
+              
+              <div style="display: flex; gap: 8px; margin-top: 12px;">
+                <button class="btn-scan-action btn-scan-secondary" id="retry-scan-btn" style="flex: 1;">재촬영</button>
+                <button class="btn-scan-action btn-scan-primary" id="submit-ocr-btn" style="flex: 2;">창구로 전송 완료</button>
+              </div>
+            </div>
+
+            <!-- 창구 제출 성공 상태 -->
+            <div class="success-message-container hidden" id="scan-success-message">
+              <div class="success-icon-wrapper">
+                <i class="fa-solid fa-cloud-arrow-up"></i>
+              </div>
+              <h3>전표 전송 완료!</h3>
+              <p>송금 정보가 해당 창구로 정상 전송되었습니다.<br>차례가 되었을 때 직원에게 말씀해 주세요.</p>
+              <button type="button" class="btn-secondary" id="edit-scan-btn">다시 작성 / 재스캔</button>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- 업무별 필요 서류 체크리스트 섹션 -->
+      <section class="checklist-section animate-fade-in">
+        <button class="checklist-banner" id="checklist-accordion-btn">
+          <div class="banner-title-group">
+            <span class="badge-new" style="background-color: var(--brand-mint-light); color: var(--brand-mint-dark);">구비서류</span>
+            <span class="banner-title">업무별 필요 서류 체크리스트</span>
+          </div>
+          <i class="fa-solid fa-chevron-down arrow-icon" id="checklist-arrow"></i>
+        </button>
+
+        <div class="checklist-content collapsed" id="checklist-container">
+          <p class="form-desc">방문하시는 업무에 필요한 서류가 준비되었는지 확인해 보세요.</p>
+          
+          <!-- 탭 메뉴 -->
+          <div class="tab-menu">
+            <button class="tab-btn active" data-tab="card">카드 개설</button>
+            <button class="tab-btn" data-tab="bankbook">통장 발급</button>
+            <button class="tab-btn" data-tab="irp">퇴직연금</button>
+          </div>
+
+          <!-- 준비 상태 진척도 바 -->
+          <div class="progress-wrapper">
+            <div class="progress-info">
+              <span>서류 준비 상태</span>
+              <span class="progress-pct" id="checklist-progress-pct">0%</span>
+            </div>
+            <div class="progress-bar-bg">
+              <div class="progress-bar-fill" id="checklist-progress-bar"></div>
+            </div>
+          </div>
+
+          <!-- 체크리스트 내용 영역 -->
+          <div class="check-list" id="checklist-items">
+            <!-- JavaScript에서 동적으로 생성 예정 -->
+          </div>
+
+          <!-- AI 일괄 서류 진단 시작 버튼 -->
+          <div class="ai-batch-btn-wrapper" style="margin-top: 14px;">
+            <button type="button" class="btn-ai-batch-start" id="ai-batch-start-btn">
+              <i class="fa-solid fa-wand-magic-sparkles"></i>
+              <span>AI 일괄 서류 진단 시작</span>
+            </button>
+          </div>
+        </div>
+      </section>
+
+
+
+      <!-- 금융 성향 테스트 섹션 (인라인 아코디언 형태) -->
+      <section class="game-section-inline animate-fade-in" id="game-accordion-section">
+        <div class="game-section-header" id="game-accordion-header">
+          <div class="game-section-header-text">
+            <span class="game-section-subtitle">대기 시간 맞춤형 금융 진단 💡</span>
+            <h4 class="game-section-title">나의 맞춤 금융 성향 테스트</h4>
+          </div>
+          <div class="game-section-toggle-icon">
+            <i class="fa-solid fa-chevron-down"></i>
+          </div>
+        </div>
+        <div class="game-section-content hidden" id="game-accordion-content">
+          <!-- 인라인 퀴즈 바디 -->
+          <div class="game-body-inline">
+            <!-- 인트로 화면 (3대 카테고리 선택 리스트) -->
+            <div class="quiz-intro" id="quiz-intro-box">
+              <div class="quiz-intro-header">
+                <i class="fa-solid fa-lightbulb quiz-intro-icon"></i>
+                <h4>나에게 맞는 스마트한 상품 추천 진단</h4>
+                <p class="quiz-intro-desc">아래의 카테고리 중 진단받고 싶은 금융 성향을 선택해 주세요.</p>
+              </div>
+              
+              <div class="quiz-category-grid">
+                <div class="category-card" data-category="card">
+                  <div class="category-icon-box">
+                    <i class="fa-solid fa-credit-card"></i>
+                  </div>
+                  <div class="category-info">
+                    <span class="category-title">카드 성향 진단</span>
+                    <span class="category-desc">나의 일상 소비 영역에 맞춘 원픽 카드 매칭</span>
+                  </div>
+                  <i class="fa-solid fa-chevron-right category-arrow"></i>
+                </div>
+                                
+                <div class="category-card" data-category="deposit">
+                  <div class="category-icon-box" style="background-color: #FFF9E6; color: #E2A300;">
+                    <i class="fa-solid fa-piggy-bank"></i>
+                  </div>
+                  <div class="category-info">
+                    <span class="category-title">예적금 성향 진단</span>
+                    <span class="category-desc">계획 vs 자유, 자금 적립 습관별 상품 진단</span>
+                  </div>
+                  <i class="fa-solid fa-chevron-right category-arrow"></i>
+                </div>
+              </div>
+            </div>
+
+            <!-- 퀴즈 단계 화면 -->
+            <div class="quiz-card hidden" id="quiz-card-box">
+              <div class="quiz-progress">
+                <span id="quiz-step-indicator">질문 1 of 5</span>
+                <span id="quiz-progress-percent">20%</span>
+              </div>
+              <h3 class="quiz-question" id="quiz-question-text">질문 내용</h3>
+              <div class="quiz-options" id="quiz-options-box">
+                <!-- 옵션 버튼 동적 생성 -->
+              </div>
+            </div>
+
+            <!-- 테스트 결과 화면 -->
+            <div class="result-card hidden" id="quiz-result-box">
+              <span class="result-badge">테스트 결과</span>
+              <h3 class="result-type" id="result-type-name">성향 분석 결과</h3>
+              <p class="result-desc" id="result-type-desc">성향 설명이 들어가는 부분입니다.</p>
+              
+              <h4 class="recommended-title"><i class="fa-solid fa-gift"></i> 추천 금융 상품</h4>
+              
+              <!-- 추천 상품 목록 컨테이너 -->
+              <div class="recommended-products-container" id="recommended-products-container">
+                <!-- 동적으로 생성된 product-card 요소들이 삽입됩니다 -->
+              </div>
+
+              <button class="btn-scan-action btn-scan-secondary" id="restart-quiz-btn" style="margin-top: 12px;">테스트 다시 하기</button>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- 추가 안내 사항 -->
+      <section class="notice-section animate-fade-in">
+        <h4><i class="fa-solid fa-circle-info"></i> 이용 안내 및 유의사항</h4>
+        <ul>
+          <li>대기인원은 매순간의 영업점 혼잡도에 따라 실시간 변동될 수 있습니다.</li>
+          <li>창구에서 호출 시 부재중일 경우, 자동 취소처리되어 다시 번호표를 발급받으셔야 합니다.</li>
+          <li>소리 및 진동 알림은 브라우저 탭 활성화 상태 및 권한 허용 여부에 따라 원활하지 않을 수 있으니 주기적으로 화면을 확인해 주세요.</li>
+        </ul>
+      </section>
+    </main>
+  </div> <!-- Ends .mobile-web-container -->
+
+  <!-- 하단 고정 CTA 버튼 바 -->
+  <footer class="app-footer">
+    <div class="footer-btn-container">
+      <button class="footer-btn-refresh" id="refresh-bottom-btn-2" aria-label="실시간 대기 갱신">
+        <i class="fa-solid fa-arrows-rotate" id="refresh-icon-2"></i>
+      </button>
+      <button class="footer-btn-sms" id="sms-alert-btn">
+        <i class="fa-solid fa-sms"></i>
+        <span>문자 알림받기</span>
+      </button>
+      <button class="footer-btn-primary" id="kakaotalk-btn">
+        <i class="fa-solid fa-comment"></i>
+        <span>카톡 알림받기</span>
+      </button>
+    </div>
+  </footer>
+
+  <!-- 토스트 알림창 -->
+  <div id="toast" class="toast hidden">대기 정보가 성공적으로 갱신되었습니다.</div>
+
+  <!-- 카카오톡 알림신청 모달 -->
+  <div id="kakao-modal" class="modal-overlay hidden">
+    <div class="modal-content animate-slide-up">
+      <div class="modal-header">
+        <div class="modal-header-title">
+          <i class="fa-solid fa-comment kakao-icon"></i>
+          <h3>카카오톡 대기 알림 신청</h3>
+        </div>
+        <button class="close-btn" id="close-modal-btn">&times;</button>
+      </div>
+      <div class="modal-body">
+        <p class="modal-desc">내 차례가 오기 전 (대기 인원 2명 남았을 때) 카카오톡 알림톡으로 미리 발송해 드립니다.</p>
+        <div class="input-phone-group">
+          <label for="phone-number" class="form-label">휴대폰 번호</label>
+          <input type="tel" id="phone-number" class="form-input" placeholder="010-0000-0000" value="010-1004-5852" required>
+        </div>
+        <p class="modal-note">* 알림톡 서비스는 입력하신 번호로 1회성 안내만 전송하며 대기 완료 후 즉시 폐기됩니다.</p>
+      </div>
+      <div class="modal-footer">
+        <button class="btn-cancel" id="cancel-modal-btn">취소</button>
+        <button class="btn-confirm" id="confirm-modal-btn">알림 받기 신청</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 문자(SMS) 대기 알림신청 모달 -->
+  <div id="sms-modal" class="modal-overlay hidden">
+    <div class="modal-content animate-slide-up">
+      <div class="modal-header">
+        <div class="modal-header-title">
+          <i class="fa-solid fa-sms sms-modal-icon"></i>
+          <h3>문자 대기 알림 신청</h3>
+        </div>
+        <button class="close-btn" id="close-sms-modal-btn">&times;</button>
+      </div>
+      <div class="modal-body">
+        <p class="modal-desc">내 차례가 오기 전 (대기 인원 2명 남았을 때) 입력하신 번호로 문자 메시지를 발송해 드립니다.</p>
+        <div class="input-phone-group">
+          <label for="sms-phone-number" class="form-label">휴대폰 번호</label>
+          <input type="tel" id="sms-phone-number" class="form-input" placeholder="010-0000-0000" value="010-1004-5852" required>
+        </div>
+        <p class="modal-note">* 입력하신 번호는 대기 알림 발송 후 즉시 폐기됩니다.</p>
+      </div>
+      <div class="modal-footer">
+        <button class="btn-cancel" id="cancel-sms-modal-btn">취소</button>
+        <button class="btn-confirm" id="confirm-sms-modal-btn" style="background-color: var(--brand-mint);">알림 받기 신청</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 대기 순번 미루기 커스텀 안내창 모달 -->
+  <div id="delay-confirm-modal" class="modal-overlay hidden">
+    <div class="modal-content animate-slide-up">
+      <div class="modal-header">
+        <div class="modal-header-title">
+          <i class="fa-solid fa-circle-question delay-modal-icon"></i>
+          <h3>대기 순번 미루기</h3>
+        </div>
+        <button class="close-btn" id="close-delay-modal-btn">&times;</button>
+      </div>
+      <div class="modal-body">
+        <p class="modal-desc" style="font-weight: 700; color: var(--dark-text); font-size: 14px;">현재 대기 순번을 약 3명 뒤로 미루시겠습니까?</p>
+        <p class="modal-note" style="margin-top: 8px; color: var(--warning-red); font-weight: 500;">* 순번 미루기는 1회에 한해서만 가능하며 다시 취소할 수 없습니다.</p>
+      </div>
+      <div class="modal-footer" style="grid-template-columns: 1fr 1.5fr;">
+        <button class="btn-cancel" id="cancel-delay-modal-btn">아니오</button>
+        <button class="btn-confirm" id="confirm-delay-modal-btn" style="background-color: var(--brand-mint);">예, 미루겠습니다</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- AI 서류 스캔 모달 (일괄 스캔 개정) -->
+  <div id="ai-scan-modal" class="modal-overlay hidden">
+    <div class="modal-content animate-slide-up">
+      <div class="modal-header">
+        <div class="modal-header-title">
+          <i class="fa-solid fa-wand-magic-sparkles ai-modal-icon" style="color: var(--brand-mint-dark); font-size: 16px;"></i>
+          <h3 style="font-size: 15px; font-weight: 700;">AI 서류 적합성 진단</h3>
+        </div>
+        <button class="close-btn" id="close-ai-modal-btn">&times;</button>
+      </div>
+      <div class="modal-body" style="padding: 16px;">
+        <!-- [1단계] 연속 카메라 스캔 촬영 화면 -->
+        <div id="ai-scan-step-camera">
+          <div class="ai-scan-progress-header" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+            <span id="ai-batch-step-text" style="font-size: 11px; font-weight: bold; color: var(--brand-mint-dark);">단계: 1 / 3</span>
+            <span id="ai-batch-step-percent" style="font-size: 11px; color: var(--cool-gray);">33%</span>
+          </div>
+          <p class="modal-desc" id="ai-scan-doc-target-name" style="font-weight: 700; color: var(--dark-text); font-size: 13px; text-align: center; margin-bottom: 12px; height: 18px;">서류 명칭</p>
+          
+          <!-- 모의 카메라 화면 프레임 -->
+          <div class="camera-viewfinder" style="height: 180px;">
+            <!-- 가상 서류 견본 -->
+            <div class="mock-document-view" id="ai-mock-document">
+              <!-- JS 동적 내용 -->
+            </div>
+            <!-- 카메라 가이드라인 브라켓 -->
+            <div class="camera-guide"></div>
+            <!-- 레이저 스캐닝 빔 라인 -->
+            <div class="scan-laser" id="ai-scan-laser-line"></div>
+          </div>
+          
+          <button class="btn-scan-action btn-scan-primary" id="ai-start-scan-btn" style="margin-top: 12px; background-color: var(--brand-mint-dark); width: 100%;">
+            <i class="fa-solid fa-camera"></i>
+            <span>스캔 후 다음 서류 촬영</span>
+          </button>
+        </div>
+
+        <!-- [2단계] AI 종합 분석 결과 확인 영역 -->
+        <div class="ocr-result-container hidden" id="ai-result-container">
+          <div class="ocr-result-title" id="ai-result-status-title" style="justify-content: center; font-size: 15px; font-weight: 800; color: var(--brand-mint-dark); margin-bottom: 12px;">
+            <i class="fa-solid fa-chart-simple" style="margin-right: 6px;"></i>AI 일괄 진단 결과 리포트
+          </div>
+          
+          <!-- 종합 통계 박스 -->
+          <div class="ai-batch-summary-box" style="background: linear-gradient(135deg, var(--brand-mint-light) 0%, #FAFDFB 100%); border: 1px solid rgba(0, 199, 169, 0.2); padding: 12px; border-radius: 12px; text-align: center; margin-bottom: 14px;">
+            <span style="font-size: 11px; color: var(--cool-gray); font-weight: 500;">서류 준비 현황</span>
+            <h4 id="ai-batch-summary-text" style="font-size: 16px; font-weight: 800; color: var(--dark-text); margin: 4px 0;">3개 중 2개 서류 준비 완료</h4>
+            <div style="font-size: 12px; color: var(--brand-mint-dark); font-weight: 700;" id="ai-batch-summary-pct">준비율 66%</div>
+          </div>
+
+          <!-- 개별 서류 진단 리스트 -->
+          <div class="ai-batch-result-list" id="ai-batch-result-list" style="display: flex; flex-direction: column; gap: 8px; margin-bottom: 16px; text-align: left; max-height: 180px; overflow-y: auto; padding-right: 4px;">
+            <!-- JS 동적 생성 (적합/부적합 항목 리스트) -->
+          </div>
+          
+          <div style="display: flex; gap: 8px; margin-top: 12px;">
+            <button class="btn-scan-action btn-scan-secondary" id="ai-retry-scan-btn" style="flex: 1;">재촬영</button>
+            <button class="btn-scan-action btn-scan-primary" id="ai-confirm-btn" style="flex: 2; background-color: var(--brand-mint-dark);">결과 적용하기</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+<script src="app.js"></script>
+</body>
+</html>

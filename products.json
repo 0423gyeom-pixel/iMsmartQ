@@ -1,0 +1,75 @@
+[
+  {
+    "id": "im-i-card",
+    "category": "카드",
+    "name": "iM i 카드",
+    "rate": "-",
+    "benefit": "온라인 쇼핑, 배달앱, 커피, 편의점, 통신비 10% 집중 청구할인을 제공하는 디지털 실속형 카드",
+    "icon": "fa-solid fa-credit-card",
+    "image": "./im_i_card.png",
+    "matchTypes": ["smart"],
+    "lastUpdated": "2026-07-14 21:10"
+  },
+  {
+    "id": "im-z-card",
+    "category": "카드",
+    "name": "iM Z 체크카드",
+    "rate": "-",
+    "benefit": "전월 실적 조건 없이 쓸 때마다 즉시 무제한 할인/적립을 제공하는 심플한 생활 체크카드",
+    "icon": "fa-solid fa-credit-card",
+    "image": "./im_one_card.png",
+    "matchTypes": ["simple"],
+    "lastUpdated": "2026-07-14 21:10"
+  },
+  {
+    "id": "im-yplus-card",
+    "category": "카드",
+    "name": "Master Y+ 체크카드",
+    "rate": "-",
+    "benefit": "해외 가맹점 및 직구 수수료 캐시백과 인천공항 라운지 무료 이용이 포함된 여행 글로벌 전용 체크카드",
+    "icon": "fa-solid fa-credit-card",
+    "image": "./im_travel_card.png",
+    "matchTypes": ["travel"],
+    "lastUpdated": "2026-07-14 21:10"
+  },
+  {
+    "id": "im-seven-savings",
+    "category": "적금",
+    "name": "세븐적금",
+    "rate": "최고 연 4.0%",
+    "benefit": "7개월 만기 구성으로 매주 부담 없는 소액 자동이체를 통해 쉽고 유연하게 목표 목돈을 만드는 자유적금",
+    "icon": "fa-solid fa-piggy-bank",
+    "matchTypes": ["savings"],
+    "lastUpdated": "2026-07-14 21:10"
+  },
+  {
+    "id": "im-hotple-savings",
+    "category": "적금",
+    "name": "iM핫플적금",
+    "rate": "최고 연 4.5%",
+    "benefit": "대구·경북 주요 관광지 및 명소를 여행하며 앱 내 위치인증 미션 완수 시 풍성한 우대금리를 획득하는 참여형 적금",
+    "icon": "fa-solid fa-route",
+    "matchTypes": ["challenger"],
+    "lastUpdated": "2026-07-14 21:10"
+  },
+  {
+    "id": "im-main-deposit",
+    "category": "예금",
+    "name": "iM주거래우대예금",
+    "rate": "최고 연 3.4%",
+    "benefit": "기본 금리에 더해 주거래 조건(급여이체, 카드실적) 충족 시 우대 금리를 제공하는 거치식 정기예금",
+    "icon": "fa-solid fa-vault",
+    "matchTypes": ["deposit"],
+    "lastUpdated": "2026-07-14 21:10"
+  },
+  {
+    "id": "im-salary-bankbook",
+    "category": "예금",
+    "name": "직장인우대통장",
+    "rate": "수수료 면제",
+    "benefit": "급여 이체 우대실적 충족 시 인터넷 뱅킹 이체 및 DGB CD기 출금 수수료를 전면 면제하는 우대 금리 입출금통장",
+    "icon": "fa-solid fa-wallet",
+    "matchTypes": ["deposit"],
+    "lastUpdated": "2026-07-14 21:10"
+  }
+]
