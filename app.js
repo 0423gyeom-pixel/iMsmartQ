@@ -161,39 +161,6 @@ document.addEventListener('DOMContentLoaded', async () => {
   // Load products initially
   await loadProducts();
 
-  // --- 1-2. 기기 규격 대응: PC/태블릿에서 폰 프레임 비율 유지 축소 ---
-  // 모바일(<=600px)은 화면을 꽉 채우고, 그 이상에서는 390x844 논리 해상도를
-  // 유지한 채 브라우저 창 크기에 맞춰 프레임 전체를 통째로 스케일링한다.
-  const FRAME_LOGICAL_W = 416; // 390 + 좌우 베젤
-  const FRAME_LOGICAL_H = 870; // 844 + 상하 베젤
-
-  function fitDeviceFrame() {
-    const root = document.documentElement;
-
-    if (window.innerWidth <= 600) {
-      root.style.setProperty('--frame-zoom', '1');
-      return;
-    }
-
-    const margin = window.innerHeight < 700 ? 24 : 48;
-    const scale = Math.min(
-      1,
-      (window.innerHeight - margin) / FRAME_LOGICAL_H,
-      (window.innerWidth - margin) / FRAME_LOGICAL_W
-    );
-
-    root.style.setProperty('--frame-zoom', Math.max(0.45, Number(scale.toFixed(4))).toString());
-  }
-
-  fitDeviceFrame();
-
-  let frameResizeTimer = null;
-  window.addEventListener('resize', () => {
-    if (frameResizeTimer) cancelAnimationFrame(frameResizeTimer);
-    frameResizeTimer = requestAnimationFrame(fitDeviceFrame);
-  });
-  window.addEventListener('orientationchange', fitDeviceFrame);
-
   // --- 2. Initialize Virtual Clock & Initial Timestamp ---
   function updateClock() {
     const now = new Date();

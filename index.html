@@ -13,7 +13,7 @@
   <!-- FontAwesome for icons -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <!-- v 파라미터: 배포/수정 시 값을 올려 브라우저 CSS 캐시를 무효화 -->
-  <link rel="stylesheet" href="style.css?v=20260818d">
+  <link rel="stylesheet" href="style.css?v=20260818e">
 </head>
 <body>
   <div class="mobile-web-container">
@@ -103,7 +103,10 @@
               <path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"></path>
             </svg>
           </div>
-          <span class="quick-card-title">미리작성</span>
+          <span class="quick-card-text">
+            <span class="quick-card-title">미리작성</span>
+            <span class="quick-card-desc">방문 전 서류를 미리 작성해 창구 처리 시간을 절반으로 단축합니다.</span>
+          </span>
         </button>
         <button class="quick-card-btn" id="btn-quick-checklist">
           <div class="quick-card-icon-wrapper checklist">
@@ -112,7 +115,10 @@
               <path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"></path>
             </svg>
           </div>
-          <span class="quick-card-title">체크리스트</span>
+          <span class="quick-card-text">
+            <span class="quick-card-title">체크리스트</span>
+            <span class="quick-card-desc">업무별 필요 서류를 확인하고 AI 일괄 진단으로 적합성을 점검합니다.</span>
+          </span>
         </button>
         <button class="quick-card-btn" id="btn-quick-scan">
           <div class="quick-card-icon-wrapper scan">
@@ -124,7 +130,10 @@
               <polyline points="10 9 9 9 8 9"></polyline>
             </svg>
           </div>
-          <span class="quick-card-title">송금전표</span>
+          <span class="quick-card-text">
+            <span class="quick-card-title">송금전표</span>
+            <span class="quick-card-desc">수기로 작성한 전표를 촬영하면 내용을 자동으로 인식해 전송합니다.</span>
+          </span>
         </button>
         <button class="quick-card-btn" id="btn-quick-financial-test">
           <div class="quick-card-icon-wrapper investment">
@@ -135,8 +144,22 @@
               <line x1="8" y1="11" x2="14" y2="11"></line>
             </svg>
           </div>
-          <span class="quick-card-title">금융성향 테스트</span>
+          <span class="quick-card-text">
+            <span class="quick-card-title">금융성향 테스트</span>
+            <span class="quick-card-desc">5문항 간단 진단으로 나에게 맞는 카드·예적금 상품을 추천받습니다.</span>
+          </span>
         </button>
+      </section>
+
+      <!-- 이용 안내: 데스크톱/태블릿에서만 노출 (모바일은 헤더 ⓘ 모달로 대체) -->
+      <section class="notice-section">
+        <h4><i class="fa-solid fa-circle-info"></i> 이용 안내 및 유의사항</h4>
+        <ul>
+          <li>대기인원은 매순간의 영업점 혼잡도에 따라 실시간 변동될 수 있습니다.</li>
+          <li>창구에서 호출 시 부재중일 경우, 자동 취소처리되어 다시 번호표를 발급받으셔야 합니다.</li>
+          <li>소리 및 진동 알림은 브라우저 탭 활성화 상태 및 권한 허용 여부에 따라 원활하지 않을 수 있으니 주기적으로 화면을 확인해 주세요.</li>
+          <li>순번 미루기는 1회에 한해 가능하며 3명 뒤로 이동합니다. 대기 인원이 3명 이하일 때는 미룰 수 없습니다.</li>
+        </ul>
       </section>
 
     </main>
@@ -650,6 +673,6 @@
 
   </div> <!-- Ends .mobile-web-container (푸터/토스트/모달까지 모두 포함하여 PC 폰 프레임 안에 갇히도록 함) -->
 
-<script src="app.js?v=20260818d"></script>
+<script src="app.js?v=20260818e"></script>
 </body>
 </html>

@@ -3252,87 +3252,360 @@ input:checked + .slider:before {
   color: var(--brand-mint);
 }
 
+
+/* 모바일에서는 데스크톱 전용 요소 숨김 */
+.quick-card-desc,
+.notice-section {
+  display: none;
+}
+
 /* ==========================================================================
-   DESKTOP / TABLET — 기기 프레임 반응형 (601px 이상)
-   390 x 844 논리 해상도의 프레임을 중앙 배치하고, app.js가 계산한
-   --frame-zoom 으로 브라우저 창 크기에 맞춰 통째로 비율 유지 축소·확대한다.
-   프레임 내부는 항상 논리 844px 기준이므로 cqh 비례가 그대로 유지됨.
+   TABLET & DESKTOP — 일반 웹사이트 레이아웃 (601px 이상)
+   모바일의 "한 화면 무스크롤 + 폰 비율" 제약을 해제하고
+   상단 고정 헤더 / 중앙 정렬 콘텐츠 / 사이트 푸터 구조로 전환한다.
    ========================================================================== */
 
 @media (min-width: 601px) {
+  html,
   body {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    background-color: #DDE2E5;
-    background-image:
-      radial-gradient(circle at 50% 0%, rgba(0, 199, 169, 0.10) 0%, rgba(0, 199, 169, 0) 55%),
-      linear-gradient(160deg, #EDF1F2 0%, #DDE2E5 100%);
-    overflow: hidden;
+    height: auto;
+    min-height: 100%;
+    overflow: visible;
+    overflow-x: hidden;
   }
 
+  body {
+    display: block;
+    background-color: #F1F4F5;
+  }
+
+  /* 컨테이너 쿼리 해제: 이하 모든 크기는 px로 재정의 */
   .mobile-web-container {
-    zoom: var(--frame-zoom, 1);
-    width: 390px;
-    max-width: 390px;
-    height: 844px;
-    flex: 0 0 auto;
-    border-radius: 46px;
-    overflow: hidden;
-    box-shadow:
-      0 0 0 11px #17191C,
-      0 0 0 13px #33383E,
-      0 26px 56px rgba(0, 0, 0, 0.30),
-      0 6px 16px rgba(0, 0, 0, 0.16);
+    container-type: normal;
+    width: 100%;
+    max-width: none;
+    height: auto;
+    min-height: 100vh;
+    min-height: 100dvh;
+    display: flex;
+    flex-direction: column;
+    overflow: visible;
+    background-color: transparent;
+    box-shadow: none;
+    border-radius: 0;
   }
 
-  /* 다이나믹 아일랜드 형태의 상단 노치 */
-  .mobile-web-container::before {
-    content: "";
-    position: absolute;
-    top: 9px;
-    left: 50%;
-    transform: translateX(-50%);
-    width: 96px;
-    height: 24px;
-    background-color: #17191C;
-    border-radius: 14px;
-    z-index: 8000;
-    pointer-events: none;
-  }
-
+  /* ---------------------------------------------------- 상단 고정 헤더 */
   .app-header {
-    padding-top: 30px;
+    position: sticky;
+    top: 0;
+    z-index: 500;
+    background-color: rgba(255, 255, 255, 0.92);
+    backdrop-filter: saturate(180%) blur(12px);
+    -webkit-backdrop-filter: saturate(180%) blur(12px);
+    border-bottom: 1px solid var(--light-gray);
+    padding: 0;
   }
 
-  /* 하단 홈 인디케이터 */
+  .web-title-bar {
+    width: 100%;
+    max-width: 1160px;
+    margin: 0 auto;
+    padding: 16px 28px;
+    border-bottom: none;
+  }
+
+  .web-title-text {
+    font-size: 20px;
+    gap: 9px;
+  }
+
+  .web-title-text i {
+    font-size: 19px;
+  }
+
+  .header-bottom {
+    gap: 8px;
+  }
+
+  .timestamp {
+    font-size: 13px;
+  }
+
+  .header-info-btn {
+    font-size: 18px;
+    padding-left: 4px;
+  }
+
+  /* ------------------------------------------------ 본문 (2단 그리드) */
+  .app-content {
+    display: grid;
+    width: 100%;
+    max-width: 1160px;
+    margin: 0 auto;
+    flex: 1 1 auto;
+    padding: 32px 28px 44px;
+    gap: 24px;
+    grid-template-columns: minmax(0, 1fr);
+    grid-template-areas:
+      "ticket"
+      "quick"
+      "notice";
+    align-content: start;
+    overflow: visible;
+    background-color: transparent;
+  }
+
+  .ticket-card { grid-area: ticket; }
+  .quick-menu-grid { grid-area: quick; }
+  .notice-section { grid-area: notice; display: block; }
+
+  /* ---------------------------------------------------- 번호표 카드 */
+  .ticket-card {
+    flex: none;
+    background-color: var(--white);
+    border: 1px solid var(--light-gray);
+    padding: 28px 30px;
+    border-radius: 20px;
+    gap: 20px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.04);
+  }
+
+  .ticket-branch {
+    font-size: 14px;
+    padding: 7px 14px;
+  }
+
+  .ticket-branch i { font-size: 13px; }
+
+  .ticket-status-badge,
+  .qr-verify-badge {
+    font-size: 13px;
+    padding: 6px 12px;
+  }
+
+  .qr-verify-badge i { font-size: 12px; }
+
+  .ticket-number-label { font-size: 15px; }
+  .highlight-num { font-size: 56px; }
+
+  .accent-backdrop-container {
+    padding: 14px 26px;
+    border-radius: 14px;
+  }
+
+  .business-category .label { font-size: 13px; }
+  .business-category .value { font-size: 28px; }
+
+  .ticket-stats-grid { padding: 20px 0; }
+  .stat-line { height: 46px; }
+  .stat-label { font-size: 14px; }
+  .stat-value { font-size: 28px; }
+
+  .ticket-action-row { gap: 14px; }
+
+  .notification-toggle-wrapper {
+    padding: 14px 18px;
+    border-radius: 14px;
+    background-color: var(--card-bg);
+  }
+
+  .sound-icon { font-size: 20px; }
+  .toggle-label { font-size: 15px; }
+
+  .switch { width: 50px; height: 28px; }
+
+  .delay-btn {
+    padding: 14px 22px;
+    font-size: 15px;
+    border-radius: 14px;
+  }
+
+  .delay-btn i { font-size: 16px; }
+
+  .delay-btn .delay-badge {
+    font-size: 11px;
+    border-color: var(--white);
+  }
+
+  /* ------------------------------------------- 퀵 메뉴 (가로형 카드) */
+  .quick-menu-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    grid-template-rows: none;
+    gap: 16px;
+    max-height: none;
+    flex: none;
+  }
+
+  .quick-card-btn {
+    container-type: normal;
+    flex-direction: row;
+    align-items: center;
+    justify-content: flex-start;
+    text-align: left;
+    gap: 18px;
+    padding: 22px 24px;
+    border-radius: 18px;
+    min-height: 0;
+  }
+
+  .quick-card-icon-wrapper {
+    width: 62px;
+    height: 62px;
+    border-radius: 18px;
+    margin-bottom: 0;
+    flex-shrink: 0;
+  }
+
+  .quick-svg-icon { width: 32px; height: 32px; }
+
+  .quick-card-text {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 5px;
+    min-width: 0;
+  }
+
+  .quick-card-title {
+    font-size: 17px;
+    text-align: left;
+  }
+
+  .quick-card-desc {
+    display: block;
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--cool-gray);
+    line-height: 1.5;
+    letter-spacing: -0.3px;
+    text-align: left;
+  }
+
+  /* --------------------------------------------------- 이용 안내 카드 */
+  .notice-section {
+    background-color: var(--white);
+    border: 1px solid var(--light-gray);
+    border-radius: 18px;
+    padding: 20px 26px;
+  }
+
+  .notice-section h4 {
+    font-size: 15px;
+    margin-bottom: 12px;
+  }
+
+  .notice-section ul { gap: 8px; }
+
+  .notice-section li {
+    font-size: 13px;
+    line-height: 1.6;
+    padding-left: 12px;
+  }
+
+  /* -------------------------------------------------------- 사이트 푸터 */
   .app-footer {
-    padding-bottom: 18px;
+    position: sticky;
+    bottom: 0;
+    z-index: 400;
+    background-color: rgba(255, 255, 255, 0.94);
+    backdrop-filter: saturate(180%) blur(12px);
+    -webkit-backdrop-filter: saturate(180%) blur(12px);
+    border-top: 1px solid var(--light-gray);
+    box-shadow: 0 -2px 14px rgba(0, 0, 0, 0.04);
+    padding: 0;
   }
 
-  .app-footer::after {
+  .footer-btn-container {
+    width: 100%;
+    max-width: 1160px;
+    margin: 0 auto;
+    padding: 14px 28px;
+    justify-content: flex-end;
+    gap: 10px;
+  }
+
+  /* 좌측 안내 문구 (넓은 화면에서만 노출) */
+  .footer-btn-container::before {
     content: "";
-    position: absolute;
-    bottom: 7px;
-    left: 50%;
-    transform: translateX(-50%);
-    width: 118px;
-    height: 4px;
-    background-color: #C6CBCF;
-    border-radius: 4px;
+    margin-right: auto;
   }
 
+  .footer-btn-refresh {
+    width: 48px;
+    height: 48px;
+    border-radius: 12px;
+    font-size: 17px;
+    flex: none;
+  }
+
+  .footer-btn-sms,
+  .footer-btn-primary {
+    flex: none;
+    min-width: 168px;
+    height: 48px;
+    border-radius: 12px;
+    font-size: 14.5px;
+    gap: 7px;
+  }
+
+  /* ------------------------------------------- 모달·토스트 (뷰포트 기준) */
   .modal-overlay {
-    border-radius: 46px;
+    position: fixed;
+    border-radius: 0;
+  }
+
+  .toast {
+    position: fixed;
+    bottom: 96px;
   }
 }
 
-/* 폭은 넓지만 창 높이가 매우 낮은 경우 프레임 장식만 단순화 */
-@media (min-width: 601px) and (max-height: 560px) {
-  .mobile-web-container { border-radius: 34px; }
-  .mobile-web-container::before { display: none; }
-  .app-header { padding-top: 0; }
-  .modal-overlay { border-radius: 34px; }
+/* ---------------------------------- 데스크톱: 2단 그리드로 전환 (1024px~) */
+@media (min-width: 1024px) {
+  .app-content {
+    grid-template-columns: minmax(0, 1.05fr) minmax(0, 1fr);
+    grid-template-areas:
+      "ticket quick"
+      "notice quick";
+    gap: 22px 26px;
+    padding: 32px 28px 36px;
+  }
+
+  /* 우측 컬럼: 좌측(번호표+안내) 높이에 맞춰 카드 4장이 균등하게 늘어남 */
+  .quick-menu-grid {
+    grid-template-columns: minmax(0, 1fr);
+    grid-auto-rows: minmax(96px, 1fr);
+    align-content: stretch;
+  }
+
+  .ticket-card { padding: 32px 34px; }
+
+  .footer-btn-container::before {
+    content: "실시간 대기 정보는 영업점 혼잡도에 따라 변동될 수 있습니다.";
+    font-size: 13px;
+    color: var(--cool-gray);
+    font-weight: 500;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .highlight-num { font-size: 62px; }
+  .business-category .value { font-size: 30px; }
+  .stat-value { font-size: 30px; }
+}
+
+/* ------------------------------- 초광폭 화면: 콘텐츠 폭만 소폭 확장 */
+@media (min-width: 1600px) {
+  .web-title-bar,
+  .app-content,
+  .footer-btn-container {
+    max-width: 1280px;
+  }
+
+  .highlight-num { font-size: 68px; }
 }
 
 /* 컨테이너 쿼리 미지원 구형 브라우저 대비 최소 안전값 */
