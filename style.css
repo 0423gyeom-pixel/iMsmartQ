@@ -2846,12 +2846,37 @@ body {
   overscroll-behavior: none;
 }
 
+/* 푸터/토스트/모달이 모두 이 컨테이너의 자식이므로 position 기준점 역할을 함 */
 .mobile-web-container {
+  position: relative;
+  width: 100%;
+  max-width: none;
   height: 100vh;
   height: 100dvh;
   min-height: 0;
   overflow: hidden;
-  padding-bottom: calc(var(--footer-h) + env(safe-area-inset-bottom, 0px));
+  padding-bottom: 0;
+  box-shadow: none;
+}
+
+/* 푸터는 fixed가 아니라 컨테이너 안의 flex 자식으로 배치 */
+.app-footer {
+  position: static;
+  left: auto;
+  bottom: auto;
+  transform: none;
+  width: 100%;
+  max-width: none;
+  flex: 0 0 auto;
+}
+
+/* 모달·토스트도 뷰포트가 아닌 컨테이너 기준으로 고정 */
+.modal-overlay {
+  position: absolute;
+}
+
+.toast {
+  position: absolute;
 }
 
 /* --- 헤더: 1줄 압축 --- */
@@ -2924,7 +2949,7 @@ body {
 .ticket-card {
   flex: 1 1 auto;
   min-height: 0;
-  max-height: 360px;
+  max-height: 320px;
   align-items: stretch;
   justify-content: space-between;
   padding: 12px 14px;
@@ -3126,10 +3151,12 @@ input:checked + .slider:before {
 
 /* --- 2x2 퀵 메뉴: 남은 공간을 채움 --- */
 .quick-menu-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  grid-template-rows: repeat(2, minmax(0, 1fr));
   flex: 1.2 1 auto;
   min-height: 0;
   max-height: 340px;
-  grid-template-rows: repeat(2, minmax(0, 1fr));
   gap: 10px;
   margin: 0;
 }
@@ -3209,7 +3236,8 @@ input:checked + .slider:before {
 }
 
 /* --- 초소형 화면 (iPhone SE 이하) 추가 압축 --- */
-@media (max-height: 640px) {
+/* PC 프레임은 논리 높이가 항상 844px이므로 실제 모바일 폭에서만 적용 */
+@media (max-width: 600px) and (max-height: 640px) {
   .highlight-num { font-size: 26px; }
   .highlight-num em { font-size: 14px; }
   .business-category .value { font-size: 14px; }
@@ -3220,4 +3248,102 @@ input:checked + .slider:before {
   .quick-svg-icon { width: 19px; height: 19px; }
   .quick-card-title { font-size: 11.5px; }
   .quick-menu-grid { gap: 8px; }
+}
+
+/* ==========================================================================
+   DESKTOP / TABLET — 기기 프레임 반응형 (601px 이상)
+   넓은 화면에서는 모바일 비율(390 x 844)의 기기 프레임을 중앙에 배치하고,
+   app.js가 --frame-zoom 을 계산해 브라우저 창 크기에 맞춰 통째로 축소·확대함.
+   (JS가 동작하지 않아도 프레임 자체는 정상 표시됨)
+   ========================================================================== */
+
+@media (min-width: 601px) {
+  body {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: #DDE2E5;
+    background-image:
+      radial-gradient(circle at 50% 0%, rgba(0, 199, 169, 0.10) 0%, rgba(0, 199, 169, 0) 55%),
+      linear-gradient(160deg, #EDF1F2 0%, #DDE2E5 100%);
+    overflow: hidden;
+  }
+
+  .mobile-web-container {
+    /* 논리 해상도는 항상 390 x 844 로 고정하고 zoom 으로 비율 유지 축소 */
+    zoom: var(--frame-zoom, 1);
+    width: 390px;
+    max-width: 390px;
+    height: 844px;
+    flex: 0 0 auto;
+    border-radius: 46px;
+    overflow: hidden;
+    box-shadow:
+      0 0 0 11px #17191C,
+      0 0 0 13px #33383E,
+      0 26px 56px rgba(0, 0, 0, 0.30),
+      0 6px 16px rgba(0, 0, 0, 0.16);
+  }
+
+  /* 다이나믹 아일랜드 형태의 상단 노치 */
+  .mobile-web-container::before {
+    content: "";
+    position: absolute;
+    top: 9px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 96px;
+    height: 24px;
+    background-color: #17191C;
+    border-radius: 14px;
+    z-index: 8000;
+    pointer-events: none;
+  }
+
+  /* 노치를 피하기 위한 상단 여백 */
+  .app-header {
+    padding-top: 34px;
+  }
+
+  /* 하단 홈 인디케이터 */
+  .app-footer {
+    padding-bottom: 18px;
+  }
+
+  .app-footer::after {
+    content: "";
+    position: absolute;
+    bottom: 7px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 118px;
+    height: 4px;
+    background-color: #C6CBCF;
+    border-radius: 4px;
+  }
+
+  .app-footer {
+    position: relative;
+  }
+
+  /* 프레임 안쪽이므로 모달 라운딩이 프레임 밖으로 새지 않도록 */
+  .modal-overlay {
+    border-radius: 46px;
+  }
+}
+
+/* 폭은 넓지만 높이가 낮은 창(노트북 등)에서도 프레임이 잘리지 않도록 최소 보정 */
+@media (min-width: 601px) and (max-height: 560px) {
+  .mobile-web-container {
+    border-radius: 34px;
+  }
+  .mobile-web-container::before {
+    display: none;
+  }
+  .app-header {
+    padding-top: 0;
+  }
+  .modal-overlay {
+    border-radius: 34px;
+  }
 }
