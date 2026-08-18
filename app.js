@@ -200,7 +200,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   // --- 3. Sound Notification Web Audio API ---
   let audioCtx = null;
   function playNotificationSound(type) {
-    if (!soundToggle.checked) return;
+    if (soundToggle && !soundToggle.checked) return;
     
     try {
       if (!audioCtx) {
@@ -242,14 +242,16 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
   }
   
-  soundToggle.addEventListener('change', () => {
-    if (soundToggle.checked) {
-      playNotificationSound('beep');
-      showToast('알림 소리 및 진동이 설정되었습니다.');
-    } else {
-      showToast('알림이 무음으로 변경되었습니다.');
-    }
-  });
+  if (soundToggle) {
+    soundToggle.addEventListener('change', () => {
+      if (soundToggle.checked) {
+        playNotificationSound('beep');
+        showToast('알림 소리 및 진동이 설정되었습니다.');
+      } else {
+        showToast('알림이 무음으로 변경되었습니다.');
+      }
+    });
+  }
 
   // --- 4. Live Wait Refresh Simulation ---
   let isRefreshing = false;

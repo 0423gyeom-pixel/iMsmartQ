@@ -2986,19 +2986,23 @@ body {
 
 /* 내 번호 + 업무 분야 1행 */
 .ticket-hero {
+  position: relative;
+  width: 100%;
   display: flex;
+  flex-direction: column;
   align-items: center;
-  justify-content: space-between;
-  gap: 10px;
+  justify-content: center;
+  gap: 4px;
 }
 
 .ticket-number {
   display: flex;
   flex-direction: column;
-  align-items: flex-start;
+  align-items: center;
   gap: 0;
   margin-bottom: 0;
   line-height: 1.1;
+  text-align: center;
 }
 
 .ticket-number-label {
@@ -3023,6 +3027,10 @@ body {
 }
 
 .accent-backdrop-container {
+  position: absolute;
+  right: clamp(13px, 4cqw, 22px);
+  top: 50%;
+  transform: translateY(-50%);
   width: auto;
   flex-shrink: 0;
   padding: clamp(7px, 1.25cqh, 15px) clamp(12px, 4.4cqw, 24px);
@@ -3114,8 +3122,8 @@ input:checked + .slider:before {
 
 .delay-btn {
   position: relative;
-  width: auto;
-  flex: 0 0 auto;
+  width: 100%;
+  flex: 1 1 auto;
   padding: clamp(7px, 1.3cqh, 15px) clamp(11px, 3.6cqw, 18px);
   font-size: clamp(11.5px, 1.68cqh, 16px);
   font-weight: 800;
@@ -3376,6 +3384,10 @@ input:checked + .slider:before {
   .highlight-num { font-size: 56px; }
 
   .accent-backdrop-container {
+    position: absolute;
+    right: 30px;
+    top: 50%;
+    transform: translateY(-50%);
     padding: 14px 26px;
     border-radius: 14px;
   }
