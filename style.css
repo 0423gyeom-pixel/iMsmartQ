@@ -2767,8 +2767,8 @@ input:checked + .slider:before {
 }
 
 .quick-card-btn {
-  background-color: var(--white);
-  border: 1px solid var(--light-gray);
+  background-color: #1A6366; /* 딥 틸 색상 적용 */
+  border: none; /* 테두리 제거로 플랫하고 자연스러운 연출 */
   border-radius: 18px;
   padding: 24px 16px;
   display: flex;
@@ -2777,14 +2777,14 @@ input:checked + .slider:before {
   justify-content: center;
   gap: 12px;
   cursor: pointer;
-  transition: transform 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
+  transition: transform 0.2s ease, background-color 0.2s ease, box-shadow 0.2s ease;
   box-shadow: var(--shadow-sm);
 }
 
 .quick-card-btn:hover {
   transform: translateY(-2px);
-  border-color: var(--brand-mint);
-  box-shadow: var(--shadow-md);
+  background-color: #217377; /* 밝아진 Teal 컬러 */
+  box-shadow: 0 8px 20px rgba(20, 90, 92, 0.25);
 }
 
 .quick-card-btn:active {
@@ -2798,20 +2798,12 @@ input:checked + .slider:before {
   display: flex;
   align-items: center;
   justify-content: center;
+  background-color: rgba(255, 255, 255, 0.12) !important; /* 딥 틸에 어울리게 투명한 흰색 배경으로 통일 */
 }
 
-/* 각 카드별 아이콘 배경색 지정 (기존 고유 색상 및 테마 유지) */
-.quick-card-icon-wrapper.paper-pencil {
-  background-color: rgba(0, 199, 169, 0.08);
-}
-.quick-card-icon-wrapper.checklist {
-  background-color: rgba(209, 232, 52, 0.12);
-}
-.quick-card-icon-wrapper.scan {
-  background-color: rgba(74, 144, 226, 0.08);
-}
-.quick-card-icon-wrapper.investment {
-  background-color: rgba(245, 166, 35, 0.08);
+/* SVG stroke 색상을 흰색으로 일괄 오버라이드 */
+.quick-card-icon-wrapper svg {
+  stroke: var(--white) !important;
 }
 
 .quick-svg-icon {
@@ -2822,7 +2814,7 @@ input:checked + .slider:before {
 .quick-card-title {
   font-size: 14px;
   font-weight: 800;
-  color: var(--dark-text);
+  color: var(--white); /* 텍스트 흰색으로 변경 */
 }
 
 
@@ -3475,7 +3467,7 @@ input:checked + .slider:before {
     display: block;
     font-size: 13px;
     font-weight: 500;
-    color: var(--cool-gray);
+    color: rgba(255, 255, 255, 0.75); /* 딥 틸 배경에 어울리는 반투명 흰색 */
     line-height: 1.5;
     letter-spacing: -0.3px;
     text-align: left;
