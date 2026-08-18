@@ -1479,24 +1479,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     });
   }
 
-  // --- 14-2. 이용 안내 및 유의사항 모달 제어 (헤더 ⓘ 버튼) ---
-  const noticeInfoBtn = document.getElementById('notice-info-btn');
-  const noticeModal = document.getElementById('notice-modal');
-  const closeNoticeModalBtn = document.getElementById('close-notice-modal-btn');
 
-  if (noticeInfoBtn && noticeModal) {
-    noticeInfoBtn.addEventListener('click', () => {
-      noticeModal.classList.remove('hidden');
-      playNotificationSound('beep');
-    });
-
-    const closeNoticeModal = () => noticeModal.classList.add('hidden');
-
-    if (closeNoticeModalBtn) closeNoticeModalBtn.addEventListener('click', closeNoticeModal);
-    noticeModal.addEventListener('click', (e) => {
-      if (e.target === noticeModal) closeNoticeModal();
-    });
-  }
 
   // --- 15. 스마트 앱 배너 닫기 제어 ---
   const closeAppBanner = document.getElementById('close-app-banner');
