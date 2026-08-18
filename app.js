@@ -1853,9 +1853,9 @@ document.addEventListener('DOMContentLoaded', async () => {
   
   const agreeAllCheckbox = document.getElementById('agree-all-consents');
   const individualConsentCheckboxes = document.querySelectorAll('.individual-consent');
-  const agreePersonalInfo = document.getElementById('agree-personal-info');
-  const agreePreTransfer = document.getElementById('agree-pre-transfer');
-  const agreeMarketing = document.getElementById('agree-consent-marketing');
+  const agreePolicy = document.getElementById('agree-policy-check');
+  const agreeRequired = document.getElementById('agree-required-check');
+  const agreeOptional = document.getElementById('agree-optional-check');
   
   let pendingModalId = null;
 
@@ -1891,14 +1891,14 @@ document.addEventListener('DOMContentLoaded', async () => {
   if (submitCommonConsentBtn && commonConsentModal) {
     submitCommonConsentBtn.addEventListener('click', () => {
       // 필수 약관 동의 체크 검증
-      if (!agreePersonalInfo.checked || !agreePreTransfer.checked) {
-        alert('서비스 이용을 위해 필수 약관에 모두 동의해 주셔야 합니다.');
+      if (!agreePolicy.checked || !agreeRequired.checked) {
+        alert('서비스 이용을 위해 필수 약관(개인정보 처리방침 확인 및 필수 수집·이용 동의)에 동의해 주셔야 합니다.');
         return;
       }
 
       // 동의 상태 저장
       localStorage.setItem('smartq_consent', 'true');
-      if (agreeMarketing.checked) {
+      if (agreeOptional.checked) {
         localStorage.setItem('smartq_marketing_consent', 'true');
       } else {
         localStorage.removeItem('smartq_marketing_consent');
