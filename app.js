@@ -184,8 +184,10 @@ document.addEventListener('DOMContentLoaded', async () => {
     // Convert 24h to 12h
     hours = hours % 12;
     hours = hours ? hours : 12; // 0 should be 12
-    
-    return `${ampm} ${hours}시 ${minutes}분 기준 실시간 업데이트`;
+
+    // 헤더 1줄 압축 레이아웃 대응: 짧은 포맷 (예: 오후 3:07 기준)
+    const paddedMinutes = minutes < 10 ? '0' + minutes : minutes;
+    return `${ampm} ${hours}:${paddedMinutes} 기준`;
   }
   
   updateClock();
@@ -278,6 +280,9 @@ document.addEventListener('DOMContentLoaded', async () => {
       waitingCountEl.textContent = `${randomWaitPeople}명`;
       waitingTimeEl.textContent = `약 ${randomWaitTime}분`;
       
+      // Update delay badge dynamically
+      updateDelayBadge();
+      
       // Remove animations
       if (refreshIcon) refreshIcon.classList.remove('spinning');
       if (refreshIcon2) refreshIcon2.classList.remove('spinning');
@@ -297,8 +302,13 @@ document.addEventListener('DOMContentLoaded', async () => {
 
   // --- 5. Toast Controller ---
   let toastTimeout = null;
-  function showToast(message) {
+  function showToast(message, isWarning = false) {
     toast.textContent = message;
+    if (isWarning) {
+      toast.classList.add('warning');
+    } else {
+      toast.classList.remove('warning');
+    }
     toast.classList.remove('hidden');
     
     // Clear previous timeout if exists
@@ -312,10 +322,12 @@ document.addEventListener('DOMContentLoaded', async () => {
   }
 
   // --- 6. Pre-Writing Form Interaction (Accordion) ---
-  accordionBtn.addEventListener('click', () => {
-    formContainer.classList.toggle('collapsed');
-    accordionArrow.classList.toggle('rotated');
-  });
+  if (accordionBtn) {
+    accordionBtn.addEventListener('click', () => {
+      formContainer.classList.toggle('collapsed');
+      accordionArrow.classList.toggle('rotated');
+    });
+  }
 
   // Switch form requirements dynamically based on selected transaction
   radioButtons.forEach(radio => {
@@ -453,9 +465,46 @@ document.addEventListener('DOMContentLoaded', async () => {
   });
 
   // --- 8. 순번 미루기 기능 (1회 한정 - 커스텀 모달 연동) ---
+  function updateDelayBadge() {
+    if (!delayStatusBadge) return;
+    
+    // 버튼 위 코너 칩으로 표시되므로 짧은 문구 사용 (상세 안내는 ⓘ 모달 참고)
+    if (hasDelayed) {
+      delayStatusBadge.textContent = '사용완료';
+      delayStatusBadge.className = 'delay-badge completed';
+      delayQueueBtn && delayQueueBtn.setAttribute('title', '순번 미루기는 1회만 가능합니다.');
+      return;
+    }
+
+    let currentWaitCount = parseInt(waitingCountEl.textContent, 10) || 0;
+    if (currentWaitCount <= 3) {
+      delayStatusBadge.textContent = '불가';
+      delayStatusBadge.className = 'delay-badge warning';
+      delayQueueBtn && delayQueueBtn.setAttribute('title', '대기 인원이 3명 이하일 때는 순번을 미룰 수 없습니다.');
+    } else {
+      delayStatusBadge.textContent = '1회 가능';
+      delayStatusBadge.className = 'delay-badge';
+      delayQueueBtn && delayQueueBtn.setAttribute('title', '순번을 3명 뒤로 미룹니다. (1회 한정)');
+    }
+  }
+
+  // 초기 로드 시 뱃지 상태 업데이트
+  updateDelayBadge();
+
   if (delayQueueBtn && delayConfirmModal) {
     delayQueueBtn.addEventListener('click', () => {
+      // 1. 대기 인원 3명 이하 체크 (예외 처리)
+      let currentWaitCount = parseInt(waitingCountEl.textContent, 10) || 0;
+      if (currentWaitCount <= 3) {
+        showToast("대기 인원이 3명 이하일 때는 순번을 미룰 수 없습니다.", true);
+        playNotificationSound('beep');
+        return;
+      }
+
+      // 2. 1회 사용 여부 체크
       if (hasDelayed) return;
+
+      // 3. 정상 동작: 모달 띄우기
       delayConfirmModal.classList.remove('hidden');
       playNotificationSound('beep');
     });
@@ -486,15 +535,12 @@ document.addEventListener('DOMContentLoaded', async () => {
         
         hasDelayed = true;
         delayQueueBtn.disabled = true;
-        const delayBtnText = delayQueueBtn.querySelector('span');
-        if (delayBtnText) delayBtnText.textContent = '순번 미루기 완료';
+        const delayBtnText = delayQueueBtn.querySelector('span:not(.delay-badge)');
+        if (delayBtnText) delayBtnText.textContent = '미루기 완료';
         const delayBtnIcon = delayQueueBtn.querySelector('i');
         if (delayBtnIcon) delayBtnIcon.className = 'fa-solid fa-check';
         
-        if (delayStatusBadge) {
-          delayStatusBadge.textContent = '1회 미루기 완료';
-          delayStatusBadge.classList.add('completed');
-        }
+        updateDelayBadge();
         
         playNotificationSound('double');
         showToast('대기 순번이 3명 뒤로 미뤄졌습니다.');
@@ -1433,6 +1479,25 @@ document.addEventListener('DOMContentLoaded', async () => {
     });
   }
 
+  // --- 14-2. 이용 안내 및 유의사항 모달 제어 (헤더 ⓘ 버튼) ---
+  const noticeInfoBtn = document.getElementById('notice-info-btn');
+  const noticeModal = document.getElementById('notice-modal');
+  const closeNoticeModalBtn = document.getElementById('close-notice-modal-btn');
+
+  if (noticeInfoBtn && noticeModal) {
+    noticeInfoBtn.addEventListener('click', () => {
+      noticeModal.classList.remove('hidden');
+      playNotificationSound('beep');
+    });
+
+    const closeNoticeModal = () => noticeModal.classList.add('hidden');
+
+    if (closeNoticeModalBtn) closeNoticeModalBtn.addEventListener('click', closeNoticeModal);
+    noticeModal.addEventListener('click', (e) => {
+      if (e.target === noticeModal) closeNoticeModal();
+    });
+  }
+
   // --- 15. 스마트 앱 배너 닫기 제어 ---
   const closeAppBanner = document.getElementById('close-app-banner');
   const smartAppBanner = document.querySelector('.smart-app-banner');
@@ -1458,5 +1523,84 @@ document.addEventListener('DOMContentLoaded', async () => {
       });
     }
   }
+
+  // --- 16. 2x2 퀵 메뉴 그리드 클릭 이벤트 및 모달 팝업 바인딩 ---
+  const quickPreWritingBtn = document.getElementById('btn-quick-pre-writing');
+  const quickChecklistBtn = document.getElementById('btn-quick-checklist');
+  const quickScanBtn = document.getElementById('btn-quick-scan');
+  const quickFinancialTestBtn = document.getElementById('btn-quick-financial-test');
+
+  const preWritingModal = document.getElementById('pre-writing-modal');
+  const checklistModal = document.getElementById('checklist-modal');
+  const financialTestModal = document.getElementById('financial-test-modal');
+
+  const closePreWritingBtn = document.getElementById('close-pre-writing-modal-btn');
+  const closeChecklistBtn = document.getElementById('close-checklist-modal-btn');
+  const closeFinancialTestBtn = document.getElementById('close-financial-test-modal-btn');
+
+  // 미리작성 모달 열기
+  if (quickPreWritingBtn && preWritingModal) {
+    quickPreWritingBtn.addEventListener('click', () => {
+      preWritingModal.classList.remove('hidden');
+      
+      // 서류 직접 작성 탭 활성화
+      const formTabBtn = document.querySelector('.pre-tab-btn[data-pre-tab="form"]');
+      if (formTabBtn) {
+        formTabBtn.click();
+      }
+      playNotificationSound('beep');
+    });
+  }
+
+  // 송금전표 모달 열기
+  if (quickScanBtn && preWritingModal) {
+    quickScanBtn.addEventListener('click', () => {
+      preWritingModal.classList.remove('hidden');
+      
+      // 송금전표 스캔 탭 활성화
+      const scanTabBtn = document.querySelector('.pre-tab-btn[data-pre-tab="scan"]');
+      if (scanTabBtn) {
+        scanTabBtn.click();
+      }
+      playNotificationSound('beep');
+    });
+  }
+
+  // 체크리스트 모달 열기
+  if (quickChecklistBtn && checklistModal) {
+    quickChecklistBtn.addEventListener('click', () => {
+      checklistModal.classList.remove('hidden');
+      renderChecklist(); // 진척도 및 체크리스트 강제 렌더링
+      playNotificationSound('beep');
+    });
+  }
+
+  // 금융성향 테스트 모달 열기
+  if (quickFinancialTestBtn && financialTestModal) {
+    quickFinancialTestBtn.addEventListener('click', () => {
+      financialTestModal.classList.remove('hidden');
+      playNotificationSound('beep');
+    });
+  }
+
+  // 닫기 버튼 이벤트 바인딩
+  const setupModalClose = (closeBtnEl, modalEl) => {
+    if (closeBtnEl && modalEl) {
+      closeBtnEl.addEventListener('click', () => {
+        modalEl.classList.add('hidden');
+        playNotificationSound('beep');
+      });
+      // 오버레이 배경 클릭 시 닫기
+      modalEl.addEventListener('click', (e) => {
+        if (e.target === modalEl) {
+          modalEl.classList.add('hidden');
+        }
+      });
+    }
+  };
+
+  setupModalClose(closePreWritingBtn, preWritingModal);
+  setupModalClose(closeChecklistBtn, checklistModal);
+  setupModalClose(closeFinancialTestBtn, financialTestModal);
 
 });

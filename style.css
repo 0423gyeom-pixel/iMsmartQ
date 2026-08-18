@@ -186,6 +186,11 @@ body {
   color: #383D41;
 }
 
+.delay-badge.warning {
+  background-color: var(--warning-bg);
+  color: var(--warning-red);
+}
+
 .delay-desc {
   font-size: 11px;
   color: var(--cool-gray);
@@ -1991,6 +1996,12 @@ input:checked + .slider:before {
   transform: translate(-50%, 20px);
 }
 
+.toast.warning {
+  background-color: rgba(255, 107, 107, 0.95);
+  color: var(--white);
+  box-shadow: 0 8px 24px rgba(255, 107, 107, 0.2);
+}
+
 /* Modal System */
 .modal-overlay {
   position: fixed;
@@ -2471,3 +2482,742 @@ input:checked + .slider:before {
   font-size: 11px;
 }
 
+/* --- New Layout Layout (시안 대응) --- */
+.app-header-new {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 16px 20px;
+  background-color: var(--white);
+  border-bottom: 1px solid var(--light-gray);
+}
+
+.header-close-btn {
+  background: none;
+  border: none;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--dark-text);
+  cursor: pointer;
+}
+
+.header-logo-center {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.header-logo-img-wrapper {
+  width: 24px;
+  height: 24px;
+  border-radius: 6px;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.header-logo-img-wrapper img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.header-logo-text {
+  font-size: 15px;
+  font-weight: 800;
+  color: var(--dark-text);
+  letter-spacing: -0.3px;
+}
+
+.header-alert-btn {
+  background: none;
+  border: none;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  cursor: pointer;
+  color: var(--dark-text);
+}
+
+.header-alert-btn i {
+  font-size: 18px;
+}
+
+.alert-btn-text {
+  font-size: 9px;
+  font-weight: 700;
+}
+
+/* 메인 번호표 카드 (시안 스타일) */
+.ticket-card-new {
+  background-color: var(--white);
+  border: 1px solid var(--light-gray);
+  border-radius: 18px;
+  overflow: hidden;
+  box-shadow: var(--shadow-sm);
+  display: flex;
+  flex-direction: column;
+}
+
+.ticket-branch-header {
+  background-color: #ECEEEF;
+  padding: 10px 16px;
+  text-align: center;
+  border-bottom: 1px solid var(--light-gray);
+}
+
+.ticket-branch-header span {
+  font-size: 13px;
+  font-weight: 800;
+  color: var(--dark-text);
+}
+
+.ticket-card-body {
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.live-clock-wrapper {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12px;
+  color: var(--cool-gray);
+  margin-bottom: 14px;
+  font-weight: 600;
+}
+
+.live-clock-wrapper i {
+  font-size: 13px;
+}
+
+.ticket-number-new {
+  font-size: 20px;
+  font-weight: 800;
+  color: var(--dark-text);
+  margin-bottom: 10px;
+}
+
+.highlight-num-new {
+  font-size: 28px;
+  font-weight: 900;
+  color: #000;
+  vertical-align: middle;
+}
+
+.business-category-badge {
+  background-color: #F1F3F4;
+  padding: 6px 14px;
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--dark-text);
+  margin-bottom: 18px;
+  display: flex;
+  gap: 4px;
+}
+
+.category-label {
+  color: var(--cool-gray);
+}
+
+.category-value {
+  color: #000;
+  font-weight: 800;
+}
+
+/* 대기 정보 (2컬럼) */
+.ticket-stats-grid-new {
+  display: flex;
+  width: 100%;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 18px;
+  border-top: 1px dashed var(--light-gray);
+  border-bottom: 1px dashed var(--light-gray);
+  padding: 14px 0;
+}
+
+.stat-box-new {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+}
+
+.stat-line-new {
+  width: 1px;
+  height: 32px;
+  background-color: var(--light-gray);
+}
+
+.stat-label-new {
+  font-size: 11px;
+  color: var(--cool-gray);
+  font-weight: 600;
+}
+
+.stat-value-new {
+  font-size: 16px;
+  font-weight: 800;
+  color: var(--dark-text);
+}
+
+.highlight-time-new {
+  color: var(--brand-mint-dark);
+}
+
+/* 알림 설정 */
+.notification-toggle-wrapper-new {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+  background-color: #F8FAF9;
+  padding: 12px 14px;
+  border-radius: 12px;
+  border: 1px solid rgba(0, 199, 169, 0.08);
+  margin-bottom: 12px;
+}
+
+.toggle-info-new {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.toggle-label-new {
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--dark-text);
+  letter-spacing: -0.3px;
+}
+
+/* 미루기 버튼 */
+.delay-btn-new {
+  width: 100%;
+  padding: 14px;
+  background-color: #F1F3F4;
+  border: 1px solid var(--light-gray);
+  border-radius: 12px;
+  color: var(--dark-text);
+  font-size: 13px;
+  font-weight: 800;
+  cursor: pointer;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 6px;
+  transition: all 0.2s ease;
+  margin-bottom: 12px;
+}
+
+.delay-btn-new:hover {
+  background-color: #e9ecef;
+}
+
+.delay-btn-new:disabled {
+  background-color: #f8f9fa;
+  border-color: #e9ecef;
+  color: #adb5bd;
+  cursor: not-allowed;
+}
+
+.delay-status-container-new {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+}
+
+.delay-warning-box-new {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  background-color: #FAFAFA;
+  border: 1px solid var(--light-gray);
+  padding: 8px 12px;
+  border-radius: 10px;
+  font-size: 11px;
+  color: var(--cool-gray);
+  font-weight: 600;
+  width: 100%;
+  justify-content: center;
+}
+
+.delay-warning-box-new i {
+  color: var(--warning-red);
+  font-size: 12px;
+}
+
+/* 2x2 퀵 메뉴 그리드 */
+.quick-menu-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 12px;
+  width: 100%;
+  margin-top: 4px;
+  margin-bottom: 4px;
+}
+
+.quick-card-btn {
+  background-color: var(--white);
+  border: 1px solid var(--light-gray);
+  border-radius: 18px;
+  padding: 24px 16px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  cursor: pointer;
+  transition: transform 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
+  box-shadow: var(--shadow-sm);
+}
+
+.quick-card-btn:hover {
+  transform: translateY(-2px);
+  border-color: var(--brand-mint);
+  box-shadow: var(--shadow-md);
+}
+
+.quick-card-btn:active {
+  transform: translateY(0);
+}
+
+.quick-card-icon-wrapper {
+  width: 54px;
+  height: 54px;
+  border-radius: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* 각 카드별 아이콘 배경색 지정 (기존 고유 색상 및 테마 유지) */
+.quick-card-icon-wrapper.paper-pencil {
+  background-color: rgba(0, 199, 169, 0.08);
+}
+.quick-card-icon-wrapper.checklist {
+  background-color: rgba(209, 232, 52, 0.12);
+}
+.quick-card-icon-wrapper.scan {
+  background-color: rgba(74, 144, 226, 0.08);
+}
+.quick-card-icon-wrapper.investment {
+  background-color: rgba(245, 166, 35, 0.08);
+}
+
+.quick-svg-icon {
+  width: 28px;
+  height: 28px;
+}
+
+.quick-card-title {
+  font-size: 14px;
+  font-weight: 800;
+  color: var(--dark-text);
+}
+
+/* ==========================================================================
+   ONE-VIEW MOBILE LAYOUT (한 화면 무스크롤 레이아웃) — 2026.08 개정
+   기준: iPhone SE (375 x 667) 무스크롤. 그 이상 기기는 여백이 자동 확장됨.
+   이 블록은 파일 최하단에 위치하여 위쪽 기존 규칙을 의도적으로 덮어씀.
+   ========================================================================== */
+
+:root {
+  --footer-h: 60px;
+}
+
+html {
+  height: 100%;
+}
+
+body {
+  height: 100%;
+  min-height: 0;
+  overflow: hidden;
+  overscroll-behavior: none;
+}
+
+.mobile-web-container {
+  height: 100vh;
+  height: 100dvh;
+  min-height: 0;
+  overflow: hidden;
+  padding-bottom: calc(var(--footer-h) + env(safe-area-inset-bottom, 0px));
+}
+
+/* --- 헤더: 1줄 압축 --- */
+.app-header {
+  padding: 0;
+  flex-shrink: 0;
+}
+
+.web-title-bar {
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  padding: 9px 14px;
+  margin-bottom: 0;
+}
+
+.web-title-text {
+  font-size: 14.5px;
+  letter-spacing: -0.5px;
+  gap: 5px;
+  min-width: 0;
+}
+
+.web-title-text i {
+  font-size: 13px;
+  color: var(--brand-mint);
+}
+
+.header-bottom {
+  margin-top: 0;
+  gap: 5px;
+  flex-shrink: 0;
+}
+
+.timestamp {
+  font-size: 10.5px;
+  white-space: nowrap;
+}
+
+.header-info-btn {
+  background: none;
+  border: none;
+  color: var(--cool-gray);
+  font-size: 15px;
+  line-height: 1;
+  padding: 0 0 0 2px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+}
+
+.header-info-btn:active {
+  color: var(--brand-mint-dark);
+}
+
+/* --- 콘텐츠 영역: 남은 높이를 세로로 배분 --- */
+.app-content {
+  flex: 1 1 auto;
+  min-height: 0;
+  padding: 10px 14px;
+  gap: 10px;
+  justify-content: center;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+/* --- 번호표 카드 --- */
+/* flex-grow로 화면이 큰 기기에서는 여백을 자연스럽게 흡수 */
+.ticket-card {
+  flex: 1 1 auto;
+  min-height: 0;
+  max-height: 360px;
+  align-items: stretch;
+  justify-content: space-between;
+  padding: 12px 14px;
+  border-radius: 16px;
+  gap: 10px;
+}
+
+.ticket-top-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 6px;
+}
+
+.ticket-branch {
+  margin: 0;
+  font-size: 11px;
+  padding: 4px 9px;
+  white-space: nowrap;
+}
+
+.ticket-branch i {
+  font-size: 10px;
+}
+
+.ticket-badge-group {
+  margin-bottom: 0;
+  gap: 4px;
+}
+
+.ticket-status-badge,
+.qr-verify-badge {
+  font-size: 9.5px;
+  padding: 3px 8px;
+  letter-spacing: 0;
+  white-space: nowrap;
+}
+
+.qr-verify-badge i {
+  font-size: 9px;
+}
+
+/* 내 번호 + 업무 분야 1행 */
+.ticket-hero {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.ticket-number {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0;
+  margin-bottom: 0;
+  line-height: 1.1;
+}
+
+.ticket-number-label {
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--cool-gray);
+  letter-spacing: -0.3px;
+}
+
+.highlight-num {
+  font-size: 30px;
+  font-weight: 900;
+  color: #111;
+  line-height: 1.15;
+}
+
+.highlight-num em {
+  font-size: 16px;
+  font-style: normal;
+  font-weight: 800;
+  margin-left: 1px;
+}
+
+.accent-backdrop-container {
+  width: auto;
+  flex-shrink: 0;
+  padding: 7px 13px;
+  margin-bottom: 0;
+  border-radius: 10px;
+}
+
+.business-category {
+  flex-direction: column;
+  align-items: center;
+  gap: 1px;
+}
+
+.business-category .label {
+  font-size: 9.5px;
+}
+
+.business-category .value {
+  font-size: 15px;
+  line-height: 1.15;
+}
+
+/* 대기 정보 */
+.ticket-stats-grid {
+  margin-bottom: 0;
+  padding: 9px 0;
+}
+
+.stat-line {
+  height: 26px;
+}
+
+.stat-label {
+  font-size: 10.5px;
+}
+
+.stat-value {
+  font-size: 16px;
+}
+
+/* 알림 토글 + 순번 미루기 1행 */
+.ticket-action-row {
+  display: flex;
+  align-items: stretch;
+  gap: 8px;
+}
+
+.notification-toggle-wrapper {
+  flex: 1 1 auto;
+  min-width: 0;
+  padding: 7px 10px;
+  border-radius: 10px;
+}
+
+.toggle-info {
+  gap: 6px;
+  min-width: 0;
+}
+
+.sound-icon {
+  font-size: 14px;
+}
+
+.toggle-label {
+  font-size: 12px;
+  font-weight: 700;
+  white-space: nowrap;
+  letter-spacing: -0.3px;
+}
+
+.switch {
+  width: 38px;
+  height: 21px;
+  flex-shrink: 0;
+}
+
+.slider:before {
+  height: 15px;
+  width: 15px;
+}
+
+input:checked + .slider:before {
+  transform: translateX(17px);
+}
+
+.delay-btn {
+  position: relative;
+  width: auto;
+  flex: 0 0 auto;
+  padding: 7px 12px;
+  font-size: 12px;
+  font-weight: 800;
+  border-radius: 10px;
+  gap: 5px;
+  white-space: nowrap;
+  overflow: visible;
+}
+
+.delay-btn i {
+  font-size: 12px;
+}
+
+.delay-btn .delay-badge {
+  position: absolute;
+  top: -7px;
+  right: -5px;
+  font-size: 8.5px;
+  padding: 1px 5px;
+  border-radius: 6px;
+  border: 1.5px solid var(--card-bg);
+  line-height: 1.5;
+  white-space: nowrap;
+}
+
+.delay-btn:disabled .delay-badge {
+  border-color: #f8f9fa;
+}
+
+/* --- 2x2 퀵 메뉴: 남은 공간을 채움 --- */
+.quick-menu-grid {
+  flex: 1.2 1 auto;
+  min-height: 0;
+  max-height: 340px;
+  grid-template-rows: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+  margin: 0;
+}
+
+.quick-card-btn {
+  padding: 8px;
+  gap: 7px;
+  border-radius: 14px;
+  min-height: 0;
+}
+
+.quick-card-icon-wrapper {
+  width: 42px;
+  height: 42px;
+  border-radius: 12px;
+  flex-shrink: 0;
+}
+
+.quick-svg-icon {
+  width: 22px;
+  height: 22px;
+}
+
+.quick-card-title {
+  font-size: 12.5px;
+  letter-spacing: -0.4px;
+}
+
+/* --- 하단 고정 CTA 바 --- */
+.app-footer {
+  padding: 8px 14px calc(8px + env(safe-area-inset-bottom, 0px));
+}
+
+.footer-btn-container {
+  gap: 7px;
+}
+
+.footer-btn-refresh {
+  width: 44px;
+  height: 44px;
+  border-radius: 11px;
+  font-size: 15px;
+}
+
+.footer-btn-sms,
+.footer-btn-primary {
+  height: 44px;
+  border-radius: 11px;
+  font-size: 12.5px;
+}
+
+.toast {
+  bottom: calc(var(--footer-h) + 14px + env(safe-area-inset-bottom, 0px));
+}
+
+/* --- 이용 안내 모달 리스트 --- */
+.notice-modal-list {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 9px;
+}
+
+.notice-modal-list li {
+  font-size: 12px;
+  color: var(--cool-gray);
+  line-height: 1.55;
+  position: relative;
+  padding-left: 10px;
+}
+
+.notice-modal-list li::before {
+  content: "•";
+  position: absolute;
+  left: 0;
+  color: var(--brand-mint);
+}
+
+/* --- 초소형 화면 (iPhone SE 이하) 추가 압축 --- */
+@media (max-height: 640px) {
+  .highlight-num { font-size: 26px; }
+  .highlight-num em { font-size: 14px; }
+  .business-category .value { font-size: 14px; }
+  .stat-value { font-size: 15px; }
+  .ticket-card { gap: 8px; padding: 10px 12px; }
+  .app-content { gap: 8px; padding: 8px 12px; }
+  .quick-card-icon-wrapper { width: 36px; height: 36px; border-radius: 10px; }
+  .quick-svg-icon { width: 19px; height: 19px; }
+  .quick-card-title { font-size: 11.5px; }
+  .quick-menu-grid { gap: 8px; }
+}
