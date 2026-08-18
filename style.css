@@ -2767,7 +2767,7 @@ input:checked + .slider:before {
 }
 
 .quick-card-btn {
-  background-color: #1A6366; /* 딥 틸 색상 적용 */
+  background-color: var(--brand-mint, #00C7A9); /* Pantone 326C 민트 적용 */
   border: none; /* 테두리 제거로 플랫하고 자연스러운 연출 */
   border-radius: 18px;
   padding: 24px 16px;
@@ -2783,8 +2783,8 @@ input:checked + .slider:before {
 
 .quick-card-btn:hover {
   transform: translateY(-2px);
-  background-color: #217377; /* 밝아진 Teal 컬러 */
-  box-shadow: 0 8px 20px rgba(20, 90, 92, 0.25);
+  background-color: var(--brand-mint-dark, #00A990); /* 브랜드 다크 민트 컬러 */
+  box-shadow: 0 8px 20px rgba(0, 169, 144, 0.25);
 }
 
 .quick-card-btn:active {
