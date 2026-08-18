@@ -343,16 +343,16 @@ document.addEventListener('DOMContentLoaded', async () => {
   function updateDynamicReportFields() {
     if (!dynamicReportFields) return;
     
-    // 현재 제신고성 업무가 선택되었는지 확인
+    // 현재 어떤 업무 카드가 선택되었는지 확인
     const selectedWorkRadio = document.querySelector('input[name="pre-work-type"]:checked');
     const selectedWorkType = selectedWorkRadio ? selectedWorkRadio.value : 'cif';
     
-    if (selectedWorkType !== 'report') {
+    if (selectedWorkType === 'cif') {
       dynamicReportFields.innerHTML = '';
       return;
     }
     
-    const targetVal = reportTargetSelect ? reportTargetSelect.value : 'card';
+    const targetVal = selectedWorkType; // cif를 제외한 card, bankbook, otp, mbank 값 자체가 제신고 대상 타겟이 됨
     const checkedDetailRadio = document.querySelector(`input[name="detail-${targetVal}-val"]:checked`);
     const detailVal = checkedDetailRadio ? checkedDetailRadio.value : '분실신고';
     
@@ -638,19 +638,11 @@ document.addEventListener('DOMContentLoaded', async () => {
   }
 
   // 대분류(제신고성 vs 신규) 선택에 따른 토글
+  // 작성할 업무 대분류(5단 라디오 카드) 선택에 따른 토글
   preWorkTypeRadios.forEach(radio => {
     radio.addEventListener('change', (e) => {
       const type = e.target.value;
-      if (type === 'report') {
-        if (reportFieldsGroup) reportFieldsGroup.classList.remove('hidden');
-        if (cifFieldsGroup) cifFieldsGroup.classList.add('hidden');
-        
-        // 필수 값 지정
-        if (reportUserName) reportUserName.required = true;
-        if (reportUserPhone) reportUserPhone.required = true;
-        if (cifName) cifName.required = false;
-        if (cifPhone) cifPhone.required = false;
-      } else {
+      if (type === 'cif') {
         if (reportFieldsGroup) reportFieldsGroup.classList.add('hidden');
         if (cifFieldsGroup) cifFieldsGroup.classList.remove('hidden');
         
@@ -659,28 +651,30 @@ document.addEventListener('DOMContentLoaded', async () => {
         if (reportUserPhone) reportUserPhone.required = false;
         if (cifName) cifName.required = true;
         if (cifPhone) cifPhone.required = true;
+      } else {
+        // card, bankbook, otp, mbank 등 제신고 계열일 때
+        if (reportFieldsGroup) reportFieldsGroup.classList.remove('hidden');
+        if (cifFieldsGroup) cifFieldsGroup.classList.add('hidden');
+        
+        // 필수 값 지정
+        if (reportUserName) reportUserName.required = true;
+        if (reportUserPhone) reportUserPhone.required = true;
+        if (cifName) cifName.required = false;
+        if (cifPhone) cifPhone.required = false;
+        
+        // 선택된 제신고 대상의 세부 칩 그룹(detail-card 등)만 노출하고 나머지는 숨김
+        reportDetailGroups.forEach(group => {
+          group.classList.add('hidden');
+        });
+        const activeGroup = document.getElementById(`detail-${type}`);
+        if (activeGroup) {
+          activeGroup.classList.remove('hidden');
+        }
       }
-      // 동적 필드 초기 상태 갱신
+      // 동적 입력 필드 실시간 갱신
       updateDynamicReportFields();
     });
   });
-
-  // 제신고성 세부 대상 변경에 따른 칩 그룹 토글
-  if (reportTargetSelect) {
-    reportTargetSelect.addEventListener('change', (e) => {
-      const targetVal = e.target.value;
-      reportDetailGroups.forEach(group => {
-        group.classList.add('hidden');
-      });
-      
-      const activeGroup = document.getElementById(`detail-${targetVal}`);
-      if (activeGroup) {
-        activeGroup.classList.remove('hidden');
-      }
-      // 세부 대상 변경 시 동적 필드 갱신
-      updateDynamicReportFields();
-    });
-  }
 
   // 이벤트 위임 기법: 칩 라디오 버튼 변경 등 모든 폼 변화 발생 시 동적 필드 실시간 동기화
   if (preWritingForm) {
@@ -708,23 +702,29 @@ document.addEventListener('DOMContentLoaded', async () => {
       
       setTimeout(() => {
         const selectedWorkRadio = document.querySelector('input[name="pre-work-type"]:checked');
-        const selectedWorkType = selectedWorkRadio ? selectedWorkRadio.value : 'report';
+        const selectedWorkType = selectedWorkRadio ? selectedWorkRadio.value : 'cif';
         let nameVal = '';
         let displayJobText = '';
         
-        if (selectedWorkType === 'report') {
-          nameVal = reportUserName ? reportUserName.value : '';
-          const reportTargetText = reportTargetSelect ? reportTargetSelect.options[reportTargetSelect.selectedIndex].text : '카드';
-          
-          // 선택된 칩 세부 값 획득
-          const reportTargetVal = reportTargetSelect ? reportTargetSelect.value : 'card';
-          const checkedDetailRadio = document.querySelector(`input[name="detail-${reportTargetVal}-val"]:checked`);
-          const detailText = checkedDetailRadio ? checkedDetailRadio.value : '';
-          
-          displayJobText = `제신고 (${reportTargetText} - ${detailText})`;
-        } else {
+        if (selectedWorkType === 'cif') {
           nameVal = cifName ? cifName.value : '';
           displayJobText = '신규(CIF) 등록';
+        } else {
+          nameVal = reportUserName ? reportUserName.value : '';
+          
+          const targetNames = {
+            card: '카드',
+            bankbook: '통장',
+            otp: 'OTP/보안카드',
+            mbank: '모바일 뱅킹'
+          };
+          const targetNameText = targetNames[selectedWorkType] || '카드';
+          
+          // 선택된 칩 세부 값 획득
+          const checkedDetailRadio = document.querySelector(`input[name="detail-${selectedWorkType}-val"]:checked`);
+          const detailText = checkedDetailRadio ? checkedDetailRadio.value : '';
+          
+          displayJobText = `제신고 (${targetNameText} - ${detailText})`;
         }
         
         // Update success message UI
@@ -1846,26 +1846,126 @@ document.addEventListener('DOMContentLoaded', async () => {
   const closeFinancialTestBtn = document.getElementById('close-financial-test-modal-btn');
   const closeTransferVoucherBtn = document.getElementById('close-transfer-voucher-modal-btn');
 
-  // 미리작성 모달 열기
-  if (quickPreWritingBtn && preWritingModal) {
-    quickPreWritingBtn.addEventListener('click', () => {
-      preWritingModal.classList.remove('hidden');
-      
-      // 항상 신규(CIF) 등록 라디오를 디폴트로 초기 설정
-      const defaultRadio = document.querySelector('input[name="pre-work-type"][value="cif"]');
-      if (defaultRadio) {
-        defaultRadio.checked = true;
-        defaultRadio.dispatchEvent(new Event('change'));
+  // 1회성 공통 동의 모달 관련 변수 및 엘리먼트 정의
+  const commonConsentModal = document.getElementById('common-consent-modal');
+  const closeCommonConsentBtn = document.getElementById('close-common-consent-modal-btn');
+  const submitCommonConsentBtn = document.getElementById('submit-common-consent-btn');
+  
+  const agreeAllCheckbox = document.getElementById('agree-all-consents');
+  const individualConsentCheckboxes = document.querySelectorAll('.individual-consent');
+  const agreePersonalInfo = document.getElementById('agree-personal-info');
+  const agreePreTransfer = document.getElementById('agree-pre-transfer');
+  const agreeMarketing = document.getElementById('agree-consent-marketing');
+  
+  let pendingModalId = null;
+
+  // 전체 동의 토글 로직
+  if (agreeAllCheckbox) {
+    agreeAllCheckbox.addEventListener('change', (e) => {
+      const isChecked = e.target.checked;
+      individualConsentCheckboxes.forEach(cb => {
+        cb.checked = isChecked;
+      });
+    });
+  }
+
+  // 개별 동의 상태에 따른 전체 동의 체크박스 자동 갱신
+  individualConsentCheckboxes.forEach(cb => {
+    cb.addEventListener('change', () => {
+      const allChecked = Array.from(individualConsentCheckboxes).every(item => item.checked);
+      if (agreeAllCheckbox) {
+        agreeAllCheckbox.checked = allChecked;
       }
-      
+    });
+  });
+
+  // 동의 모달 닫기
+  if (closeCommonConsentBtn && commonConsentModal) {
+    closeCommonConsentBtn.addEventListener('click', () => {
+      commonConsentModal.classList.add('hidden');
+      pendingModalId = null;
+    });
+  }
+
+  // 동의하고 계속하기 완료 처리
+  if (submitCommonConsentBtn && commonConsentModal) {
+    submitCommonConsentBtn.addEventListener('click', () => {
+      // 필수 약관 동의 체크 검증
+      if (!agreePersonalInfo.checked || !agreePreTransfer.checked) {
+        alert('서비스 이용을 위해 필수 약관에 모두 동의해 주셔야 합니다.');
+        return;
+      }
+
+      // 동의 상태 저장
+      localStorage.setItem('smartq_consent', 'true');
+      if (agreeMarketing.checked) {
+        localStorage.setItem('smartq_marketing_consent', 'true');
+      } else {
+        localStorage.removeItem('smartq_marketing_consent');
+      }
+
+      // 모달 전환
+      commonConsentModal.classList.add('hidden');
+      if (pendingModalId) {
+        const targetModal = document.getElementById(pendingModalId);
+        if (targetModal) {
+          targetModal.classList.remove('hidden');
+          
+          // 만약 미리작성 모달이 열린다면 초기 스위칭 트리거 실행
+          if (pendingModalId === 'pre-writing-modal') {
+            const defaultRadio = document.querySelector('input[name="pre-work-type"][value="cif"]');
+            if (defaultRadio) {
+              defaultRadio.checked = true;
+              defaultRadio.dispatchEvent(new Event('change'));
+            }
+          }
+        }
+        pendingModalId = null;
+      }
+    });
+  }
+
+  // 모달 진입 전 가로채기 공통 함수
+  function openModalWithConsentCheck(targetModalId) {
+    const isConsented = localStorage.getItem('smartq_consent') === 'true';
+    
+    if (isConsented) {
+      // 이미 최초 1회 동의가 완료되었으면 바로 목적지 모달 열기
+      const targetModal = document.getElementById(targetModalId);
+      if (targetModal) {
+        targetModal.classList.remove('hidden');
+        if (targetModalId === 'pre-writing-modal') {
+          const defaultRadio = document.querySelector('input[name="pre-work-type"][value="cif"]');
+          if (defaultRadio) {
+            defaultRadio.checked = true;
+            defaultRadio.dispatchEvent(new Event('change'));
+          }
+        }
+      }
+    } else {
+      // 동의하지 않은 경우, 동의 팝업을 띄우고 목적지 저장
+      pendingModalId = targetModalId;
+      if (commonConsentModal) {
+        commonConsentModal.classList.remove('hidden');
+        // 체크박스들 초기화 (기존 찌꺼기 방지)
+        if (agreeAllCheckbox) agreeAllCheckbox.checked = false;
+        individualConsentCheckboxes.forEach(cb => cb.checked = false);
+      }
+    }
+  }
+
+  // 미리작성 모달 열기
+  if (quickPreWritingBtn) {
+    quickPreWritingBtn.addEventListener('click', () => {
+      openModalWithConsentCheck('pre-writing-modal');
       playNotificationSound('beep');
     });
   }
 
   // 송금전표 모달 열기
-  if (quickScanBtn && transferVoucherModal) {
+  if (quickScanBtn) {
     quickScanBtn.addEventListener('click', () => {
-      transferVoucherModal.classList.remove('hidden');
+      openModalWithConsentCheck('transfer-voucher-modal');
       playNotificationSound('beep');
     });
   }
@@ -1880,9 +1980,9 @@ document.addEventListener('DOMContentLoaded', async () => {
   }
 
   // 금융성향 테스트 모달 열기
-  if (quickFinancialTestBtn && financialTestModal) {
+  if (quickFinancialTestBtn) {
     quickFinancialTestBtn.addEventListener('click', () => {
-      financialTestModal.classList.remove('hidden');
+      openModalWithConsentCheck('financial-test-modal');
       playNotificationSound('beep');
     });
   }
