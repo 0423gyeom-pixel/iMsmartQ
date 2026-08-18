@@ -323,114 +323,435 @@ document.addEventListener('DOMContentLoaded', async () => {
     }, 2000);
   }
 
-  // --- 6. Pre-Writing Form Interaction (Accordion) ---
-  if (accordionBtn) {
-    accordionBtn.addEventListener('click', () => {
-      formContainer.classList.toggle('collapsed');
-      accordionArrow.classList.toggle('rotated');
-    });
+  // --- 6. Pre-Writing Form Interaction ---
+  const preWorkTypeRadios = document.querySelectorAll('input[name="pre-work-type"]');
+  const reportFieldsGroup = document.getElementById('report-fields-group');
+  const cifFieldsGroup = document.getElementById('cif-fields-group');
+  
+  const reportTargetSelect = document.getElementById('report-target');
+  const reportDetailGroups = document.querySelectorAll('.report-detail-group');
+  
+  const reportUserName = document.getElementById('report-user-name');
+  const reportUserPhone = document.getElementById('report-user-phone');
+  const cifName = document.getElementById('cif-name');
+  const cifPhone = document.getElementById('cif-phone');
+
+  // 대분류(제신고성 vs 신규) 선택에 따른 토글
+  const dynamicReportFields = document.getElementById('dynamic-report-fields');
+
+  // 제신고성 업무의 대상 및 세부항목 선택에 따른 동적 필수 정보 입력란 렌더링 함수
+  function updateDynamicReportFields() {
+    if (!dynamicReportFields) return;
+    
+    // 현재 제신고성 업무가 선택되었는지 확인
+    const selectedWorkRadio = document.querySelector('input[name="pre-work-type"]:checked');
+    const selectedWorkType = selectedWorkRadio ? selectedWorkRadio.value : 'cif';
+    
+    if (selectedWorkType !== 'report') {
+      dynamicReportFields.innerHTML = '';
+      return;
+    }
+    
+    const targetVal = reportTargetSelect ? reportTargetSelect.value : 'card';
+    const checkedDetailRadio = document.querySelector(`input[name="detail-${targetVal}-val"]:checked`);
+    const detailVal = checkedDetailRadio ? checkedDetailRadio.value : '분실신고';
+    
+    let html = '';
+    
+    if (targetVal === 'card') {
+      if (detailVal === '분실신고') {
+        html = `
+          <div class="form-group">
+            <label class="form-label">분실 카드 종류</label>
+            <select class="form-input" id="report-card-type">
+              <option value="신용카드">신용카드</option>
+              <option value="체크카드">체크카드</option>
+              <option value="법인카드">법인카드</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label class="form-label">분실 일시</label>
+            <input type="datetime-local" class="form-input" id="report-card-loss-time" required>
+          </div>
+          <div class="form-group">
+            <label class="form-label">분실 장소</label>
+            <input type="text" class="form-input" id="report-card-loss-place" placeholder="예: 대구시청 인근, 대중교통 등" required>
+          </div>
+        `;
+      } else if (detailVal === '재발급') {
+        html = `
+          <div class="form-group">
+            <label class="form-label">재발급 사유</label>
+            <select class="form-input" id="report-card-reissue-reason">
+              <option value="분실/도난">분실 / 도난</option>
+              <option value="훼손">훼손</option>
+              <option value="자성(MS) 손상">자성(MS) 손상</option>
+              <option value="유효기간 만료">유효기간 만료</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label class="form-label">수령 방법</label>
+            <div class="form-radio-group" style="grid-template-columns: repeat(3, 1fr); gap: 6px; margin-bottom: 8px;">
+              <label class="radio-card" style="padding: 0;">
+                <input type="radio" name="report-card-delivery" value="자택" checked>
+                <span class="radio-content" style="padding: 8px 4px; font-size: 11px; text-align: center;">자택 배송</span>
+              </label>
+              <label class="radio-card" style="padding: 0;">
+                <input type="radio" name="report-card-delivery" value="직장">
+                <span class="radio-content" style="padding: 8px 4px; font-size: 11px; text-align: center;">직장 배송</span>
+              </label>
+              <label class="radio-card" style="padding: 0;">
+                <input type="radio" name="report-card-delivery" value="영업점">
+                <span class="radio-content" style="padding: 8px 4px; font-size: 11px; text-align: center;">영업점 수령</span>
+              </label>
+            </div>
+          </div>
+          <div class="form-group" id="card-delivery-address-group">
+            <label class="form-label">배송지 주소</label>
+            <input type="text" class="form-input" id="report-card-delivery-address" placeholder="주소를 정확히 입력해 주세요" required>
+          </div>
+        `;
+      } else if (detailVal === '비밀번호 변경') {
+        html = `
+          <div class="form-group">
+            <label class="form-label">대상 카드 번호 (마지막 4자리)</label>
+            <input type="text" inputmode="numeric" class="form-input" id="report-card-num-last" placeholder="예: 1234" maxlength="4" required>
+          </div>
+          <div class="form-group">
+            <label class="form-label">새로운 비밀번호 (숫자 4자리)</label>
+            <input type="password" inputmode="numeric" class="form-input" id="report-card-new-pw" placeholder="비밀번호 4자리 입력" maxlength="4" required>
+          </div>
+          <div class="form-group">
+            <label class="form-label">비밀번호 확인</label>
+            <input type="password" inputmode="numeric" class="form-input" id="report-card-new-pw-confirm" placeholder="비밀번호 다시 입력" maxlength="4" required>
+          </div>
+        `;
+      }
+    } else if (targetVal === 'bankbook') {
+      if (detailVal === '분실신고') {
+        html = `
+          <div class="form-group">
+            <label class="form-label">대상 계좌번호</label>
+            <input type="text" inputmode="numeric" class="form-input" id="report-book-acc" placeholder="연계된 계좌번호 입력 (- 제외)" required>
+          </div>
+          <div class="form-group">
+            <label class="form-label">분실 일시</label>
+            <input type="datetime-local" class="form-input" id="report-book-loss-time" required>
+          </div>
+        `;
+      } else if (detailVal === '재발급') {
+        html = `
+          <div class="form-group">
+            <label class="form-label">재발급 사유</label>
+            <select class="form-input" id="report-book-reissue-reason">
+              <option value="분실/도난">분실 / 도난</option>
+              <option value="훼손">훼손</option>
+              <option value="인감/서명 변경">인감 / 서명 변경</option>
+              <option value="통장 면수 완료(이월)">통장 면수 완료 (이월)</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label class="form-label">거래 방식 선택</label>
+            <div class="form-radio-group" style="grid-template-columns: repeat(2, 1fr); gap: 6px;">
+              <label class="radio-card" style="padding: 0;">
+                <input type="radio" name="report-book-sign-type" value="서명" checked>
+                <span class="radio-content" style="padding: 8px 4px; font-size: 11px; text-align: center;">서명 거래</span>
+              </label>
+              <label class="radio-card" style="padding: 0;">
+                <input type="radio" name="report-book-sign-type" value="인감">
+                <span class="radio-content" style="padding: 8px 4px; font-size: 11px; text-align: center;">인감 도장 거래</span>
+              </label>
+            </div>
+          </div>
+        `;
+      } else if (detailVal === 'MS재수록') {
+        html = `
+          <div class="form-group">
+            <label class="form-label">재수록 대상 계좌번호</label>
+            <input type="text" inputmode="numeric" class="form-input" id="report-book-ms-acc" placeholder="마그네틱이 훼손된 계좌번호 입력" required>
+          </div>
+          <div class="info-alert-box" style="background-color: var(--brand-mint-light); border: 1px solid var(--brand-mint); border-radius: 8px; padding: 10px; font-size: 11.5px; color: var(--brand-mint-dark); font-weight: 600; line-height: 1.4; margin-bottom: 8px;">
+            <i class="fa-solid fa-circle-info"></i> 마그네틱(MS) 띠 훼손으로 인한 IC/CD기 인식 오류 상태를 정상 복구하는 서비스 신청서입니다.
+          </div>
+        `;
+      } else if (detailVal === '인감 서명 변경') {
+        html = `
+          <div class="form-group">
+            <label class="form-label">대상 계좌번호</label>
+            <input type="text" inputmode="numeric" class="form-input" id="report-book-seal-acc" placeholder="인감/서명을 변경할 계좌번호 입력" required>
+          </div>
+          <div class="form-group">
+            <label class="form-label">변경 구분</label>
+            <select class="form-input" id="report-book-seal-type">
+              <option value="기존 서명 -> 새 서명">기존 서명 -> 새로운 서명</option>
+              <option value="기존 인감 -> 새 인감">기존 인감 -> 새로운 인감</option>
+              <option value="인감 -> 서명">인감 도장 -> 서명 변경</option>
+              <option value="서명 -> 인감">서명 -> 인감 도장 변경</option>
+            </select>
+          </div>
+        `;
+      } else if (detailVal === '비밀번호 변경') {
+        html = `
+          <div class="form-group">
+            <label class="form-label">대상 계좌번호</label>
+            <input type="text" inputmode="numeric" class="form-input" id="report-book-pw-acc" placeholder="비밀번호를 변경할 계좌번호 입력" required>
+          </div>
+          <div class="form-group">
+            <label class="form-label">새로운 통장 비밀번호 (숫자 4자리)</label>
+            <input type="password" inputmode="numeric" class="form-input" id="report-book-new-pw" placeholder="비밀번호 4자리 입력" maxlength="4" required>
+          </div>
+          <div class="form-group">
+            <label class="form-label">비밀번호 확인</label>
+            <input type="password" inputmode="numeric" class="form-input" id="report-book-new-pw-confirm" placeholder="비밀번호 다시 입력" maxlength="4" required>
+          </div>
+        `;
+      }
+    } else if (targetVal === 'otp') {
+      if (detailVal === '분실신고') {
+        html = `
+          <div class="form-group">
+            <label class="form-label">분실 기기 유형</label>
+            <select class="form-input" id="report-otp-loss-type">
+              <option value="토큰형 OTP">토큰형 OTP</option>
+              <option value="카드형 OTP">카드형 OTP</option>
+              <option value="보안카드(시크리티카드)">보안카드 (시크리티 카드)</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label class="form-label">분실 일시</label>
+            <input type="datetime-local" class="form-input" id="report-otp-loss-time" required>
+          </div>
+        `;
+      } else if (detailVal === '재발급') {
+        html = `
+          <div class="form-group">
+            <label class="form-label">재발급 사유</label>
+            <select class="form-input" id="report-otp-reissue-reason">
+              <option value="분실/도난">분실 / 도난</option>
+              <option value="배터리 방전">배터리 방전 (단말기 꺼짐)</option>
+              <option value="단말기 파손/액정 훼손">단말기 파손 / 액정 훼손</option>
+              <option value="시간 불일치 오류(Ldn)">시간 불일치 오류 (Ldn)</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label class="form-label">희망 기기 종류</label>
+            <div class="form-radio-group" style="grid-template-columns: repeat(2, 1fr); gap: 6px;">
+              <label class="radio-card" style="padding: 0;">
+                <input type="radio" name="report-otp-device-type" value="토큰형(수수료 3,000원)" checked>
+                <span class="radio-content" style="padding: 8px 4px; font-size: 11px; text-align: center;">토큰형 OTP<br>(3,000원)</span>
+              </label>
+              <label class="radio-card" style="padding: 0;">
+                <input type="radio" name="report-otp-device-type" value="카드형(수수료 10,000원)">
+                <span class="radio-content" style="padding: 8px 4px; font-size: 11px; text-align: center;">카드형 스마트 OTP<br>(10,000원)</span>
+              </label>
+            </div>
+          </div>
+        `;
+      } else if (detailVal === '신고 해제') {
+        html = `
+          <div class="form-group">
+            <label class="form-label">습득 기기 일련번호</label>
+            <input type="text" class="form-input" id="report-otp-unlock-serial" placeholder="단말 뒷면 일련번호 8~10자리 입력" required>
+          </div>
+          <div class="form-group">
+            <label class="form-label">신고 해제 사유</label>
+            <input type="text" class="form-input" id="report-otp-unlock-reason" placeholder="예: 분실 단말기 자체 습득 등" required>
+          </div>
+        `;
+      } else if (detailVal === '이용등록 및 해지') {
+        html = `
+          <div class="form-group">
+            <label class="form-label">신청 구분</label>
+            <div class="form-radio-group" style="grid-template-columns: repeat(2, 1fr); gap: 6px;">
+              <label class="radio-card" style="padding: 0;">
+                <input type="radio" name="report-otp-reg-status" value="등록" checked>
+                <span class="radio-content" style="padding: 8px 4px; font-size: 11px; text-align: center;">타행 OTP 등록</span>
+              </label>
+              <label class="radio-card" style="padding: 0;">
+                <input type="radio" name="report-otp-reg-status" value="해지">
+                <span class="radio-content" style="padding: 8px 4px; font-size: 11px; text-align: center;">이용 해지</span>
+              </label>
+            </div>
+          </div>
+          <div class="form-group">
+            <label class="form-label">OTP 발급 기관</label>
+            <input type="text" class="form-input" id="report-otp-reg-vendor" placeholder="예: 국민은행, 신한은행 등" required>
+          </div>
+          <div class="form-group">
+            <label class="form-label">OTP 기기 일련번호</label>
+            <input type="text" class="form-input" id="report-otp-reg-serial" placeholder="기기 뒷면 일련번호 입력" required>
+          </div>
+        `;
+      } else if (detailVal === '비밀번호 변경') {
+        html = `
+          <div class="form-group">
+            <label class="form-label">새로운 OTP PIN 번호 (숫자 4~8자리)</label>
+            <input type="password" inputmode="numeric" class="form-input" id="report-otp-new-pin" placeholder="PIN 번호 입력" required>
+          </div>
+          <div class="info-alert-box" style="background-color: var(--brand-mint-light); border: 1px solid var(--brand-mint); border-radius: 8px; padding: 10px; font-size: 11.5px; color: var(--brand-mint-dark); font-weight: 600; line-height: 1.4; margin-bottom: 8px;">
+            <i class="fa-solid fa-circle-info"></i> OTP 비밀번호 5회 이상 입력 오류 초과로 인한 락 잠금 상태를 초기화하고 신규 PIN을 설정하는 서식입니다.
+          </div>
+        `;
+      }
+    } else if (targetVal === 'mbank') {
+      if (detailVal === '비밀번호 변경') {
+        html = `
+          <div class="form-group">
+            <label class="form-label">뱅킹 사용자 ID</label>
+            <input type="text" class="form-input" id="report-mbank-id" placeholder="iM뱅크 로그인 아이디 입력" required>
+          </div>
+          <div class="form-group checkbox-group" style="margin-bottom: 12px;">
+            <label class="checkbox-container">
+              <input type="checkbox" id="report-mbank-lock-clear" checked>
+              <span class="checkmark"></span>
+              <span class="checkbox-label">로그인 비밀번호 5회 초과 잠김 오류 해제 신청 포함</span>
+            </label>
+          </div>
+          <div class="form-group">
+            <label class="form-label">새로운 뱅킹 비밀번호 (숫자 6자리)</label>
+            <input type="password" inputmode="numeric" class="form-input" id="report-mbank-new-pw" placeholder="새로운 뱅킹 비밀번호 입력" maxlength="6" required>
+          </div>
+        `;
+      }
+    }
+    
+    dynamicReportFields.innerHTML = html;
+    
+    // 추가 서식 내 인터랙션 보정: 카드 재발급 우편/영업점 수령에 따른 주소창 가시성 연동
+    const addressGroup = document.getElementById('card-delivery-address-group');
+    const deliveryRadios = document.querySelectorAll('input[name="report-card-delivery"]');
+    const addressInput = document.getElementById('report-card-delivery-address');
+    
+    if (addressGroup && deliveryRadios.length > 0) {
+      deliveryRadios.forEach(rad => {
+        rad.addEventListener('change', (e) => {
+          if (e.target.value === '영업점') {
+            addressGroup.style.display = 'none';
+            if (addressInput) addressInput.required = false;
+          } else {
+            addressGroup.style.display = 'block';
+            if (addressInput) addressInput.required = true;
+          }
+        });
+      });
+    }
   }
 
-  // Switch form requirements dynamically based on selected transaction
-  radioButtons.forEach(radio => {
+  // 대분류(제신고성 vs 신규) 선택에 따른 토글
+  preWorkTypeRadios.forEach(radio => {
     radio.addEventListener('change', (e) => {
-      const value = e.target.value;
-      amountInput.value = ''; // Clear value when switching transaction types
-      
-      if (value === 'deposit') {
-        amountLabel.textContent = '거래 금액 (원)';
-        amountInput.placeholder = '금액을 입력해 주세요 (예: 50000)';
-        amountInput.required = true;
-        amountInput.style.display = 'block';
-        amountLabel.style.display = 'block';
-        quickAmountContainer.style.display = 'grid';
-        accountField.style.display = 'flex';
-      } else if (value === 'account') {
-        amountLabel.textContent = '최초 개설 입금액 (원)';
-        amountInput.placeholder = '개설 시 입금할 금액 (없을 시 0 입력)';
-        amountInput.required = false;
-        amountInput.style.display = 'block';
-        amountLabel.style.display = 'block';
-        quickAmountContainer.style.display = 'grid';
-        accountField.style.display = 'none'; // No account yet
-      } else if (value === 'card') {
-        // Hide amount and account details for Card registration
-        amountLabel.style.display = 'none';
-        amountInput.style.display = 'none';
-        amountInput.required = false;
-        quickAmountContainer.style.display = 'none';
-        accountField.style.display = 'flex';
-        const accountLabel = accountField.querySelector('label');
-        accountLabel.textContent = '결제 계좌번호 (iM Bank)';
+      const type = e.target.value;
+      if (type === 'report') {
+        if (reportFieldsGroup) reportFieldsGroup.classList.remove('hidden');
+        if (cifFieldsGroup) cifFieldsGroup.classList.add('hidden');
+        
+        // 필수 값 지정
+        if (reportUserName) reportUserName.required = true;
+        if (reportUserPhone) reportUserPhone.required = true;
+        if (cifName) cifName.required = false;
+        if (cifPhone) cifPhone.required = false;
+      } else {
+        if (reportFieldsGroup) reportFieldsGroup.classList.add('hidden');
+        if (cifFieldsGroup) cifFieldsGroup.classList.remove('hidden');
+        
+        // 필수 값 지정
+        if (reportUserName) reportUserName.required = false;
+        if (reportUserPhone) reportUserPhone.required = false;
+        if (cifName) cifName.required = true;
+        if (cifPhone) cifPhone.required = true;
       }
+      // 동적 필드 초기 상태 갱신
+      updateDynamicReportFields();
     });
   });
 
-  // 천 단위 쉼표 포맷팅 함수 (안전성 보강)
-  function formatNumberWithCommas(val) {
-    if (!val) return '';
-    const numOnly = val.toString().replace(/[^\d]/g, '');
-    if (!numOnly) return '';
-    return parseInt(numOnly, 10).toLocaleString();
+  // 제신고성 세부 대상 변경에 따른 칩 그룹 토글
+  if (reportTargetSelect) {
+    reportTargetSelect.addEventListener('change', (e) => {
+      const targetVal = e.target.value;
+      reportDetailGroups.forEach(group => {
+        group.classList.add('hidden');
+      });
+      
+      const activeGroup = document.getElementById(`detail-${targetVal}`);
+      if (activeGroup) {
+        activeGroup.classList.remove('hidden');
+      }
+      // 세부 대상 변경 시 동적 필드 갱신
+      updateDynamicReportFields();
+    });
   }
 
-  // 직접 입력 시 실시간 쉼표 적용
-  amountInput.addEventListener('input', (e) => {
-    e.target.value = formatNumberWithCommas(e.target.value);
-  });
-
-  // Quick Amount Buttons click logic
-  quickBtns.forEach(btn => {
-    btn.addEventListener('click', () => {
-      const valStr = btn.getAttribute('data-value');
-      if (valStr) {
-        amountInput.value = formatNumberWithCommas(valStr);
+  // 이벤트 위임 기법: 칩 라디오 버튼 변경 등 모든 폼 변화 발생 시 동적 필드 실시간 동기화
+  if (preWritingForm) {
+    preWritingForm.addEventListener('change', (e) => {
+      if (e.target.name && e.target.name.startsWith('detail-')) {
+        updateDynamicReportFields();
       }
     });
-  });
+  }
+
+  // 초기 상태 로딩을 위한 자동 동적 필드 빌드
+  updateDynamicReportFields();
 
   // Pre-writing Form Submission
-  preWritingForm.addEventListener('submit', (e) => {
-    e.preventDefault();
-    
-    // Simulate loading/saving animation
-    const submitBtnText = preWritingForm.querySelector('.submit-form-btn span');
-    const submitBtnIcon = preWritingForm.querySelector('.submit-form-btn i');
-    const originalText = submitBtnText.textContent;
-    
-    submitBtnText.textContent = '서류 제출 중...';
-    submitBtnIcon.className = 'fa-solid fa-spinner fa-spin';
-    
-    setTimeout(() => {
-      // Gather inputs
-      const nameVal = document.getElementById('user-name').value;
-      const typeVal = document.querySelector('input[name="transaction-type"]:checked').value;
-      let displayJobText = '입금/출금';
-      if (typeVal === 'account') displayJobText = '통장 개설';
-      if (typeVal === 'card') displayJobText = '카드 신청';
+  if (preWritingForm) {
+    preWritingForm.addEventListener('submit', (e) => {
+      e.preventDefault();
       
-      // Update success message UI
-      displayName.textContent = nameVal;
-      displayJob.textContent = displayJobText;
+      const submitBtnText = preWritingForm.querySelector('.submit-form-btn span');
+      const submitBtnIcon = preWritingForm.querySelector('.submit-form-btn i');
+      const originalText = submitBtnText ? submitBtnText.textContent : '서류 임시 제출 완료';
       
-      // Swapping states
-      preWritingForm.classList.add('hidden');
-      successMessage.classList.remove('hidden');
+      if (submitBtnText) submitBtnText.textContent = '서류 제출 중...';
+      if (submitBtnIcon) submitBtnIcon.className = 'fa-solid fa-spinner fa-spin';
       
-      // Restore submit button state
-      submitBtnText.textContent = originalText;
-      submitBtnIcon.className = 'fa-solid fa-arrow-right';
-      
-      playNotificationSound('double');
-      showToast('서류 작성이 완료되었습니다.');
-    }, 1000);
-  });
+      setTimeout(() => {
+        const selectedWorkRadio = document.querySelector('input[name="pre-work-type"]:checked');
+        const selectedWorkType = selectedWorkRadio ? selectedWorkRadio.value : 'report';
+        let nameVal = '';
+        let displayJobText = '';
+        
+        if (selectedWorkType === 'report') {
+          nameVal = reportUserName ? reportUserName.value : '';
+          const reportTargetText = reportTargetSelect ? reportTargetSelect.options[reportTargetSelect.selectedIndex].text : '카드';
+          
+          // 선택된 칩 세부 값 획득
+          const reportTargetVal = reportTargetSelect ? reportTargetSelect.value : 'card';
+          const checkedDetailRadio = document.querySelector(`input[name="detail-${reportTargetVal}-val"]:checked`);
+          const detailText = checkedDetailRadio ? checkedDetailRadio.value : '';
+          
+          displayJobText = `제신고 (${reportTargetText} - ${detailText})`;
+        } else {
+          nameVal = cifName ? cifName.value : '';
+          displayJobText = '신규(CIF) 등록';
+        }
+        
+        // Update success message UI
+        if (displayName) displayName.textContent = nameVal;
+        if (displayJob) displayJob.textContent = displayJobText;
+        
+        // Swapping states
+        preWritingForm.classList.add('hidden');
+        if (successMessage) successMessage.classList.remove('hidden');
+        
+        // Restore submit button state
+        if (submitBtnText) submitBtnText.textContent = originalText;
+        if (submitBtnIcon) submitBtnIcon.className = 'fa-solid fa-arrow-right';
+        
+        playNotificationSound('double');
+        showToast('서류 작성이 완료되었습니다.');
+      }, 1000);
+    });
+  }
 
   // Edit/Reset form button inside success layout
-  editFormBtn.addEventListener('click', () => {
-    successMessage.classList.add('hidden');
-    preWritingForm.classList.remove('hidden');
-  });
+  if (editFormBtn) {
+    editFormBtn.addEventListener('click', () => {
+      if (successMessage) successMessage.classList.add('hidden');
+      if (preWritingForm) preWritingForm.classList.remove('hidden');
+    });
+  }
 
   // --- 7. KakaoTalk Modal Control ---
   kakaotalkBtn.addEventListener('click', () => {
@@ -1518,35 +1839,33 @@ document.addEventListener('DOMContentLoaded', async () => {
   const preWritingModal = document.getElementById('pre-writing-modal');
   const checklistModal = document.getElementById('checklist-modal');
   const financialTestModal = document.getElementById('financial-test-modal');
+  const transferVoucherModal = document.getElementById('transfer-voucher-modal');
 
   const closePreWritingBtn = document.getElementById('close-pre-writing-modal-btn');
   const closeChecklistBtn = document.getElementById('close-checklist-modal-btn');
   const closeFinancialTestBtn = document.getElementById('close-financial-test-modal-btn');
+  const closeTransferVoucherBtn = document.getElementById('close-transfer-voucher-modal-btn');
 
   // 미리작성 모달 열기
   if (quickPreWritingBtn && preWritingModal) {
     quickPreWritingBtn.addEventListener('click', () => {
       preWritingModal.classList.remove('hidden');
       
-      // 서류 직접 작성 탭 활성화
-      const formTabBtn = document.querySelector('.pre-tab-btn[data-pre-tab="form"]');
-      if (formTabBtn) {
-        formTabBtn.click();
+      // 항상 신규(CIF) 등록 라디오를 디폴트로 초기 설정
+      const defaultRadio = document.querySelector('input[name="pre-work-type"][value="cif"]');
+      if (defaultRadio) {
+        defaultRadio.checked = true;
+        defaultRadio.dispatchEvent(new Event('change'));
       }
+      
       playNotificationSound('beep');
     });
   }
 
   // 송금전표 모달 열기
-  if (quickScanBtn && preWritingModal) {
+  if (quickScanBtn && transferVoucherModal) {
     quickScanBtn.addEventListener('click', () => {
-      preWritingModal.classList.remove('hidden');
-      
-      // 송금전표 스캔 탭 활성화
-      const scanTabBtn = document.querySelector('.pre-tab-btn[data-pre-tab="scan"]');
-      if (scanTabBtn) {
-        scanTabBtn.click();
-      }
+      transferVoucherModal.classList.remove('hidden');
       playNotificationSound('beep');
     });
   }
@@ -1587,5 +1906,6 @@ document.addEventListener('DOMContentLoaded', async () => {
   setupModalClose(closePreWritingBtn, preWritingModal);
   setupModalClose(closeChecklistBtn, checklistModal);
   setupModalClose(closeFinancialTestBtn, financialTestModal);
+  setupModalClose(closeTransferVoucherBtn, transferVoucherModal);
 
 });

@@ -553,6 +553,56 @@ input:checked + .slider:before {
   color: var(--brand-mint-dark);
 }
 
+/* 신규(CIF) 등록 카드 테두리에 은은한 연민트색 보더 적용 */
+.cif-radio-card .radio-content {
+  border: 1.5px solid #80E4D5 !important;
+}
+
+/* 첫 이용 고객이라면 말풍선 스타일 (부드러운 파스텔 옐로우로 변경) */
+.tooltip-bubble {
+  position: absolute;
+  left: 50%;
+  bottom: -28px; /* 버튼 아래로 배치 */
+  transform: translateX(-50%);
+  background-color: #FFE79A;
+  color: #4A3E1B; /* 눈이 편안하고 대비가 우수한 다크 브라운 텍스트 */
+  font-size: 10px;
+  font-weight: 800;
+  padding: 3.5px 8px;
+  border-radius: 6px;
+  white-space: nowrap;
+  box-shadow: 0 3px 8px rgba(0, 0, 0, 0.06);
+  z-index: 10;
+  animation: tooltipBounce 2s infinite;
+}
+
+/* 말풍선 위쪽 삼각형 꼬리 (버튼 테두리 가리킴) */
+.tooltip-bubble::after {
+  content: '';
+  position: absolute;
+  top: -4px; /* 위로 배치 */
+  left: 50%;
+  transform: translateX(-50%);
+  border-width: 0 4px 4px;
+  border-style: solid;
+  border-color: transparent transparent #FFE79A;
+  display: block;
+  width: 0;
+}
+
+/* 말풍선 위아래 바운스 애니메이션 (수평 중앙정렬 유지) */
+@keyframes tooltipBounce {
+  0%, 20%, 50%, 80%, 100% {
+    transform: translateX(-50%) translateY(0);
+  }
+  40% {
+    transform: translateX(-50%) translateY(3px); /* 아래로 바운스 */
+  }
+  60% {
+    transform: translateX(-50%) translateY(1px);
+  }
+}
+
 .form-input {
   width: 100%;
   padding: 12px;
@@ -3634,4 +3684,47 @@ input:checked + .slider:before {
   .highlight-num { font-size: 36px; }
   .stat-value { font-size: 19px; }
   .business-category .value { font-size: 19px; }
+}
+
+/* --------------------------------- Pre-Writing Form Chip Radio Style */
+.chip-group {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 6px;
+  margin-bottom: 2px;
+}
+
+.chip-item {
+  position: relative;
+  cursor: pointer;
+  user-select: none;
+}
+
+.chip-item input[type="radio"] {
+  position: absolute;
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+
+.chip-item span {
+  display: inline-block;
+  padding: 8px 16px;
+  background-color: var(--white);
+  border: 1px solid var(--light-gray);
+  border-radius: 20px;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--cool-gray);
+  transition: all 0.2s ease;
+  white-space: nowrap;
+}
+
+.chip-item input[type="radio"]:checked + span {
+  background-color: var(--brand-mint-light);
+  border-color: var(--brand-mint);
+  color: var(--brand-mint-dark);
+  font-weight: 800;
+  box-shadow: 0 2px 8px rgba(0, 199, 169, 0.1);
 }
