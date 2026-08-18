@@ -2832,7 +2832,7 @@ input:checked + .slider:before {
    ========================================================================== */
 
 :root {
-  --footer-h: 60px;
+  --footer-h: 64px;
 }
 
 html {
@@ -2895,14 +2895,14 @@ body {
 }
 
 .web-title-text {
-  font-size: 14.5px;
+  font-size: 16px;
   letter-spacing: -0.5px;
   gap: 5px;
   min-width: 0;
 }
 
 .web-title-text i {
-  font-size: 13px;
+  font-size: 15px;
   color: var(--brand-mint);
 }
 
@@ -2913,7 +2913,7 @@ body {
 }
 
 .timestamp {
-  font-size: 10.5px;
+  font-size: 11.5px;
   white-space: nowrap;
 }
 
@@ -2921,7 +2921,7 @@ body {
   background: none;
   border: none;
   color: var(--cool-gray);
-  font-size: 15px;
+  font-size: 17px;
   line-height: 1;
   padding: 0 0 0 2px;
   cursor: pointer;
@@ -2949,10 +2949,10 @@ body {
 .ticket-card {
   flex: 1 1 auto;
   min-height: 0;
-  max-height: 320px;
+  max-height: 330px;
   align-items: stretch;
   justify-content: space-between;
-  padding: 12px 14px;
+  padding: 14px 16px;
   border-radius: 16px;
   gap: 10px;
 }
@@ -2966,13 +2966,13 @@ body {
 
 .ticket-branch {
   margin: 0;
-  font-size: 11px;
-  padding: 4px 9px;
+  font-size: 12.5px;
+  padding: 5px 11px;
   white-space: nowrap;
 }
 
 .ticket-branch i {
-  font-size: 10px;
+  font-size: 11.5px;
 }
 
 .ticket-badge-group {
@@ -2982,14 +2982,14 @@ body {
 
 .ticket-status-badge,
 .qr-verify-badge {
-  font-size: 9.5px;
-  padding: 3px 8px;
+  font-size: 11px;
+  padding: 4px 9px;
   letter-spacing: 0;
   white-space: nowrap;
 }
 
 .qr-verify-badge i {
-  font-size: 9px;
+  font-size: 10.5px;
 }
 
 /* 내 번호 + 업무 분야 1행 */
@@ -3010,21 +3010,21 @@ body {
 }
 
 .ticket-number-label {
-  font-size: 11px;
+  font-size: 13px;
   font-weight: 700;
   color: var(--cool-gray);
   letter-spacing: -0.3px;
 }
 
 .highlight-num {
-  font-size: 30px;
+  font-size: 40px;
   font-weight: 900;
   color: #111;
   line-height: 1.15;
 }
 
 .highlight-num em {
-  font-size: 16px;
+  font-size: 20px;
   font-style: normal;
   font-weight: 800;
   margin-left: 1px;
@@ -3033,9 +3033,9 @@ body {
 .accent-backdrop-container {
   width: auto;
   flex-shrink: 0;
-  padding: 7px 13px;
+  padding: 10px 16px;
   margin-bottom: 0;
-  border-radius: 10px;
+  border-radius: 12px;
 }
 
 .business-category {
@@ -3045,30 +3045,30 @@ body {
 }
 
 .business-category .label {
-  font-size: 9.5px;
+  font-size: 11.5px;
 }
 
 .business-category .value {
-  font-size: 15px;
+  font-size: 21px;
   line-height: 1.15;
 }
 
 /* 대기 정보 */
 .ticket-stats-grid {
   margin-bottom: 0;
-  padding: 9px 0;
+  padding: 12px 0;
 }
 
 .stat-line {
-  height: 26px;
+  height: 34px;
 }
 
 .stat-label {
-  font-size: 10.5px;
+  font-size: 12.5px;
 }
 
 .stat-value {
-  font-size: 16px;
+  font-size: 21px;
 }
 
 /* 알림 토글 + 순번 미루기 1행 */
@@ -3081,8 +3081,8 @@ body {
 .notification-toggle-wrapper {
   flex: 1 1 auto;
   min-width: 0;
-  padding: 7px 10px;
-  border-radius: 10px;
+  padding: 10px 12px;
+  border-radius: 12px;
 }
 
 .toggle-info {
@@ -3091,54 +3091,54 @@ body {
 }
 
 .sound-icon {
-  font-size: 14px;
+  font-size: 17px;
 }
 
 .toggle-label {
-  font-size: 12px;
+  font-size: 13.5px;
   font-weight: 700;
   white-space: nowrap;
   letter-spacing: -0.3px;
 }
 
 .switch {
-  width: 38px;
-  height: 21px;
+  width: 44px;
+  height: 25px;
   flex-shrink: 0;
 }
 
 .slider:before {
-  height: 15px;
-  width: 15px;
+  height: 19px;
+  width: 19px;
 }
 
 input:checked + .slider:before {
-  transform: translateX(17px);
+  transform: translateX(19px);
 }
 
 .delay-btn {
   position: relative;
   width: auto;
   flex: 0 0 auto;
-  padding: 7px 12px;
-  font-size: 12px;
+  padding: 10px 14px;
+  font-size: 13.5px;
   font-weight: 800;
-  border-radius: 10px;
+  border-radius: 12px;
   gap: 5px;
   white-space: nowrap;
   overflow: visible;
 }
 
 .delay-btn i {
-  font-size: 12px;
+  font-size: 14px;
 }
 
 .delay-btn .delay-badge {
   position: absolute;
-  top: -7px;
+  top: -8px;
   right: -5px;
-  font-size: 8.5px;
-  padding: 1px 5px;
+  font-size: 10px;
+  padding: 1.5px 6px;
   border-radius: 6px;
   border: 1.5px solid var(--card-bg);
   line-height: 1.5;
@@ -3156,32 +3156,33 @@ input:checked + .slider:before {
   grid-template-rows: repeat(2, minmax(0, 1fr));
   flex: 1.2 1 auto;
   min-height: 0;
-  max-height: 340px;
+  max-height: 330px;
   gap: 10px;
   margin: 0;
 }
 
 .quick-card-btn {
-  padding: 8px;
-  gap: 7px;
-  border-radius: 14px;
+  padding: 10px;
+  gap: 10px;
+  border-radius: 16px;
   min-height: 0;
 }
 
 .quick-card-icon-wrapper {
-  width: 42px;
-  height: 42px;
-  border-radius: 12px;
+  width: 58px;
+  height: 58px;
+  border-radius: 17px;
   flex-shrink: 0;
 }
 
 .quick-svg-icon {
-  width: 22px;
-  height: 22px;
+  width: 32px;
+  height: 32px;
+  stroke-width: 2.1;
 }
 
 .quick-card-title {
-  font-size: 12.5px;
+  font-size: 15px;
   letter-spacing: -0.4px;
 }
 
@@ -3195,17 +3196,18 @@ input:checked + .slider:before {
 }
 
 .footer-btn-refresh {
-  width: 44px;
-  height: 44px;
-  border-radius: 11px;
-  font-size: 15px;
+  width: 48px;
+  height: 48px;
+  border-radius: 12px;
+  font-size: 17px;
 }
 
 .footer-btn-sms,
 .footer-btn-primary {
-  height: 44px;
-  border-radius: 11px;
-  font-size: 12.5px;
+  height: 48px;
+  border-radius: 12px;
+  font-size: 14px;
+  gap: 6px;
 }
 
 .toast {
@@ -3238,16 +3240,22 @@ input:checked + .slider:before {
 /* --- 초소형 화면 (iPhone SE 이하) 추가 압축 --- */
 /* PC 프레임은 논리 높이가 항상 844px이므로 실제 모바일 폭에서만 적용 */
 @media (max-width: 600px) and (max-height: 640px) {
-  .highlight-num { font-size: 26px; }
-  .highlight-num em { font-size: 14px; }
-  .business-category .value { font-size: 14px; }
-  .stat-value { font-size: 15px; }
-  .ticket-card { gap: 8px; padding: 10px 12px; }
+  .highlight-num { font-size: 33px; }
+  .highlight-num em { font-size: 17px; }
+  .ticket-number-label { font-size: 12px; }
+  .business-category .value { font-size: 18px; }
+  .accent-backdrop-container { padding: 8px 13px; }
+  .stat-value { font-size: 18px; }
+  .stat-label { font-size: 11.5px; }
+  .ticket-stats-grid { padding: 9px 0; }
+  .ticket-card { gap: 8px; padding: 11px 13px; }
   .app-content { gap: 8px; padding: 8px 12px; }
-  .quick-card-icon-wrapper { width: 36px; height: 36px; border-radius: 10px; }
-  .quick-svg-icon { width: 19px; height: 19px; }
-  .quick-card-title { font-size: 11.5px; }
+  .quick-card-icon-wrapper { width: 46px; height: 46px; border-radius: 14px; }
+  .quick-svg-icon { width: 26px; height: 26px; }
+  .quick-card-title { font-size: 13px; }
   .quick-menu-grid { gap: 8px; }
+  .footer-btn-refresh { width: 44px; height: 44px; }
+  .footer-btn-sms, .footer-btn-primary { height: 44px; font-size: 13px; }
 }
 
 /* ==========================================================================
@@ -3346,4 +3354,55 @@ input:checked + .slider:before {
   .modal-overlay {
     border-radius: 34px;
   }
+}
+
+/* ==========================================================================
+   TALL FRAME DENSITY — 세로 여유가 있는 화면에서 요소를 한 단계 더 키움
+   대상: PC/태블릿 폰 프레임(논리 높이 844px 고정) + 세로 780px 이상의 실제 폰
+   목적: 컨테이너 대비 아이콘·글자가 작아 비어 보이는 문제 해소
+   ========================================================================== */
+
+@media (min-width: 601px), (min-height: 780px) {
+  /* 번호표 카드 */
+  .ticket-card {
+    max-height: 360px;
+    padding: 16px 18px;
+    gap: 12px;
+  }
+
+  .ticket-branch { font-size: 13px; padding: 6px 12px; }
+  .ticket-branch i { font-size: 12px; }
+  .ticket-status-badge,
+  .qr-verify-badge { font-size: 11.5px; padding: 5px 10px; }
+
+  .ticket-number-label { font-size: 14px; }
+  .highlight-num { font-size: 46px; }
+  .highlight-num em { font-size: 22px; }
+
+  .accent-backdrop-container { padding: 11px 18px; }
+  .business-category .label { font-size: 12px; }
+  .business-category .value { font-size: 24px; }
+
+  .ticket-stats-grid { padding: 14px 0; }
+  .stat-label { font-size: 13px; }
+  .stat-value { font-size: 23px; }
+  .stat-line { height: 38px; }
+
+  .notification-toggle-wrapper { padding: 12px 14px; }
+  .sound-icon { font-size: 18px; }
+  .toggle-label { font-size: 14px; }
+  .delay-btn { padding: 12px 15px; font-size: 14px; }
+  .delay-btn i { font-size: 15px; }
+
+  /* 퀵 메뉴 */
+  .quick-menu-grid { max-height: 360px; gap: 12px; }
+  .quick-card-btn { padding: 12px; gap: 12px; }
+  .quick-card-icon-wrapper { width: 68px; height: 68px; border-radius: 20px; }
+  .quick-svg-icon { width: 38px; height: 38px; }
+  .quick-card-title { font-size: 16.5px; }
+
+  /* 푸터 */
+  .footer-btn-refresh { width: 52px; height: 52px; font-size: 18px; }
+  .footer-btn-sms,
+  .footer-btn-primary { height: 52px; font-size: 15px; }
 }
