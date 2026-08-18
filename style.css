@@ -19,7 +19,7 @@
   --warning-bg: #FFEAEA;
 }
 
-* {
+*, body, input, button, select, textarea {
   box-sizing: border-box;
   margin: 0;
   padding: 0;
@@ -112,7 +112,7 @@ body {
 /* Ticket Card */
 .ticket-card {
   background-color: var(--card-bg);
-  border: 2px solid var(--brand-mint, #00C7A9); /* 브랜드 민트색 2px 테두리 적용 */
+  border: 1px solid var(--brand-mint-light);
   border-radius: 20px;
   padding: 24px 20px;
   box-shadow: var(--shadow-sm);
@@ -1237,7 +1237,7 @@ input:checked + .slider:before {
 }
 
 .voucher-title {
-  font-family: 'Noto Sans KR', sans-serif;
+  font-family: 'Pretendard', sans-serif;
   font-size: 12px;
   font-weight: 900;
   color: #005670;
@@ -2768,7 +2768,7 @@ input:checked + .slider:before {
 
 .quick-card-btn {
   background-color: var(--white);
-  border: 2px solid var(--brand-mint, #00C7A9); /* 테두리 굵기를 2px로 미세 확장 */
+  border: 1.5px solid var(--brand-mint, #00C7A9); /* 민트 테두리 적용 */
   border-radius: 18px;
   padding: 24px 16px;
   display: flex;
@@ -3358,7 +3358,7 @@ input:checked + .slider:before {
   .ticket-card {
     flex: none;
     background-color: var(--white);
-    border: 2px solid var(--brand-mint, #00C7A9); /* 데스크톱 뷰에서도 민트 테두리 2px 통일 */
+    border: 1px solid var(--light-gray);
     padding: 28px 30px;
     border-radius: 20px;
     gap: 20px;
