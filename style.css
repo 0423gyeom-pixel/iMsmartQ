@@ -99,6 +99,25 @@ body {
   font-weight: 500;
 }
 
+.header-info-btn {
+  background: none;
+  border: none;
+  color: var(--cool-gray);
+  font-size: 13px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  margin-left: 8px;
+}
+
+.info-btn-text {
+  font-size: 10.5px;
+  font-weight: 600;
+  color: var(--cool-gray);
+  letter-spacing: -0.5px;
+}
+
 /* Main Content Area */
 .app-content {
   padding: 16px;
@@ -2931,12 +2950,21 @@ body {
   background: none;
   border: none;
   color: var(--cool-gray);
-  font-size: clamp(14px, 2cqh, 19px);
+  font-size: clamp(12px, 1.8cqh, 16px);
   line-height: 1;
-  padding: 0 0 0 2px;
+  padding: 0;
   cursor: pointer;
   display: flex;
   align-items: center;
+  gap: 4px;
+  margin-left: 8px;
+}
+
+.info-btn-text {
+  font-size: clamp(9px, 1.35cqh, 11.5px);
+  font-weight: 600;
+  color: var(--cool-gray);
+  letter-spacing: -0.5px;
 }
 
 .header-info-btn:active {
@@ -3333,8 +3361,13 @@ input:checked + .slider:before {
   }
 
   .header-info-btn {
-    font-size: 18px;
-    padding-left: 4px;
+    font-size: 16px;
+    margin-left: 12px;
+    gap: 6px;
+  }
+
+  .info-btn-text {
+    font-size: 12px;
   }
 
   /* ------------------------------------------------ 본문 (2단 그리드) */
@@ -3489,6 +3522,10 @@ input:checked + .slider:before {
     border: 1px solid var(--light-gray);
     border-radius: 18px;
     padding: 20px 26px;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
   }
 
   .notice-section h4 {
@@ -3564,20 +3601,37 @@ input:checked + .slider:before {
 
 /* ---------------------------------- 데스크톱: 2단 그리드로 전환 (1024px~) */
 @media (min-width: 1024px) {
+  html,
+  body {
+    height: 100%;
+    overflow: hidden;
+  }
+
+  .mobile-web-container {
+    height: 100vh;
+    height: 100dvh;
+    min-height: 0;
+    overflow: hidden;
+  }
+
   .app-content {
     grid-template-columns: minmax(0, 1.05fr) minmax(0, 1fr);
+    grid-template-rows: auto 1fr;
     grid-template-areas:
       "ticket quick"
       "notice quick";
     gap: 22px 26px;
     padding: 32px 28px 36px;
+    height: 100%;
+    align-content: stretch;
   }
 
   /* 우측 컬럼: 좌측(번호표+안내) 높이에 맞춰 카드 4장이 균등하게 늘어남 */
   .quick-menu-grid {
     grid-template-columns: minmax(0, 1fr);
-    grid-auto-rows: minmax(96px, 1fr);
+    grid-template-rows: repeat(4, 1fr);
     align-content: stretch;
+    height: 100%;
   }
 
   .ticket-card { padding: 32px 34px; }
