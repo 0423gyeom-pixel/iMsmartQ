@@ -2825,10 +2825,16 @@ input:checked + .slider:before {
   color: var(--dark-text);
 }
 
+
 /* ==========================================================================
-   ONE-VIEW MOBILE LAYOUT (한 화면 무스크롤 레이아웃) — 2026.08 개정
-   기준: iPhone SE (375 x 667) 무스크롤. 그 이상 기기는 여백이 자동 확장됨.
-   이 블록은 파일 최하단에 위치하여 위쪽 기존 규칙을 의도적으로 덮어씀.
+   ONE-VIEW RESPONSIVE LAYOUT — 2026.08 개정 (v3)
+   설계 원칙
+   1) 세로 스크롤 없음: 헤더 + 콘텐츠 + 푸터가 화면 높이를 정확히 나눠 가짐
+   2) 고정 px 대신 컨테이너 비례 단위(cqh / cqw) 사용
+      → 접속 기기 화면 크기에 맞춰 글자·아이콘이 함께 확대·축소되며
+        남는 공백이 생기지 않음
+   3) 601px 이상(PC/태블릿)은 390x844 논리 해상도의 폰 프레임을 중앙 배치
+   ※ 이 블록은 파일 최하단에 위치하여 위쪽 기존 규칙을 의도적으로 덮어씀
    ========================================================================== */
 
 :root {
@@ -2846,7 +2852,8 @@ body {
   overscroll-behavior: none;
 }
 
-/* 푸터/토스트/모달이 모두 이 컨테이너의 자식이므로 position 기준점 역할을 함 */
+/* 푸터·토스트·모달이 모두 이 컨테이너의 자식이므로 위치 기준점이자
+   내부 비례 단위(cqh/cqw)의 기준 컨테이너 역할을 함 */
 .mobile-web-container {
   position: relative;
   width: 100%;
@@ -2857,11 +2864,13 @@ body {
   overflow: hidden;
   padding-bottom: 0;
   box-shadow: none;
+  container-type: size;
+  container-name: device;
 }
 
-/* 푸터는 fixed가 아니라 컨테이너 안의 flex 자식으로 배치 */
+/* 푸터는 fixed가 아니라 컨테이너 안의 flex 자식 */
 .app-footer {
-  position: static;
+  position: relative;
   left: auto;
   bottom: auto;
   transform: none;
@@ -2870,19 +2879,20 @@ body {
   flex: 0 0 auto;
 }
 
-/* 모달·토스트도 뷰포트가 아닌 컨테이너 기준으로 고정 */
+/* 모달·토스트도 뷰포트가 아닌 컨테이너 기준 */
 .modal-overlay {
   position: absolute;
 }
 
 .toast {
   position: absolute;
+  bottom: calc(var(--footer-h) + 14px + env(safe-area-inset-bottom, 0px));
 }
 
-/* --- 헤더: 1줄 압축 --- */
+/* --------------------------------------------------------------- 헤더 */
 .app-header {
   padding: 0;
-  flex-shrink: 0;
+  flex: 0 0 auto;
 }
 
 .web-title-bar {
@@ -2890,19 +2900,19 @@ body {
   align-items: center;
   justify-content: space-between;
   gap: 8px;
-  padding: 9px 14px;
+  padding: clamp(8px, 1.35cqh, 14px) clamp(12px, 3.6cqw, 20px);
   margin-bottom: 0;
 }
 
 .web-title-text {
-  font-size: 16px;
+  font-size: clamp(14px, 2.05cqh, 19px);
   letter-spacing: -0.5px;
   gap: 5px;
   min-width: 0;
 }
 
 .web-title-text i {
-  font-size: 15px;
+  font-size: clamp(13px, 1.95cqh, 18px);
   color: var(--brand-mint);
 }
 
@@ -2913,7 +2923,7 @@ body {
 }
 
 .timestamp {
-  font-size: 11.5px;
+  font-size: clamp(10px, 1.42cqh, 13.5px);
   white-space: nowrap;
 }
 
@@ -2921,7 +2931,7 @@ body {
   background: none;
   border: none;
   color: var(--cool-gray);
-  font-size: 17px;
+  font-size: clamp(14px, 2cqh, 19px);
   line-height: 1;
   padding: 0 0 0 2px;
   cursor: pointer;
@@ -2933,28 +2943,25 @@ body {
   color: var(--brand-mint-dark);
 }
 
-/* --- 콘텐츠 영역: 남은 높이를 세로로 배분 --- */
+/* ------------------------------------------------- 콘텐츠 영역 배분 */
 .app-content {
   flex: 1 1 auto;
   min-height: 0;
-  padding: 10px 14px;
-  gap: 10px;
-  justify-content: center;
-  overflow-y: auto;
-  -webkit-overflow-scrolling: touch;
+  padding: clamp(8px, 1.3cqh, 16px) clamp(12px, 3.6cqw, 20px);
+  gap: clamp(8px, 1.3cqh, 16px);
+  justify-content: flex-start;
+  overflow: hidden;
 }
 
-/* --- 번호표 카드 --- */
-/* flex-grow로 화면이 큰 기기에서는 여백을 자연스럽게 흡수 */
+/* --------------------------------------------------------- 번호표 카드 */
+/* 내용에 딱 맞는 높이만 차지하고, 남는 세로 공간은 전부 퀵메뉴가 흡수 */
 .ticket-card {
-  flex: 1 1 auto;
-  min-height: 0;
-  max-height: 330px;
+  flex: 0 0 auto;
   align-items: stretch;
-  justify-content: space-between;
-  padding: 14px 16px;
-  border-radius: 16px;
-  gap: 10px;
+  justify-content: flex-start;
+  padding: clamp(12px, 1.85cqh, 22px) clamp(13px, 4cqw, 22px);
+  border-radius: clamp(14px, 2.2cqh, 22px);
+  gap: clamp(8px, 1.35cqh, 16px);
 }
 
 .ticket-top-row {
@@ -2966,13 +2973,13 @@ body {
 
 .ticket-branch {
   margin: 0;
-  font-size: 12.5px;
-  padding: 5px 11px;
+  font-size: clamp(11px, 1.55cqh, 14.5px);
+  padding: clamp(4px, 0.62cqh, 7px) clamp(9px, 3cqw, 14px);
   white-space: nowrap;
 }
 
 .ticket-branch i {
-  font-size: 11.5px;
+  font-size: clamp(10px, 1.42cqh, 13.5px);
 }
 
 .ticket-badge-group {
@@ -2982,14 +2989,14 @@ body {
 
 .ticket-status-badge,
 .qr-verify-badge {
-  font-size: 11px;
-  padding: 4px 9px;
+  font-size: clamp(9.5px, 1.38cqh, 13px);
+  padding: clamp(3px, 0.55cqh, 6px) clamp(8px, 2.5cqw, 12px);
   letter-spacing: 0;
   white-space: nowrap;
 }
 
 .qr-verify-badge i {
-  font-size: 10.5px;
+  font-size: clamp(9px, 1.28cqh, 12px);
 }
 
 /* 내 번호 + 업무 분야 1행 */
@@ -3010,21 +3017,21 @@ body {
 }
 
 .ticket-number-label {
-  font-size: 13px;
+  font-size: clamp(11px, 1.68cqh, 16px);
   font-weight: 700;
   color: var(--cool-gray);
   letter-spacing: -0.3px;
 }
 
 .highlight-num {
-  font-size: 40px;
+  font-size: clamp(30px, 5.35cqh, 54px);
   font-weight: 900;
   color: #111;
-  line-height: 1.15;
+  line-height: 1.12;
 }
 
 .highlight-num em {
-  font-size: 20px;
+  font-size: 0.48em;
   font-style: normal;
   font-weight: 800;
   margin-left: 1px;
@@ -3033,9 +3040,9 @@ body {
 .accent-backdrop-container {
   width: auto;
   flex-shrink: 0;
-  padding: 10px 16px;
+  padding: clamp(7px, 1.25cqh, 15px) clamp(12px, 4.4cqw, 24px);
   margin-bottom: 0;
-  border-radius: 12px;
+  border-radius: clamp(10px, 1.6cqh, 16px);
 }
 
 .business-category {
@@ -3045,44 +3052,44 @@ body {
 }
 
 .business-category .label {
-  font-size: 11.5px;
+  font-size: clamp(9.5px, 1.4cqh, 13px);
 }
 
 .business-category .value {
-  font-size: 21px;
+  font-size: clamp(15px, 2.8cqh, 28px);
   line-height: 1.15;
 }
 
 /* 대기 정보 */
 .ticket-stats-grid {
   margin-bottom: 0;
-  padding: 12px 0;
+  padding: clamp(9px, 1.65cqh, 19px) 0;
 }
 
 .stat-line {
-  height: 34px;
+  height: clamp(26px, 4.4cqh, 44px);
 }
 
 .stat-label {
-  font-size: 12.5px;
+  font-size: clamp(10.5px, 1.55cqh, 14.5px);
 }
 
 .stat-value {
-  font-size: 21px;
+  font-size: clamp(15px, 2.7cqh, 27px);
 }
 
 /* 알림 토글 + 순번 미루기 1행 */
 .ticket-action-row {
   display: flex;
   align-items: stretch;
-  gap: 8px;
+  gap: clamp(6px, 2.2cqw, 12px);
 }
 
 .notification-toggle-wrapper {
   flex: 1 1 auto;
   min-width: 0;
-  padding: 10px 12px;
-  border-radius: 12px;
+  padding: clamp(7px, 1.3cqh, 15px) clamp(10px, 3.2cqw, 16px);
+  border-radius: clamp(10px, 1.6cqh, 16px);
 }
 
 .toggle-info {
@@ -3091,53 +3098,57 @@ body {
 }
 
 .sound-icon {
-  font-size: 17px;
+  font-size: clamp(14px, 2.15cqh, 21px);
 }
 
 .toggle-label {
-  font-size: 13.5px;
+  font-size: clamp(11.5px, 1.68cqh, 16px);
   font-weight: 700;
   white-space: nowrap;
   letter-spacing: -0.3px;
 }
 
 .switch {
-  width: 44px;
-  height: 25px;
+  width: clamp(38px, 5.5cqh, 54px);
+  height: clamp(21px, 3.1cqh, 31px);
   flex-shrink: 0;
 }
 
 .slider:before {
-  height: 19px;
-  width: 19px;
+  height: 72%;
+  width: auto;
+  aspect-ratio: 1;
+  left: 14%;
+  bottom: 14%;
 }
 
 input:checked + .slider:before {
-  transform: translateX(19px);
+  transform: translateX(38cqw);
+  transform: translateX(calc(100% + 14%));
 }
 
 .delay-btn {
   position: relative;
   width: auto;
   flex: 0 0 auto;
-  padding: 10px 14px;
-  font-size: 13.5px;
+  padding: clamp(7px, 1.3cqh, 15px) clamp(11px, 3.6cqw, 18px);
+  font-size: clamp(11.5px, 1.68cqh, 16px);
   font-weight: 800;
-  border-radius: 12px;
+  border-radius: clamp(10px, 1.6cqh, 16px);
   gap: 5px;
   white-space: nowrap;
   overflow: visible;
 }
 
 .delay-btn i {
-  font-size: 14px;
+  font-size: clamp(12px, 1.78cqh, 17px);
 }
 
 .delay-btn .delay-badge {
   position: absolute;
-  top: -8px;
+  top: -0.75em;
   right: -5px;
-  font-size: 10px;
+  font-size: clamp(8.5px, 1.22cqh, 11.5px);
   padding: 1.5px 6px;
   border-radius: 6px;
   border: 1.5px solid var(--card-bg);
@@ -3149,72 +3160,76 @@ input:checked + .slider:before {
   border-color: #f8f9fa;
 }
 
-/* --- 2x2 퀵 메뉴: 남은 공간을 채움 --- */
+/* ------------------------------------------------------- 2x2 퀵 메뉴 */
+/* 남은 세로 공간을 전부 채우고, 카드 내부 요소는 카드 크기에 비례 */
 .quick-menu-grid {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
   grid-template-rows: repeat(2, minmax(0, 1fr));
-  flex: 1.2 1 auto;
+  flex: 1 1 auto;
   min-height: 0;
-  max-height: 330px;
-  gap: 10px;
+  gap: clamp(8px, 1.3cqh, 16px);
   margin: 0;
 }
 
 .quick-card-btn {
-  padding: 10px;
-  gap: 10px;
-  border-radius: 16px;
+  container-type: size;
+  container-name: qcard;
+  padding: 6%;
+  gap: 0;
+  border-radius: clamp(12px, 2cqh, 22px);
   min-height: 0;
+  justify-content: center;
 }
 
 .quick-card-icon-wrapper {
-  width: 58px;
-  height: 58px;
-  border-radius: 17px;
+  width: min(56cqh, 46cqw);
+  height: min(56cqh, 46cqw);
+  border-radius: 28%;
   flex-shrink: 0;
+  margin-bottom: 6cqh;
 }
 
 .quick-svg-icon {
-  width: 32px;
-  height: 32px;
+  width: 55%;
+  height: 55%;
   stroke-width: 2.1;
 }
 
 .quick-card-title {
-  font-size: 15px;
+  font-size: clamp(11.5px, 14cqh, 20px);
+  font-weight: 800;
   letter-spacing: -0.4px;
+  line-height: 1.2;
+  text-align: center;
 }
 
-/* --- 하단 고정 CTA 바 --- */
+/* --------------------------------------------------- 하단 고정 CTA 바 */
 .app-footer {
-  padding: 8px 14px calc(8px + env(safe-area-inset-bottom, 0px));
+  padding: clamp(7px, 1.2cqh, 14px) clamp(12px, 3.6cqw, 20px)
+           calc(clamp(7px, 1.2cqh, 14px) + env(safe-area-inset-bottom, 0px));
 }
 
 .footer-btn-container {
-  gap: 7px;
+  gap: clamp(6px, 2cqw, 12px);
 }
 
 .footer-btn-refresh {
-  width: 48px;
-  height: 48px;
-  border-radius: 12px;
-  font-size: 17px;
+  width: clamp(44px, 6.3cqh, 62px);
+  height: clamp(44px, 6.3cqh, 62px);
+  border-radius: clamp(11px, 1.6cqh, 16px);
+  font-size: clamp(15px, 2.15cqh, 21px);
 }
 
 .footer-btn-sms,
 .footer-btn-primary {
-  height: 48px;
-  border-radius: 12px;
-  font-size: 14px;
+  height: clamp(44px, 6.3cqh, 62px);
+  border-radius: clamp(11px, 1.6cqh, 16px);
+  font-size: clamp(12.5px, 1.8cqh, 17px);
   gap: 6px;
 }
 
-.toast {
-  bottom: calc(var(--footer-h) + 14px + env(safe-area-inset-bottom, 0px));
-}
-
-/* --- 이용 안내 모달 리스트 --- */
+/* ------------------------------------------------- 이용 안내 모달 리스트 */
 .notice-modal-list {
   list-style: none;
   display: flex;
@@ -3237,32 +3252,11 @@ input:checked + .slider:before {
   color: var(--brand-mint);
 }
 
-/* --- 초소형 화면 (iPhone SE 이하) 추가 압축 --- */
-/* PC 프레임은 논리 높이가 항상 844px이므로 실제 모바일 폭에서만 적용 */
-@media (max-width: 600px) and (max-height: 640px) {
-  .highlight-num { font-size: 33px; }
-  .highlight-num em { font-size: 17px; }
-  .ticket-number-label { font-size: 12px; }
-  .business-category .value { font-size: 18px; }
-  .accent-backdrop-container { padding: 8px 13px; }
-  .stat-value { font-size: 18px; }
-  .stat-label { font-size: 11.5px; }
-  .ticket-stats-grid { padding: 9px 0; }
-  .ticket-card { gap: 8px; padding: 11px 13px; }
-  .app-content { gap: 8px; padding: 8px 12px; }
-  .quick-card-icon-wrapper { width: 46px; height: 46px; border-radius: 14px; }
-  .quick-svg-icon { width: 26px; height: 26px; }
-  .quick-card-title { font-size: 13px; }
-  .quick-menu-grid { gap: 8px; }
-  .footer-btn-refresh { width: 44px; height: 44px; }
-  .footer-btn-sms, .footer-btn-primary { height: 44px; font-size: 13px; }
-}
-
 /* ==========================================================================
    DESKTOP / TABLET — 기기 프레임 반응형 (601px 이상)
-   넓은 화면에서는 모바일 비율(390 x 844)의 기기 프레임을 중앙에 배치하고,
-   app.js가 --frame-zoom 을 계산해 브라우저 창 크기에 맞춰 통째로 축소·확대함.
-   (JS가 동작하지 않아도 프레임 자체는 정상 표시됨)
+   390 x 844 논리 해상도의 프레임을 중앙 배치하고, app.js가 계산한
+   --frame-zoom 으로 브라우저 창 크기에 맞춰 통째로 비율 유지 축소·확대한다.
+   프레임 내부는 항상 논리 844px 기준이므로 cqh 비례가 그대로 유지됨.
    ========================================================================== */
 
 @media (min-width: 601px) {
@@ -3278,7 +3272,6 @@ input:checked + .slider:before {
   }
 
   .mobile-web-container {
-    /* 논리 해상도는 항상 390 x 844 로 고정하고 zoom 으로 비율 유지 축소 */
     zoom: var(--frame-zoom, 1);
     width: 390px;
     max-width: 390px;
@@ -3308,9 +3301,8 @@ input:checked + .slider:before {
     pointer-events: none;
   }
 
-  /* 노치를 피하기 위한 상단 여백 */
   .app-header {
-    padding-top: 34px;
+    padding-top: 30px;
   }
 
   /* 하단 홈 인디케이터 */
@@ -3330,79 +3322,24 @@ input:checked + .slider:before {
     border-radius: 4px;
   }
 
-  .app-footer {
-    position: relative;
-  }
-
-  /* 프레임 안쪽이므로 모달 라운딩이 프레임 밖으로 새지 않도록 */
   .modal-overlay {
     border-radius: 46px;
   }
 }
 
-/* 폭은 넓지만 높이가 낮은 창(노트북 등)에서도 프레임이 잘리지 않도록 최소 보정 */
+/* 폭은 넓지만 창 높이가 매우 낮은 경우 프레임 장식만 단순화 */
 @media (min-width: 601px) and (max-height: 560px) {
-  .mobile-web-container {
-    border-radius: 34px;
-  }
-  .mobile-web-container::before {
-    display: none;
-  }
-  .app-header {
-    padding-top: 0;
-  }
-  .modal-overlay {
-    border-radius: 34px;
-  }
+  .mobile-web-container { border-radius: 34px; }
+  .mobile-web-container::before { display: none; }
+  .app-header { padding-top: 0; }
+  .modal-overlay { border-radius: 34px; }
 }
 
-/* ==========================================================================
-   TALL FRAME DENSITY — 세로 여유가 있는 화면에서 요소를 한 단계 더 키움
-   대상: PC/태블릿 폰 프레임(논리 높이 844px 고정) + 세로 780px 이상의 실제 폰
-   목적: 컨테이너 대비 아이콘·글자가 작아 비어 보이는 문제 해소
-   ========================================================================== */
-
-@media (min-width: 601px), (min-height: 780px) {
-  /* 번호표 카드 */
-  .ticket-card {
-    max-height: 360px;
-    padding: 16px 18px;
-    gap: 12px;
-  }
-
-  .ticket-branch { font-size: 13px; padding: 6px 12px; }
-  .ticket-branch i { font-size: 12px; }
-  .ticket-status-badge,
-  .qr-verify-badge { font-size: 11.5px; padding: 5px 10px; }
-
-  .ticket-number-label { font-size: 14px; }
-  .highlight-num { font-size: 46px; }
-  .highlight-num em { font-size: 22px; }
-
-  .accent-backdrop-container { padding: 11px 18px; }
-  .business-category .label { font-size: 12px; }
-  .business-category .value { font-size: 24px; }
-
-  .ticket-stats-grid { padding: 14px 0; }
-  .stat-label { font-size: 13px; }
-  .stat-value { font-size: 23px; }
-  .stat-line { height: 38px; }
-
-  .notification-toggle-wrapper { padding: 12px 14px; }
-  .sound-icon { font-size: 18px; }
-  .toggle-label { font-size: 14px; }
-  .delay-btn { padding: 12px 15px; font-size: 14px; }
-  .delay-btn i { font-size: 15px; }
-
-  /* 퀵 메뉴 */
-  .quick-menu-grid { max-height: 360px; gap: 12px; }
-  .quick-card-btn { padding: 12px; gap: 12px; }
-  .quick-card-icon-wrapper { width: 68px; height: 68px; border-radius: 20px; }
-  .quick-svg-icon { width: 38px; height: 38px; }
-  .quick-card-title { font-size: 16.5px; }
-
-  /* 푸터 */
-  .footer-btn-refresh { width: 52px; height: 52px; font-size: 18px; }
-  .footer-btn-sms,
-  .footer-btn-primary { height: 52px; font-size: 15px; }
+/* 컨테이너 쿼리 미지원 구형 브라우저 대비 최소 안전값 */
+@supports not (container-type: size) {
+  .quick-card-icon-wrapper { width: 54px; height: 54px; margin-bottom: 8px; }
+  .quick-card-title { font-size: 14px; }
+  .highlight-num { font-size: 36px; }
+  .stat-value { font-size: 19px; }
+  .business-category .value { font-size: 19px; }
 }
