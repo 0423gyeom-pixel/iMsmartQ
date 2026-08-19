@@ -3897,3 +3897,117 @@ input:checked + .slider:before {
   padding: 6px 8px;
   text-align: left;
 }
+
+/* ==========================================================================
+   수기 송금전표 4단계 스마트 스캔 및 행원 전용 단말 뷰 스타일 추가
+   ========================================================================== */
+.scan-flow-steps span {
+  transition: color 0.3s;
+}
+.scan-flow-steps .active-step {
+  color: var(--brand-mint) !important;
+  font-weight: 800;
+}
+
+.voucher-type-grid .v-type-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 10px rgba(0, 186, 174, 0.15);
+}
+.voucher-type-grid .v-type-card.active {
+  border-color: var(--brand-mint) !important;
+  background-color: var(--brand-mint-light) !important;
+}
+
+/* 2분할 OCR 화면 */
+.ocr-split-layout {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+@media (min-width: 500px) {
+  .ocr-split-layout {
+    flex-direction: row;
+  }
+  .ocr-split-left {
+    width: 40% !important;
+  }
+  .ocr-split-right {
+    width: 60% !important;
+  }
+}
+
+.ocr-table {
+  width: 100%;
+}
+.ocr-table th, .ocr-table td {
+  padding: 8px 6px;
+  border-bottom: 1px solid var(--light-gray);
+  vertical-align: middle;
+}
+.ocr-table tbody tr:hover {
+  background-color: #fcfdfe;
+}
+.ocr-table input {
+  width: 100%;
+  padding: 4px 6px;
+  border: 1px solid var(--light-gray);
+  border-radius: 4px;
+  font-size: 11px;
+  box-sizing: border-box;
+}
+.ocr-table input:focus {
+  border-color: var(--brand-mint);
+  outline: none;
+}
+
+/* 행원 전용 단말 뷰 */
+#staff-terminal-modal {
+  display: flex;
+}
+.staff-layout-wrapper {
+  font-family: 'Pretendard', -apple-system, sans-serif;
+  color: #2c3e50;
+  display: flex;
+  flex-direction: column;
+}
+.staff-voucher-card {
+  border: 1px solid var(--light-gray);
+  border-radius: 8px;
+  padding: 12px;
+  background-color: var(--white);
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.staff-voucher-card:hover {
+  border-color: var(--brand-mint);
+  box-shadow: 0 2px 8px rgba(0, 186, 174, 0.1);
+  transform: translateY(-1px);
+}
+.staff-voucher-card.selected {
+  border-color: var(--brand-mint);
+  background-color: var(--brand-mint-light);
+}
+
+.s-badge {
+  display: inline-block;
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-size: 10px;
+  font-weight: 700;
+}
+.s-badge-waiting {
+  background-color: #ffeaa7;
+  color: #d63031;
+}
+.s-badge-checking {
+  background-color: #74b9ff;
+  color: #0984e3;
+}
+.s-badge-completed {
+  background-color: #55efc4;
+  color: #00b894;
+}
+.s-badge-rejected {
+  background-color: #ff7675;
+  color: #d63031;
+}

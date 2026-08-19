@@ -1119,15 +1119,86 @@ document.addEventListener('DOMContentLoaded', async () => {
       {
         readiness: '100%',
         suitability: '적합',
-        guide: '타사 퇴직연금 이전 의뢰 정보가 양사 규정에 부합하게 올바른 내용으로 기재되어 검증되었습니다.',
+        guide: '대체 이체 계좌 이전 동의 정보가 당사 규정에 적합하게 내용이 기재되어 검증되었습니다.',
         isSuccess: true
       }
     ]
   };
 
+  // 탭 클릭 이벤트 바인딩
+  if (tabButtons) {
+    tabButtons.forEach(btn => {
+      btn.addEventListener('click', (e) => {
+        tabButtons.forEach(b => b.classList.remove('active'));
+        e.target.classList.add('active');
+        activeTab = e.target.getAttribute('data-tab') || 'card';
+        renderChecklist();
+      });
+    });
+  }
+
+  // 체크리스트 아이템 동적 렌더링 함수
+  function renderChecklist() {
+    if (!checklistItemsEl) return;
+    checklistItemsEl.innerHTML = '';
+    
+    const items = checklistData[activeTab] || [];
+    const states = checkedState[activeTab] || [];
+    
+    items.forEach((item, index) => {
+      const itemEl = document.createElement('div');
+      itemEl.className = 'checklist-item';
+      
+      const isChecked = states[index] || false;
+      
+      itemEl.innerHTML = `
+        <label style="display: flex; align-items: flex-start; gap: 10px; cursor: pointer;">
+          <input type="checkbox" class="checklist-checkbox" data-index="${index}" ${isChecked ? 'checked' : ''} style="margin-top: 3px;">
+          <div>
+            <div style="font-weight: 600; font-size: 14px; color: #2c3e50;">${item.text}</div>
+            <div style="font-size: 12px; color: #7f8c8d; margin-top: 2px;">${item.desc}</div>
+          </div>
+        </label>
+      `;
+      
+      const checkbox = itemEl.querySelector('.checklist-checkbox');
+      if (checkbox) {
+        checkbox.addEventListener('change', (e) => {
+          checkedState[activeTab][index] = e.target.checked;
+          updateChecklistProgress();
+        });
+      }
+      
+      checklistItemsEl.appendChild(itemEl);
+    });
+    
+    updateChecklistProgress();
+  }
+
+  function updateChecklistProgress() {
+    if (!checkedState[activeTab]) return;
+    const total = checkedState[activeTab].length;
+    const checkedCount = checkedState[activeTab].filter(Boolean).length;
+    const percentage = total > 0 ? Math.round((checkedCount / total) * 100) : 0;
+ 
+    if (progressBarEl) progressBarEl.style.width = `${percentage}%`;
+    if (progressPctEl) progressPctEl.textContent = `${percentage}%`;
+  }
+
+  // AI 일괄 진단 버튼 클릭 시 모달 기동
+  if (aiBatchStartBtn) {
+    aiBatchStartBtn.addEventListener('click', () => {
+      openAiBatchScanModal();
+    });
+  }
+
   function openAiBatchScanModal() {
     aiCurrentStep = 0;
-    aiTotalSteps = checklistData[activeTab].length;
+    if (checklistData[activeTab]) {
+      aiTotalSteps = checklistData[activeTab].length;
+    } else {
+      aiTotalSteps = 0;
+    }
     aiStepResults = [];
 
     // 모달 초기 상태 리셋
@@ -1143,89 +1214,57 @@ document.addEventListener('DOMContentLoaded', async () => {
   }
 
   function loadScanStep() {
-    const docName = checklistData[activeTab][aiCurrentStep].text;
-    
-    // 단계 인디케이터 업데이트
-    if (aiBatchStepText) {
-      aiBatchStepText.textContent = `단계: ${aiCurrentStep + 1} / ${aiTotalSteps}`;
+    if (aiCurrentStep >= aiTotalSteps) {
+      showBatchResults();
+      return;
     }
-    if (aiBatchStepPercent) {
-      const pct = Math.round(((aiCurrentStep + 1) / aiTotalSteps) * 100);
-      aiBatchStepPercent.textContent = `${pct}%`;
-    }
+
+    const items = checklistData[activeTab];
+    if (!items) return;
+    const currentItem = items[aiCurrentStep];
+
+    // 스캔 안내 타이틀 갱신
     if (aiScanDocTargetName) {
-      aiScanDocTargetName.textContent = `[진단 서류] ${docName}`;
+      aiScanDocTargetName.textContent = `[${aiCurrentStep + 1}/${aiTotalSteps}] ${currentItem.text}`;
     }
-    
-    // 모의 서류 삽입
+
+    // 모의 서류 템플릿 로드
+    const templates = aiMockDocTemplates[activeTab] || [];
     if (aiMockDocument) {
-      aiMockDocument.innerHTML = aiMockDocTemplates[activeTab][aiCurrentStep] || '<div>가상 서류 데이터 없음</div>';
-      aiMockDocument.classList.remove('scanned');
+      aiMockDocument.innerHTML = templates[aiCurrentStep] || '<div>문서 스캔 영역</div>';
     }
-    
-    if (aiScanLaserLine) aiScanLaserLine.classList.remove('animating');
-    
-    const startSpan = aiStartScanBtn.querySelector('span');
-    const startIcon = aiStartScanBtn.querySelector('i');
-    
-    if (aiCurrentStep === aiTotalSteps - 1) {
-      if (startSpan) startSpan.textContent = '스캔 및 종합 진단 시작';
-      if (startIcon) startIcon.className = 'fa-solid fa-chart-line';
-    } else {
-      if (startSpan) startSpan.textContent = '스캔 후 다음 서류 촬영';
-      if (startIcon) startIcon.className = 'fa-solid fa-camera';
-    }
-    
-    if (aiStartScanBtn) aiStartScanBtn.disabled = false;
-  }
 
-  // 모달 닫기
-  function closeAiScanModal() {
-    if (aiScanModal) {
-      aiScanModal.classList.add('hidden');
+    // 버튼 활성화 초기화
+    if (aiStartScanBtn) {
+      aiStartScanBtn.disabled = false;
+      const btnSpan = aiStartScanBtn.querySelector('span');
+      if (btnSpan) btnSpan.textContent = '서류 촬영 및 AI 진단';
+      const btnIcon = aiStartScanBtn.querySelector('i');
+      if (btnIcon) btnIcon.className = 'fa-solid fa-camera';
     }
   }
 
-  if (closeAiModalBtn) {
-    closeAiModalBtn.addEventListener('click', closeAiScanModal);
-  }
-
-  // AI 스캔 시작 시뮬레이션
   if (aiStartScanBtn) {
     aiStartScanBtn.addEventListener('click', () => {
-      const startSpan = aiStartScanBtn.querySelector('span');
-      const startIcon = aiStartScanBtn.querySelector('i');
-      
-      if (startSpan) startSpan.textContent = 'AI 분석 중...';
-      if (startIcon) startIcon.className = 'fa-solid fa-spinner fa-spin';
       aiStartScanBtn.disabled = true;
+      const btnSpan = aiStartScanBtn.querySelector('span');
+      if (btnSpan) btnSpan.textContent = 'AI OCR 분석 및 진단 중...';
+      const btnIcon = aiStartScanBtn.querySelector('i');
+      if (btnIcon) btnIcon.className = 'fa-solid fa-spinner fa-spin';
 
       if (aiScanLaserLine) aiScanLaserLine.classList.add('animating');
       playNotificationSound('beep');
 
       setTimeout(() => {
         if (aiScanLaserLine) aiScanLaserLine.classList.remove('animating');
-        if (aiMockDocument) aiMockDocument.classList.add('scanned');
         
-        // 현재 단계의 결과 누적
-        const scenario = aiVerifyScenarios[activeTab][aiCurrentStep];
-        aiStepResults.push({
-          index: aiCurrentStep,
-          name: checklistData[activeTab][aiCurrentStep].text,
-          ...scenario
-        });
+        const scenarios = aiVerifyScenarios[activeTab] || [];
+        const result = scenarios[aiCurrentStep] || { readiness: '100%', suitability: '적합', guide: '확인 완료', isSuccess: true };
+        aiStepResults.push(result);
 
-        playNotificationSound('beep');
-
-        // 다음 단계 전환 또는 결과창 노출
-        if (aiCurrentStep < aiTotalSteps - 1) {
-          aiCurrentStep++;
-          loadScanStep();
-        } else {
-          // 종합 분석 결과 표시
-          showBatchResults();
-        }
-      }, 1000);
+        aiCurrentStep++;
+        loadScanStep();
+      }, 1500);
     });
   }
 
@@ -1235,207 +1274,1202 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     if (aiBatchResultList) {
       aiBatchResultList.innerHTML = '';
-      
-      let fitCount = 0;
-      
-      aiStepResults.forEach(res => {
-        const item = document.createElement('div');
-        item.className = 'ai-report-item';
-        
-        const badgeClass = res.isSuccess ? 'badge-status-fit' : 'badge-status-unfit';
-        const badgeText = res.isSuccess ? '적합' : '보완 필요';
-        if (res.isSuccess) fitCount++;
+    }
 
-        item.innerHTML = `
-          <div class="ai-report-header">
-            <span class="ai-report-title">${res.name}</span>
-            <span class="${badgeClass}">${badgeText} (${res.readiness})</span>
-          </div>
-          <div class="ai-report-desc">${res.guide}</div>
-        `;
-        
-        aiBatchResultList.appendChild(item);
-      });
+    const items = checklistData[activeTab];
+    if (!items) return;
+    let fitCount = 0;
 
-      // 종합 통계 텍스트 업데이트
-      if (aiBatchSummaryText) {
-        aiBatchSummaryText.textContent = `총 ${aiTotalSteps}개 중 ${fitCount}개 서류 준비 완료`;
+    aiStepResults.forEach((res, index) => {
+      const item = items[index];
+      if (!item) return;
+      const resultItemEl = document.createElement('div');
+      resultItemEl.className = 'ai-report-item';
+      resultItemEl.style.borderBottom = '1px solid #f1f2f6';
+      resultItemEl.style.padding = '12px 0';
+
+      const suitabilityStyle = res.isSuccess ? 'background-color:#e3fcef; color:#00a389;' : 'background-color:#ffebe6; color:#de350b;';
+
+      if (res.isSuccess) {
+        fitCount++;
       }
-      if (aiBatchSummaryPct) {
-        const totalPct = Math.round((fitCount / aiTotalSteps) * 100);
-        aiBatchSummaryPct.textContent = `준비율 ${totalPct}%`;
+
+      resultItemEl.innerHTML = `
+        <div style="display:flex; justify-content:space-between; align-items:center;">
+          <span style="font-weight:700; font-size:14px; color:#2c3e50;">${item.text}</span>
+          <span style="font-size:11px; font-weight:800; padding:2px 8px; border-radius:12px; ${suitabilityStyle}">${res.suitability} (${res.readiness})</span>
+        </div>
+        <div style="font-size:12px; color:#7f8c8d; margin-top:6px; line-height:1.4;">${res.guide}</div>
+      `;
+
+      aiBatchResultList.appendChild(resultItemEl);
+    });
+
+    const totalCount = items.length;
+    const isAllPassed = fitCount === totalCount;
+    
+    if (aiResultStatusTitle) {
+      aiResultStatusTitle.textContent = isAllPassed ? '서류 진단 완료 (적합)' : '서류 보완 필요 (부적합)';
+      aiResultStatusTitle.style.color = isAllPassed ? '#00a389' : '#de350b';
+    }
+
+    if (aiBatchSummaryText) {
+      aiBatchSummaryText.textContent = `총 ${totalCount}개 서류 중 ${fitCount}개 적합`;
+    }
+
+    if (aiBatchSummaryPct) {
+      const pct = Math.round((fitCount / totalCount) * 100);
+      aiBatchSummaryPct.textContent = `${pct}%`;
+    }
+
+    if (aiConfirmBtn) {
+      aiConfirmBtn.addEventListener('click', () => {
+        items.forEach((item, idx) => {
+          const res = aiStepResults[idx];
+          if (res && res.isSuccess) {
+            checkedState[activeTab][idx] = true;
+          }
+        });
+        renderChecklist();
+        
+        if (aiScanModal) aiScanModal.classList.add('hidden');
+        showToast('AI 진단 결과가 체크리스트에 동기화되었습니다.');
+      });
+    }
+  }
+
+  if (closeAiModalBtn && aiScanModal) {
+    closeAiModalBtn.addEventListener('click', () => {
+      aiScanModal.classList.add('hidden');
+    });
+  }
+
+  // ==========================================================================
+  // --- 11. 수기 송금전표 AI OCR 및 실시간 행원 단말 연동 제어 ---
+  // ==========================================================================
+  
+  // OCR Service Layer 인터페이스 정의 (요구사항 20번)
+  class OCRService {
+    constructor(mode = 'mock') {
+      this.mode = mode;
+    }
+    
+    // 전표 스캔 분석 수행
+    analyze(voucherType, images) {
+      if (this.mode === 'mock') {
+        return this.getMockAnalysis(voucherType, images);
+      } else {
+        // 향후 실제 OCR API 연동 시 확장구역
+        return null;
       }
     }
 
-    playNotificationSound('double');
-    showToast('AI 서류 일괄 진단이 완료되었습니다.');
-  }
+    getMockAnalysis(voucherType, images) {
+      if (voucherType === 'SINGLE_TRANSFER') {
+        return {
+          type: "SINGLE_TRANSFER",
+          images: [images[0]],
+          ocrData: {
+            withdrawalAccount: "123-456-789012",
+            bank: "iM뱅크",
+            recipientAccount: "234-567-890123",
+            recipientName: "김철수",
+            amount: 500000,
+            sender: "홍길동",
+            purpose: "개인 송금"
+          },
+          ocrConfidence: {
+            withdrawalAccount: 0.98,
+            bank: 0.99,
+            recipientAccount: 0.72, // 신뢰도 낮음 -> "확인 필요" 고지 대상
+            recipientName: 0.97,
+            amount: 0.99,
+            sender: 0.99,
+            purpose: 0.95
+          }
+        };
+      } else if (voucherType === 'MASS_TRANSFER') {
+        // 이미지 개수에 맞춰 거래 목록 매핑 (각 거래에 sourceImageId 연동)
+        const matchedTransactions = [];
+        const baseTransactions = [
+          { bank: "iM뱅크", accountNumber: "123-456-789012", accountHolder: "홍길동", amount: 500000, description: "급여", ocrConfidence: 0.99 },
+          { bank: "국민은행", accountNumber: "234-567-890123", accountHolder: "김철수", amount: 300000, description: "급여", ocrConfidence: 0.75 }, // 신뢰도 낮음
+          { bank: "신한은행", accountNumber: "345-678-901234", accountHolder: "이영희", amount: 700000, description: "급여", ocrConfidence: 0.99 },
+          { bank: "우리은행", accountNumber: "456-789-012345", accountHolder: "박민수", amount: 400000, description: "보너스", ocrConfidence: 0.98 },
+          { bank: "하나은행", accountNumber: "567-890-123456", accountHolder: "최지우", amount: 600000, description: "급여", ocrConfidence: 0.99 }
+        ];
 
-  // 다시 스캔
-  if (aiRetryScanBtn) {
-    aiRetryScanBtn.addEventListener('click', () => {
-      openAiBatchScanModal();
-    });
-  }
+        images.forEach((img, idx) => {
+          const base = baseTransactions[idx % baseTransactions.length];
+          matchedTransactions.push({
+            bank: base.bank,
+            accountNumber: base.accountNumber,
+            accountHolder: base.accountHolder,
+            amount: base.amount,
+            description: base.description,
+            sourceImageId: img.id,
+            ocrConfidence: base.ocrConfidence
+          });
+        });
 
-  // 일괄 결과 적용하기
-  if (aiConfirmBtn) {
-    aiConfirmBtn.addEventListener('click', () => {
-      closeAiScanModal();
-      
-      let appliedCount = 0;
-      aiStepResults.forEach(res => {
-        if (res.isSuccess) {
-          checkedState[activeTab][res.index] = true;
-          appliedCount++;
+        // 데모 중복 검사를 위한 임시 중복 데이터 1건 강제 이식 (이미지가 2장 이상일 때)
+        if (images.length >= 2) {
+          matchedTransactions.push({
+            bank: matchedTransactions[0].bank,
+            accountNumber: matchedTransactions[0].accountNumber,
+            accountHolder: matchedTransactions[0].accountHolder,
+            amount: matchedTransactions[0].amount,
+            description: matchedTransactions[0].description,
+            sourceImageId: images[1].id, // 다른 전표 소스이지만 데이터는 완전 중복
+            ocrConfidence: 0.99
+          });
         }
-      });
-      
-      renderChecklist(); // 체크리스트 리로드
-      showToast(`AI 진단 결과에 따라 서류 ${appliedCount}개가 준비 처리되었습니다.`);
-      playNotificationSound('double');
-    });
+
+        // 총액 계산
+        let totalAmt = 0;
+        matchedTransactions.forEach(t => totalAmt += t.amount);
+
+        return {
+          type: "MASS_TRANSFER",
+          images: images,
+          transactions: matchedTransactions,
+          totalCount: matchedTransactions.length,
+          totalAmount: totalAmt
+        };
+      }
+    }
   }
 
-  // 일괄 진단 시작 버튼 바인딩
-  if (aiBatchStartBtn) {
-    aiBatchStartBtn.addEventListener('click', () => {
-      openAiBatchScanModal();
-    });
-  }
+  // 모의 스캔 서비스 싱글톤 인스턴스 생성
+  const aiOcrService = new OCRService('mock');
 
-  function renderChecklist() {
-    if (!checklistItemsEl) return;
+  // 모달 내 뷰 단계 제어 엘리먼트들
+  const selectView = document.getElementById('scan-step-select-view');
+  const captureView = document.getElementById('scan-step-capture-view');
+  const resultView = document.getElementById('scan-step-result-view');
+  const successView = document.getElementById('scan-step-success-view');
+
+  // 단계 인디케이터
+  const stepInds = [
+    document.getElementById('step-ind-1'),
+    document.getElementById('step-ind-2'),
+    document.getElementById('step-ind-3'),
+    document.getElementById('step-ind-4')
+  ];
+
+  // 제어 버튼들
+  const goToCaptureBtn = document.getElementById('go-to-capture-btn');
+  const backToSelectBtn = document.getElementById('back-to-select-btn');
+  const finishCaptureBtn = document.getElementById('finish-capture-btn');
+  const btnMockShoot = document.getElementById('btn-mock-shoot');
+  const btnMockGallery = document.getElementById('btn-mock-gallery');
+  const ocrRetryBtn = document.getElementById('ocr-retry-btn');
+  const ocrSendBtn = document.getElementById('ocr-send-btn');
+  const finishScanFlowBtn = document.getElementById('finish-scan-flow-btn');
+  const ocrAddMoreShootBtn = document.getElementById('ocr-add-more-shoot-btn');
+
+  // 대량 촬영 이미지 슬롯 정보
+  const massImageSlotsContainer = document.getElementById('mass-image-slots-container');
+  const massImageThumbnails = document.getElementById('mass-image-thumbnails');
+  const massSlotsCount = document.getElementById('mass-slots-count');
+
+  // 데이터 폼 컨테이너 및 안내 뱃지
+  const ocrFormStandard = document.getElementById('ocr-form-standard');
+  const ocrFormMulti = document.getElementById('ocr-form-multi');
+  const ocrSourceImageBox = document.getElementById('ocr-source-image-box');
+  const laserEffect = document.getElementById('laser-effect');
+  const demoVoucherPreview = document.getElementById('demo-voucher-preview');
+
+  // 에러 및 중복 알림 배너
+  const integrityErrorBanner = document.getElementById('ocr-integrity-error-banner');
+  const duplicateWarningBanner = document.getElementById('ocr-duplicate-warning-banner');
+
+  // 현재 선택된 이체 유형 및 업로드 이미지 개체
+  let selectedVoucherType = 'SINGLE_TRANSFER'; // SINGLE_TRANSFER, MASS_TRANSFER
+  let massUploadedImages = []; // { id: "IMG...", name: "전표 X", url: ... }
+  let ocrResultData = null;    // AI 분석 결과 원본 객체 백업
+  let activePreviewImageIndex = 0; // 대량 이체 결과 확인 시 왼쪽 뷰에 띄울 액티브 이미지 인덱스
+
+  // [행원 데이터베이스] (실시간 접수 목록 - 데모용 기본 3건 사전적재)
+  window.staffVoucherDb = [
+    {
+      id: "T202608191001",
+      type: "SINGLE_TRANSFER",
+      customer: { name: "고객 A" },
+      images: [{ id: "IMG001", name: "전표 1" }],
+      transactions: [{ bank: "iM뱅크", accountNumber: "123-456-789012", accountHolder: "김철수", amount: 500000, description: "개인 송금" }],
+      totalCount: 1,
+      totalAmount: 500000,
+      status: "WAITING",
+      createdAt: "2026-08-19 10:31",
+      updatedAt: "2026-08-19 10:31"
+    },
+    {
+      id: "T202608191002",
+      type: "SINGLE_TRANSFER",
+      customer: { name: "고객 B" },
+      images: [{ id: "IMG001", name: "전표 1" }],
+      transactions: [{ bank: "국민은행", accountNumber: "508-12-345678-9", accountHolder: "홍길순", amount: 1000000, description: "용돈" }],
+      totalCount: 1,
+      totalAmount: 1000000,
+      status: "WAITING",
+      createdAt: "2026-08-19 10:33",
+      updatedAt: "2026-08-19 10:33"
+    },
+    {
+      id: "T202608191003",
+      type: "MASS_TRANSFER",
+      customer: { name: "고객 C" },
+      images: [
+        { id: "IMG001", name: "전표 1" },
+        { id: "IMG002", name: "전표 2" },
+        { id: "IMG003", name: "전표 3" }
+      ],
+      transactions: [
+        { bank: "iM뱅크", accountNumber: "508-99-888777-6", accountHolder: "홍길동", amount: 500000, sourceImageId: "IMG001" },
+        { bank: "국민은행", accountNumber: "234-567-890123", accountHolder: "김철수", amount: 500000, sourceImageId: "IMG002" },
+        { bank: "신한은행", accountNumber: "345-678-901234", accountHolder: "이영희", amount: 500000, sourceImageId: "IMG003" }
+      ],
+      totalCount: 3,
+      totalAmount: 1500000,
+      status: "WAITING",
+      createdAt: "2026-08-19 10:35",
+      updatedAt: "2026-08-19 10:35"
+    }
+  ];
+
+  // 단계 전환 제어 함수
+  function gotoScanStep(stepNum) {
+    if (!selectView || !captureView || !resultView || !successView) return;
     
-    checklistItemsEl.innerHTML = '';
-    const currentItems = checklistData[activeTab];
-    const currentState = checkedState[activeTab];
+    selectView.classList.add('hidden');
+    captureView.classList.add('hidden');
+    resultView.classList.add('hidden');
+    successView.classList.add('hidden');
 
-    currentItems.forEach((item, index) => {
-      const itemWrapper = document.createElement('label');
-      itemWrapper.className = 'check-item-label';
-      
-      const isChecked = currentState[index];
-
-      // 개별 AI 버튼은 완전히 제거
-      itemWrapper.innerHTML = `
-        <div class="check-item-left">
-          <input type="checkbox" class="check-item-input" data-index="${index}" ${isChecked ? 'checked' : ''}>
-          <div class="check-text-group">
-            <span class="check-item-text">${item.text}</span>
-            <span class="check-item-desc">${item.desc}</span>
-          </div>
-        </div>
-      `;
-
-      const checkbox = itemWrapper.querySelector('.check-item-input');
-      checkbox.addEventListener('change', (e) => {
-        checkedState[activeTab][index] = e.target.checked;
-        updateChecklistProgress();
-        if (e.target.checked) {
-          playNotificationSound('beep');
-        }
-      });
-
-      checklistItemsEl.appendChild(itemWrapper);
+    stepInds.forEach(ind => {
+      if (ind) ind.classList.remove('active-step');
     });
 
-    updateChecklistProgress();
+    if (stepNum === 1) {
+      selectView.classList.remove('hidden');
+      if (stepInds[0]) stepInds[0].classList.add('active-step');
+      if (typeof renderMySentVoucherList === 'function') {
+        renderMySentVoucherList();
+      }
+    } else if (stepNum === 2) {
+      captureView.classList.remove('hidden');
+      if (stepInds[1]) stepInds[1].classList.add('active-step');
+      
+      // 대량 이체 다중 등록 바 및 타이틀 세팅
+      const captureTitle = document.getElementById('capture-title-text');
+      const captureGuidance = document.getElementById('capture-guidance-text');
+      
+      if (selectedVoucherType === 'MASS_TRANSFER') {
+        if (captureTitle) captureTitle.textContent = "대량 이체 전표를 촬영해주세요.";
+        if (captureGuidance) captureGuidance.textContent = "여러 장의 전표를 한 번에 추가 등록할 수 있습니다.";
+        massImageSlotsContainer.classList.remove('hidden');
+        renderMassThumbnails();
+      } else {
+        if (captureTitle) captureTitle.textContent = "전표를 촬영해 주세요.";
+        if (captureGuidance) captureGuidance.textContent = "전표 전체가 화면에 들어오도록 촬영해주세요.";
+        massImageSlotsContainer.classList.add('hidden');
+      }
+
+      // 모의 배경 가이드 이미지 매핑
+      if (demoVoucherPreview) {
+        demoVoucherPreview.style.background = selectedVoucherType === 'MASS_TRANSFER' 
+          ? "linear-gradient(135deg, #ede7f6 0%, #b39ddb 100%)" 
+          : "linear-gradient(135deg, #e0f7fa 0%, #80deea 100%)";
+        demoVoucherPreview.style.borderRadius = "8px";
+        demoVoucherPreview.style.boxShadow = "0 6px 18px rgba(0,0,0,0.35)";
+        demoVoucherPreview.style.width = "75%";
+        demoVoucherPreview.style.height = "55%";
+        demoVoucherPreview.innerHTML = `
+          <div style="padding: 14px; color: #333; font-family: sans-serif; display: flex; flex-direction: column; justify-content: space-between; height: 100%; box-sizing: border-box;">
+            <div style="display:flex; justify-content: space-between; border-bottom: 2px solid #005670; padding-bottom: 4px;">
+              <strong style="font-size: 11px; color:#005670;">iM Bank 전표 스캔</strong>
+              <span style="font-size: 8px; font-weight:700; color: #e74c3c;">[대기중]</span>
+            </div>
+            <div style="font-size: 10px; font-weight: 700; margin-top: 10px;">
+              업무유형: ${selectedVoucherType === 'MASS_TRANSFER' ? '대량이체 (다중 전표)' : '단일이체 (전표 1장)'}<br>
+              가이드 격자선에 맞춰 전표 앞면을 위치시켜 주세요.
+            </div>
+            <div style="text-align: right; font-size: 8px; color: #666;">iM SmartQ AI OCR</div>
+          </div>
+        `;
+      }
+
+    } else if (stepNum === 3) {
+      resultView.classList.remove('hidden');
+      if (stepInds[2]) stepInds[2].classList.add('active-step');
+      
+      // 왼쪽 프리뷰 세팅
+      activePreviewImageIndex = 0;
+      updatePreviewImageBox();
+      
+      // 오른쪽 보정/검증 폼 빌드
+      buildOcrEditForm();
+    } else if (stepNum === 4) {
+      successView.classList.remove('hidden');
+      if (stepInds[3]) stepInds[3].classList.add('active-step');
+      
+      // 모의 분석 및 전송 로더 시작
+      const loaderBar = document.getElementById('sending-bar-fill');
+      const loaderText = document.getElementById('sending-status-text');
+      const successBox = document.getElementById('scan-send-success-box');
+      const sendingLoader = document.getElementById('scan-sending-loader');
+      const checklistProgress = document.getElementById('mass-analysis-progress-checklist');
+      
+      if (loaderBar && loaderText && successBox && sendingLoader) {
+        successBox.classList.add('hidden');
+        sendingLoader.classList.remove('hidden');
+        loaderBar.style.width = "0%";
+        loaderText.textContent = "전송 준비 중...";
+        
+        // 대량 이체일 경우 순차분석 텍스트 진행효과 노출 (요구사항 8번)
+        if (selectedVoucherType === 'MASS_TRANSFER') {
+          checklistProgress.classList.remove('hidden');
+          checklistProgress.innerHTML = '';
+          
+          massUploadedImages.forEach((img, idx) => {
+            const row = document.createElement('div');
+            row.id = `checklist-row-${idx}`;
+            row.style.marginBottom = "6px";
+            row.style.color = "#7f8c8d";
+            row.innerHTML = `<i class="fa-solid fa-spinner fa-spin" style="color:var(--brand-mint);"></i> <span>${img.name} 분석 중...</span>`;
+            checklistProgress.appendChild(row);
+          });
+
+          // 분석 순차 체크마크 딜레이
+          massUploadedImages.forEach((img, idx) => {
+            setTimeout(() => {
+              const row = document.getElementById(`checklist-row-${idx}`);
+              if (row) {
+                row.style.color = "var(--brand-mint-dark)";
+                row.innerHTML = `<i class="fa-solid fa-circle-check" style="color:var(--brand-mint);"></i> <span>${img.name} 분석 완료 ✓</span>`;
+                playNotificationSound('beep');
+              }
+            }, (idx + 1) * 450);
+          });
+        } else {
+          checklistProgress.classList.add('hidden');
+        }
+
+        const totalStepsDuration = selectedVoucherType === 'MASS_TRANSFER' ? (massUploadedImages.length * 450 + 500) : 1200;
+
+        setTimeout(() => {
+          loaderBar.style.width = "50%";
+          loaderText.textContent = "구조화 데이터 전송 패키지 압축 및 채널 암호화 중 (50%)...";
+        }, totalStepsDuration / 3);
+
+        setTimeout(() => {
+          loaderBar.style.width = "90%";
+          loaderText.textContent = "행원 정보 단말 실시간 접수 중 (90%)...";
+        }, (totalStepsDuration / 3) * 2);
+
+        setTimeout(() => {
+          loaderBar.style.width = "100%";
+          loaderText.textContent = "전송 완료!";
+          
+          setTimeout(() => {
+            // 전송 완료 성공 정보 세팅
+            sendingLoader.classList.add('hidden');
+            successBox.classList.remove('hidden');
+            
+            const newId = "T20260819" + Math.floor(1000 + Math.random() * 9000);
+            document.getElementById('display-staff-ticket-id').textContent = newId;
+            document.getElementById('display-staff-voucher-type').textContent = selectedVoucherType === 'MASS_TRANSFER' ? '대량 이체' : '단일 이체';
+            
+            let sizeText = '';
+            if (selectedVoucherType === 'MASS_TRANSFER') {
+              sizeText = `${ocrResultData.totalCount}건 / ${ocrResultData.totalAmount.toLocaleString()}원`;
+            } else {
+              sizeText = `${ocrResultData.ocrData.amount.toLocaleString()}원`;
+            }
+            document.getElementById('display-staff-total-amount').textContent = sizeText;
+            
+             // 전역 DB에 수신 적재
+            const newRecord = {
+              id: newId,
+              type: selectedVoucherType,
+              customer: { name: reportUserName ? reportUserName.value || "고객" : "고객" },
+              images: selectedVoucherType === 'MASS_TRANSFER' ? [...massUploadedImages] : [{ id: "IMG001", name: "단일 전표" }],
+              transactions: selectedVoucherType === 'MASS_TRANSFER' ? [...ocrResultData.transactions] : [ocrResultData.ocrData],
+              totalCount: selectedVoucherType === 'MASS_TRANSFER' ? ocrResultData.totalCount : 1,
+              totalAmount: selectedVoucherType === 'MASS_TRANSFER' ? ocrResultData.totalAmount : ocrResultData.ocrData.amount,
+              ocrOriginalData: selectedVoucherType === 'MASS_TRANSFER' ? JSON.parse(JSON.stringify(ocrResultData.transactions)) : JSON.parse(JSON.stringify(ocrResultData.ocrData)),
+              status: "WAITING",
+              createdAt: new Date().toISOString().replace('T', ' ').substring(0, 16),
+              updatedAt: new Date().toISOString().replace('T', ' ').substring(0, 16),
+              isMySent: true // 💡 내가 보낸 전표 리스트 필터링용 플래그
+            };
+            window.staffVoucherDb.unshift(newRecord); // 가장 최근 것을 맨 앞으로!
+            
+            playNotificationSound('double');
+            showToast('전표 연동 수신 성공!');
+            renderStaffVoucherList();
+            if (typeof renderMySentVoucherList === 'function') {
+              renderMySentVoucherList(); // 💡 내 전송 리스트 갱신
+            }
+          }, 300);
+        }, totalStepsDuration);
+      }
+    }
   }
 
-  tabButtons.forEach(btn => {
-    btn.addEventListener('click', (e) => {
-      tabButtons.forEach(b => b.classList.remove('active'));
-      e.target.classList.add('active');
-      activeTab = e.target.dataset.tab;
-      renderChecklist();
-      playNotificationSound('beep');
+  // 거래 유형 카드 선택 리스너 바인딩
+  const vTypeCards = document.querySelectorAll('.v-type-card');
+  vTypeCards.forEach(card => {
+    card.addEventListener('click', () => {
+      vTypeCards.forEach(c => {
+        c.classList.remove('active');
+        c.style.borderColor = "var(--light-gray)";
+        c.style.backgroundColor = "var(--white)";
+      });
+      card.classList.add('active');
+      card.style.borderColor = "var(--brand-mint)";
+      card.style.backgroundColor = "var(--brand-mint-light)";
+      selectedVoucherType = card.getAttribute('data-vtype');
     });
   });
 
-  renderChecklist();
-
-  // ==========================================================================
-  // --- 11. 송금 전표 스캔 시뮬레이션 제어 ---
-  // ==========================================================================
-  const startScanBtn = document.getElementById('start-scan-btn');
-  const retryScanBtn = document.getElementById('retry-scan-btn');
-  const submitOcrBtn = document.getElementById('submit-ocr-btn');
-  const editScanBtn = document.getElementById('edit-scan-btn');
-  
-  const scanLaserLine = document.getElementById('scan-laser-line');
-  const mockVoucher = document.getElementById('mock-voucher');
-  
-  const scanViewStep1 = document.getElementById('scan-view-step1');
-  const ocrResultContainer = document.getElementById('ocr-result-container');
-  const scanSuccessMessage = document.getElementById('scan-success-message');
-
-  if (startScanBtn) {
-    startScanBtn.addEventListener('click', () => {
-      const btnSpan = startScanBtn.querySelector('span');
-      const btnIcon = startScanBtn.querySelector('i');
-      const originalText = btnSpan.textContent;
-      
-      btnSpan.textContent = activeBusiness === 'sushin' ? '전표 스캔 및 OCR 분석 중...' : '대출신청서 스캔 및 OCR 분석 중...';
-      btnIcon.className = 'fa-solid fa-spinner fa-spin';
-      
-      if (scanLaserLine) scanLaserLine.classList.add('animating');
-      playNotificationSound('beep');
-
-      setTimeout(() => {
-        if (scanLaserLine) scanLaserLine.classList.remove('animating');
-        
-        if (activeBusiness === 'sushin') {
-          if (mockVoucher) mockVoucher.classList.add('scanned');
-        }
-        
-        if (scanViewStep1) scanViewStep1.classList.add('hidden');
-        if (ocrResultContainer) ocrResultContainer.classList.remove('hidden');
-        
-        btnSpan.textContent = originalText;
-        btnIcon.className = 'fa-solid fa-camera';
-        
-        playNotificationSound('double');
-        showToast(activeBusiness === 'sushin' ? '전표 스캔 및 정보 추출에 성공했습니다!' : '대출신청서 스캔 및 정보 추출에 성공했습니다!');
-      }, 1500);
-    });
-  }
-
-  if (retryScanBtn) {
-    retryScanBtn.addEventListener('click', () => {
-      if (mockVoucher) mockVoucher.classList.remove('scanned');
-      if (ocrResultContainer) ocrResultContainer.classList.add('hidden');
-      if (scanViewStep1) scanViewStep1.classList.remove('hidden');
+  // 단계 이동 이벤트 트리거
+  if (goToCaptureBtn) {
+    goToCaptureBtn.addEventListener('click', () => {
+      // 대량 이체일 때 등록 배열 초기화
+      if (selectedVoucherType === 'MASS_TRANSFER') {
+        massUploadedImages = [];
+      }
+      gotoScanStep(2);
       playNotificationSound('beep');
     });
   }
 
-  if (submitOcrBtn) {
-    submitOcrBtn.addEventListener('click', () => {
-      if (ocrResultContainer) ocrResultContainer.classList.add('hidden');
-      if (scanSuccessMessage) {
-        const titleEl = scanSuccessMessage.querySelector('h3');
-        const descEl = scanSuccessMessage.querySelector('p');
+  if (backToSelectBtn) {
+    backToSelectBtn.addEventListener('click', () => {
+      gotoScanStep(1);
+      playNotificationSound('beep');
+    });
+  }
+
+  // 대량 촬영 목록 빌드
+  function renderMassThumbnails() {
+    if (!massImageThumbnails) return;
+    massImageThumbnails.innerHTML = '';
+    massSlotsCount.textContent = `${massUploadedImages.length}장 등록됨`;
+
+    if (massUploadedImages.length === 0) {
+      massImageThumbnails.innerHTML = `<span style="font-size:10px; color:var(--cool-gray); display:flex; align-items:center; height:100%;">등록된 전표가 없습니다. 추가 촬영해 주세요.</span>`;
+      if (finishCaptureBtn) finishCaptureBtn.classList.add('hidden');
+      return;
+    }
+
+    if (finishCaptureBtn) finishCaptureBtn.classList.remove('hidden');
+
+    massUploadedImages.forEach((img, idx) => {
+      const slot = document.createElement('div');
+      slot.style.display = "flex";
+      slot.style.alignItems = "center";
+      slot.style.gap = "4px";
+      slot.style.padding = "4px 8px";
+      slot.style.backgroundColor = "#fff";
+      slot.style.border = "1px solid var(--light-gray)";
+      slot.style.borderRadius = "6px";
+      slot.style.fontSize = "10.5px";
+      slot.style.flexShrink = "0";
+
+      slot.innerHTML = `
+        <i class="fa-solid fa-receipt" style="color:var(--brand-mint-dark);"></i>
+        <span>${img.name}</span>
+        <button type="button" class="del-slot-btn" data-idx="${idx}" style="background:none; border:none; color:#e74c3c; cursor:pointer; margin-left:4px; font-weight:700;">&times;</button>
+      `;
+
+      // 삭제 액션 연동
+      const delBtn = slot.querySelector('.del-slot-btn');
+      if (delBtn) {
+        delBtn.addEventListener('click', (e) => {
+          e.stopPropagation();
+          const targetIdx = parseInt(delBtn.getAttribute('data-idx'));
+          massUploadedImages.splice(targetIdx, 1);
+          playNotificationSound('beep');
+          renderMassThumbnails();
+        });
+      }
+
+      massImageThumbnails.appendChild(slot);
+    });
+  }
+
+  // 모의 추가 촬영
+  function executeVoucherCapture() {
+    if (laserEffect) {
+      laserEffect.style.display = "block";
+    }
+    playNotificationSound('beep');
+
+    setTimeout(() => {
+      if (laserEffect) laserEffect.style.display = "none";
+      playNotificationSound('double');
+
+      if (selectedVoucherType === 'MASS_TRANSFER') {
+        // 대량 이체 이미지 1건 증설
+        const nextIdx = massUploadedImages.length + 1;
+        const ocrColors = ["linear-gradient(135deg, #ede7f6 0%, #b39ddb 100%)", "linear-gradient(135deg, #fff3e0 0%, #ffcc80 100%)", "linear-gradient(135deg, #e8f5e9 0%, #a5d6a7 100%)"];
+        const bg = ocrColors[(nextIdx - 1) % ocrColors.length];
         
-        if (activeBusiness === 'sushin') {
-          if (titleEl) titleEl.textContent = '전표 전송 완료!';
-          if (descEl) descEl.innerHTML = '송금 정보가 해당 창구로 정상 전송되었습니다.<br>차례가 되었을 때 직원에게 말씀해 주세요.';
+        massUploadedImages.push({
+          id: `IMG00${nextIdx}`,
+          name: `전표 ${nextIdx}`,
+          url: bg
+        });
+
+        showToast(`${nextIdx}번째 전표 촬영 등록 완료!`);
+        renderMassThumbnails();
+      } else {
+        // 단일 이체 OCR 실행
+        ocrResultData = aiOcrService.analyze('SINGLE_TRANSFER', ["linear-gradient(135deg, #e0f7fa 0%, #80deea 100%)"]);
+        gotoScanStep(3);
+        showToast('단일 전표 OCR 분석 성공!');
+      }
+    }, 1000);
+  }
+
+  if (btnMockShoot) {
+    btnMockShoot.addEventListener('click', executeVoucherCapture);
+  }
+  if (btnMockGallery) {
+    btnMockGallery.addEventListener('click', () => {
+      showToast('갤러리에서 이체 전표 파일을 선택 중...');
+      setTimeout(executeVoucherCapture, 500);
+    });
+  }
+
+  // 대량 촬영 완료 버튼
+  if (finishCaptureBtn) {
+    finishCaptureBtn.addEventListener('click', () => {
+      if (massUploadedImages.length === 0) {
+        alert('촬영 혹은 추가된 전표가 없습니다.');
+        return;
+      }
+      ocrResultData = aiOcrService.analyze('MASS_TRANSFER', massUploadedImages);
+      gotoScanStep(3);
+      playNotificationSound('double');
+      showToast('대량 이체 일괄 OCR 분석 성공!');
+    });
+  }
+
+  // 결과 창에서 누락 전표 추가 촬영 연동 (요구사항 10번)
+  if (ocrAddMoreShootBtn) {
+    ocrAddMoreShootBtn.addEventListener('click', () => {
+      // 대량 이체 촬영 화면으로 리다이렉트
+      gotoScanStep(2);
+      playNotificationSound('beep');
+    });
+  }
+
+  if (ocrRetryBtn) {
+    ocrRetryBtn.addEventListener('click', () => {
+      gotoScanStep(2);
+      playNotificationSound('beep');
+    });
+  }
+
+  if (ocrSendBtn) {
+    ocrSendBtn.addEventListener('click', () => {
+      // 누락 필수 정보 무결성 검증
+      let hasIntegrityError = false;
+      if (selectedVoucherType === 'MASS_TRANSFER') {
+        ocrResultData.transactions.forEach(t => {
+          if (!t.bank || !t.accountNumber || !t.accountHolder || !t.amount) {
+            hasIntegrityError = true;
+          }
+        });
+      } else {
+        const d = ocrResultData.ocrData;
+        if (!d.withdrawalAccount || !d.bank || !d.recipientAccount || !d.recipientName || !d.amount) {
+          hasIntegrityError = true;
         }
+      }
+
+      if (hasIntegrityError) {
+        integrityErrorBanner.classList.remove('hidden');
+        playNotificationSound('beep');
+        showToast('⚠ 필수 작성 누락 항목을 확인해 주세요.', true);
+        return;
+      } else {
+        integrityErrorBanner.classList.add('hidden');
+      }
+
+      // 최종 금융거래 경고 모달/안내 후 전송 진행
+      const isConfirmed = confirm("AI가 인식한 전표 정보를 확인하셨습니까?\n최종 금융거래 처리는 창구 행원의 확인 후 진행됩니다.");
+      if (!isConfirmed) return;
+
+      gotoScanStep(4);
+    });
+  }
+
+  if (finishScanFlowBtn) {
+    finishScanFlowBtn.addEventListener('click', () => {
+      const transferVoucherModal = document.getElementById('transfer-voucher-modal');
+      if (transferVoucherModal) {
+        transferVoucherModal.classList.add('hidden');
+      }
+      if (typeof gotoScanStep === 'function') {
+        gotoScanStep(1);
+      }
+      playNotificationSound('beep');
+    });
+  }
+
+  // 왼쪽 원본 뷰파인더 썸네일 업데이트
+  function updatePreviewImageBox() {
+    if (!ocrSourceImageBox) return;
+    
+    // 하이라이트 박스 클리어
+    clearOcrHighlights();
+
+    if (selectedVoucherType === 'MASS_TRANSFER') {
+      const img = massUploadedImages[activePreviewImageIndex] || { name: "전표", url: "linear-gradient(135deg, #ede7f6 0%, #b39ddb 100%)" };
+      ocrSourceImageBox.style.background = img.url;
+      document.getElementById('display-preview-source-id').textContent = `[${img.name}]`;
+      
+      ocrSourceImageBox.innerHTML = `
+        <div style="padding:10px; color:#333; height:100%; display:flex; flex-direction:column; justify-content:space-between; box-sizing:border-box;">
+          <div style="font-size:10px; font-weight:700; border-bottom:1px solid rgba(0,0,0,0.1); padding-bottom:3px;">${img.name} (대량 의뢰서)</div>
+          <div style="font-size:9.5px; font-weight:600; line-height:1.3;">
+            ※ 대량이체 일괄전표 AI OCR 매핑<br>
+            자동 텍스트 라인 세분화 추출 완료.
+          </div>
+          <div style="font-size:8px; color:#666; text-align:right;">iM SmartQ AI OCR</div>
+        </div>
+      `;
+    } else {
+      const source = ocrResultData;
+      ocrSourceImageBox.style.background = source.images[0] || "linear-gradient(135deg, #e0f7fa 0%, #80deea 100%)";
+      document.getElementById('display-preview-source-id').textContent = `[단일 전표]`;
+      
+      ocrSourceImageBox.innerHTML = `
+        <div style="padding:10px; color:#333; height:100%; display:flex; flex-direction:column; justify-content:space-between; box-sizing:border-box; position:relative; z-index:1;">
+          <div style="font-size:10px; font-weight:700; border-bottom:1px solid rgba(0,0,0,0.1); padding-bottom:3px;">단일 이체 전표 원본</div>
+          <div style="font-size:9.5px; font-weight:600; line-height:1.3;">
+            ※ 단일거래 OCR 판독<br>
+            출금/수취/예금주/금액 추출 성공.
+          </div>
+          <div style="font-size:8px; color:#666; text-align:right;">iM SmartQ AI OCR</div>
+        </div>
+        <!-- 하이라이트 박스 DOM 유지 -->
+        <div id="ocr-hl-withdrawalAccount" class="ocr-hl-box" style="position: absolute; border: 2px solid #e74c3c; background: rgba(231, 76, 60, 0.18); top: 18%; left: 32%; width: 55%; height: 12%; border-radius:3px; display: none; pointer-events: none; z-index: 20; animation: blink-effect 0.8s infinite alternate;"></div>
+        <div id="ocr-hl-bank" class="ocr-hl-box" style="position: absolute; border: 2px solid #e74c3c; background: rgba(231, 76, 60, 0.18); top: 33%; left: 32%; width: 35%; height: 12%; border-radius:3px; display: none; pointer-events: none; z-index: 20; animation: blink-effect 0.8s infinite alternate;"></div>
+        <div id="ocr-hl-recipientAccount" class="ocr-hl-box" style="position: absolute; border: 2px solid #e74c3c; background: rgba(231, 76, 60, 0.18); top: 48%; left: 32%; width: 55%; height: 12%; border-radius:3px; display: none; pointer-events: none; z-index: 20; animation: blink-effect 0.8s infinite alternate;"></div>
+        <div id="ocr-hl-recipientName" class="ocr-hl-box" style="position: absolute; border: 2px solid #e74c3c; background: rgba(231, 76, 60, 0.18); top: 63%; left: 32%; width: 35%; height: 12%; border-radius:3px; display: none; pointer-events: none; z-index: 20; animation: blink-effect 0.8s infinite alternate;"></div>
+        <div id="ocr-hl-amount" class="ocr-hl-box" style="position: absolute; border: 2px solid #e74c3c; background: rgba(231, 76, 60, 0.18); top: 78%; left: 32%; width: 45%; height: 12%; border-radius:3px; display: none; pointer-events: none; z-index: 20; animation: blink-effect 0.8s infinite alternate;"></div>
+      `;
+    }
+  }
+
+  function clearOcrHighlights() {
+    const boxes = document.querySelectorAll('.ocr-hl-box');
+    boxes.forEach(box => box.style.display = "none");
+  }
+
+  // 중복 거래 검출 함수 (요구사항 12번)
+  function checkDuplicateTransactions() {
+    if (selectedVoucherType !== 'MASS_TRANSFER') return;
+    
+    // 수취계좌 및 금액 대조 판별
+    const dups = [];
+    const tx = ocrResultData.transactions;
+    
+    for (let i = 0; i < tx.length; i++) {
+      for (let j = i + 1; j < tx.length; j++) {
+        if (tx[i].accountNumber === tx[j].accountNumber && tx[i].amount === tx[j].amount && tx[i].bank === tx[j].bank) {
+          dups.push(i);
+          dups.push(j);
+        }
+      }
+    }
+
+    const uniqueDups = [...new Set(dups)];
+    if (uniqueDups.length > 0) {
+      duplicateWarningBanner.classList.remove('hidden');
+      // 테이블에 중복 표시
+      uniqueDups.forEach(idx => {
+        const row = document.getElementById(`mass-table-row-${idx}`);
+        if (row) {
+          row.style.backgroundColor = "#FFF9E6";
+          row.style.color = "#d35400";
+        }
+      });
+    } else {
+      duplicateWarningBanner.classList.add('hidden');
+    }
+  }
+
+  // 중복 건 삭제 액션 연동
+  document.getElementById('btn-resolve-dup-delete').addEventListener('click', () => {
+    if (selectedVoucherType !== 'MASS_TRANSFER') return;
+    
+    const tx = ocrResultData.transactions;
+    const seen = new Set();
+    const filteredTx = [];
+    
+    tx.forEach(t => {
+      const key = `${t.bank}-${t.accountNumber}-${t.amount}`;
+      if (!seen.has(key)) {
+        seen.add(key);
+        filteredTx.push(t);
+      }
+    });
+
+    ocrResultData.transactions = filteredTx;
+    ocrResultData.totalCount = filteredTx.length;
+    let totalAmt = 0;
+    filteredTx.forEach(t => totalAmt += t.amount);
+    ocrResultData.totalAmount = totalAmt;
+
+    duplicateWarningBanner.classList.add('hidden');
+    buildOcrEditForm(); // 다시 폼 다시 그림
+    showToast('중복 이체 거래가 자동 제거되었습니다.');
+    playNotificationSound('double');
+  });
+
+  document.getElementById('btn-resolve-dup-keep').addEventListener('click', () => {
+    duplicateWarningBanner.classList.add('hidden');
+    showToast('중복 경고 상태를 해제하고 원본을 유지합니다.');
+    playNotificationSound('beep');
+  });
+
+  // III. 동적 OCR 수정 폼 빌드 함수
+  function buildOcrEditForm() {
+    if (!ocrFormStandard || !ocrFormMulti) return;
+    ocrFormStandard.classList.add('hidden');
+    ocrFormMulti.classList.add('hidden');
+    
+    // 배너 초기화
+    integrityErrorBanner.classList.add('hidden');
+    duplicateWarningBanner.classList.add('hidden');
+
+    if (selectedVoucherType === 'MASS_TRANSFER') {
+      ocrFormMulti.classList.remove('hidden');
+      
+      document.getElementById('multi-total-count-label').textContent = `총 ${ocrResultData.totalCount} 건`;
+      document.getElementById('multi-total-amount-label').textContent = `총 금액 ${ocrResultData.totalAmount.toLocaleString()} 원`;
+      
+      const tbody = document.getElementById('ocr-multi-table-body');
+      if (tbody) {
+        tbody.innerHTML = '';
         
-        scanSuccessMessage.classList.remove('hidden');
+        ocrResultData.transactions.forEach((rec, idx) => {
+          const tr = document.createElement('tr');
+          tr.id = `mass-table-row-${idx}`;
+          tr.style.cursor = "pointer";
+          
+          // 신뢰도 뱃지 파싱 (요구사항 13번)
+          const confBadge = rec.ocrConfidence < 0.8
+            ? `<span style="background-color:#ffeaa7; color:#d63031; padding:1px 3px; border-radius:3px; font-weight:800; font-size:8.5px;">⚠ 확인필요</span>`
+            : `<span style="background-color:#ebf8f6; color:#00b894; padding:1px 3px; border-radius:3px; font-weight:800; font-size:8.5px;">✓ 99%</span>`;
+
+          // 원본 전표 출처 이름 매치
+          const sourceName = massUploadedImages.find(img => img.id === rec.sourceImageId)?.name || "전표";
+
+          tr.innerHTML = `
+            <td style="padding:6px; font-weight:700;">${idx + 1}</td>
+            <td style="padding:6px; font-weight:700; color:var(--brand-mint-dark);">${sourceName}</td>
+            <td style="padding:4px;"><input type="text" value="${rec.bank}" class="multi-row-input" data-idx="${idx}" data-field="bank"></td>
+            <td style="padding:4px;"><input type="text" value="${rec.accountNumber}" class="multi-row-input" data-idx="${idx}" data-field="accountNumber"></td>
+            <td style="padding:4px;"><input type="text" value="${rec.accountHolder}" class="multi-row-input" data-idx="${idx}" data-field="accountHolder"></td>
+            <td style="padding:4px; text-align:right;">
+              <input type="number" value="${rec.amount}" class="multi-row-input" data-idx="${idx}" data-field="amount" style="text-align:right; width:80%;">
+              <div style="margin-top:2px;">${confBadge}</div>
+            </td>
+          `;
+
+          // 행 클릭 시 왼쪽의 원본 전표 썸네일로 스위칭 동기화 (요구사항 19번 연동)
+          tr.addEventListener('click', () => {
+            const sourceIndex = massUploadedImages.findIndex(img => img.id === rec.sourceImageId);
+            if (sourceIndex !== -1 && sourceIndex !== activePreviewImageIndex) {
+              activePreviewImageIndex = sourceIndex;
+              updatePreviewImageBox();
+              playNotificationSound('beep');
+            }
+          });
+
+          tbody.appendChild(tr);
+        });
+
+        // 대량 인풋 변경 실시간 연동
+        const multiInputs = tbody.querySelectorAll('.multi-row-input');
+        multiInputs.forEach(input => {
+          input.addEventListener('input', (e) => {
+            const idx = parseInt(e.target.getAttribute('data-idx'));
+            const field = e.target.getAttribute('data-field');
+            const val = e.target.value;
+            
+            if (field === 'amount') {
+              ocrResultData.transactions[idx][field] = parseInt(val) || 0;
+            } else {
+              ocrResultData.transactions[idx][field] = val;
+            }
+
+            // 총합 실시간 재계산
+            let sum = 0;
+            ocrResultData.transactions.forEach(t => sum += t.amount);
+            ocrResultData.totalAmount = sum;
+            document.getElementById('multi-total-amount-label').textContent = `총 금액 ${sum.toLocaleString()} 원`;
+          });
+        });
+
+        // 중복 거래 검사 자동 기동
+        checkDuplicateTransactions();
+      }
+
+    } else {
+      // 단일 이체 폼 동적 구성
+      ocrFormStandard.classList.remove('hidden');
+      ocrFormStandard.innerHTML = '';
+      
+      const fieldLabels = {
+        withdrawalAccount: "출금계좌번호",
+        bank: "수취은행",
+        recipientAccount: "수취계좌번호",
+        recipientName: "예금주명",
+        amount: "송금금액",
+        sender: "보내는 사람",
+        purpose: "송금 목적"
+      };
+
+      const d = ocrResultData.ocrData;
+      const confidence = ocrResultData.ocrConfidence;
+
+      Object.keys(d).forEach(key => {
+        const val = d[key];
+        const label = fieldLabels[key] || key;
+        const conf = confidence[key] || 1.0;
+        
+        // 신뢰도가 0.8 미만일 경우 "확인 필요" 뱃지 노출 (요구사항 13번)
+        const badge = conf < 0.8
+          ? `<span style="background-color: #FFF2F4; border: 1px solid #FFCCD3; color: #D0021B; font-size: 10px; font-weight: 700; padding: 2px 6px; border-radius: 4px; margin-left: 6px;"><i class="fa-solid fa-triangle-exclamation"></i> ⚠ 확인필요 (${Math.round(conf * 100)}%)</span>`
+          : `<span style="color:#2ecc71; font-size:10px; font-weight:700; margin-left:6px;"><i class="fa-solid fa-circle-check"></i> ✓ ${Math.round(conf * 100)}%</span>`;
+
+        const formGroup = document.createElement('div');
+        formGroup.className = 'form-group';
+        formGroup.style.marginBottom = "8px";
+        
+        const isAmount = key === 'amount';
+        const inputType = isAmount ? 'number' : 'text';
+        
+        formGroup.innerHTML = `
+          <label class="form-label" style="display:flex; justify-content:space-between; align-items:center;">
+            <span>${label}</span>
+            ${badge}
+          </label>
+          <input type="${inputType}" class="form-input ocr-std-input" data-key="${key}" value="${val}" required style="font-weight: 800;">
+        `;
+
+        const inputEl = formGroup.querySelector('.ocr-std-input');
+        
+        // 💡 중요: 항목 포커스(클릭) 시 원본 전표 해당 영역 강조 오버레이 바인딩 (요구사항 15번)
+        if (inputEl) {
+          inputEl.addEventListener('focus', () => {
+            clearOcrHighlights();
+            const hlBox = document.getElementById(`ocr-hl-${key}`);
+            if (hlBox) {
+              hlBox.style.display = "block";
+            }
+          });
+          inputEl.addEventListener('blur', () => {
+            // 약간의 딜레이 후 박스 숨김
+            setTimeout(() => {
+              const hlBox = document.getElementById(`ocr-hl-${key}`);
+              if (hlBox && document.activeElement !== inputEl) {
+                hlBox.style.display = "none";
+              }
+            }, 100);
+          });
+
+          // 인풋 값 변경 시 데이터 갱신
+          inputEl.addEventListener('input', (e) => {
+            const k = e.target.getAttribute('data-key');
+            const v = e.target.value;
+            if (k === 'amount') {
+              ocrResultData.ocrData[k] = parseInt(v) || 0;
+            } else {
+              ocrResultData.ocrData[k] = v;
+            }
+          });
+        }
+
+        ocrFormStandard.appendChild(formGroup);
+      });
+    }
+  }
+
+  // ==========================================================================
+  // --- 11-B. 행원 정보 단말 (Staff View) 실시간 제어 로직 ---
+  // ==========================================================================
+  const gotoStaffModeBtn = document.getElementById('goto-staff-mode-btn');
+  const exitStaffModeBtn = document.getElementById('exit-staff-mode-btn');
+  const staffTerminalModal = document.getElementById('staff-terminal-modal');
+  const staffVoucherList = document.getElementById('staff-voucher-list');
+  
+  const staffNoSelection = document.getElementById('staff-no-selection');
+  const staffDetailContent = document.getElementById('staff-detail-content');
+  
+  // 상세 데이터 바인딩 엘리먼트들
+  const sDetailId = document.getElementById('s-detail-id');
+  const sDetailStatusSelect = document.getElementById('s-detail-status-select');
+  const sDetailImageBox = document.getElementById('s-detail-image-box');
+  const sDetailModifiedBadge = document.getElementById('s-detail-modified-badge');
+  const sDetailTime = document.getElementById('s-detail-time');
+  const sDetailStandardBox = document.getElementById('s-detail-standard-box');
+  const sDetailMultiBox = document.getElementById('s-detail-multi-box');
+  const sDetailConfirmBtn = document.getElementById('s-detail-confirm-btn');
+  const sDetailRejectBtn = document.getElementById('s-detail-reject-btn');
+  const staffMultiImageTabs = document.getElementById('staff-multi-image-tabs');
+
+  let activeStaffVoucher = null; // 현재 조회 중인 전표
+  let activeStaffPreviewImageIndex = 0; // 대량 이체일 때 행원이 조회 중인 전표 썸네일 인덱스
+
+  // 행원 단말 진입
+  if (gotoStaffModeBtn && staffTerminalModal) {
+    gotoStaffModeBtn.addEventListener('click', () => {
+      staffTerminalModal.classList.remove('hidden');
+      renderStaffVoucherList();
+      playNotificationSound('beep');
+      showToast('행원 접수 단말 모드로 진입했습니다.');
+    });
+  }
+
+  // 행원 단말 이탈 (로그아웃)
+  if (exitStaffModeBtn && staffTerminalModal) {
+    exitStaffModeBtn.addEventListener('click', () => {
+      staffTerminalModal.classList.add('hidden');
+      playNotificationSound('beep');
+      showToast('고객 모드로 복귀했습니다.');
+    });
+  }
+
+  // 행원 접수 리스트 렌더링
+  function renderStaffVoucherList() {
+    if (!staffVoucherList) return;
+    staffVoucherList.innerHTML = '';
+    
+    // 뱃지 건수 업데이트
+    const badge = document.getElementById('staff-incoming-badge');
+    if (badge) badge.textContent = `${window.staffVoucherDb.length}건`;
+
+    const typeNames = {
+      SINGLE_TRANSFER: '단일 송금',
+      MULTI_TRANSFER: '대량 송금',
+      DEPOSIT: '입금 전표',
+      WITHDRAW: '출금 전표'
+    };
+
+    const statusBadges = {
+      WAITING: '<span class="s-badge s-badge-waiting">확인대기</span>',
+      CHECKING: '<span class="s-badge s-badge-checking">확인중</span>',
+      COMPLETED: '<span class="s-badge s-badge-completed">처리완료</span>',
+      REJECTED: '<span class="s-badge s-badge-rejected">보완필요</span>'
+    };
+
+    window.staffVoucherDb.forEach(voc => {
+      const card = document.createElement('div');
+      card.className = 'staff-voucher-card';
+      if (activeStaffVoucher && activeStaffVoucher.id === voc.id) {
+        card.classList.add('selected');
       }
       
-      playNotificationSound('double');
-      showToast(activeBusiness === 'sushin' ? '전표 정보가 창구로 전송되었습니다.' : '대출 신청 정보가 창구로 전송되었습니다.');
+      let amountText = '';
+      if (voc.type === 'MULTI_TRANSFER') {
+        amountText = `${voc.ocrData.totalCount}건 / ${voc.ocrData.totalAmount.toLocaleString()}원`;
+      } else {
+        amountText = `${voc.ocrData.amount.toLocaleString()}원`;
+      }
+
+      card.innerHTML = `
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:6px;">
+          <strong style="font-size:12.5px; color:#2c3e50;">${typeNames[voc.type]}</strong>
+          ${statusBadges[voc.status]}
+        </div>
+        <div style="font-size:11px; color:#7f8c8d; display:flex; justify-content:space-between;">
+          <span>접수번호: ${voc.id}</span>
+          <span>${voc.createdAt.split(' ')[1]}</span>
+        </div>
+        <div style="font-size:11.5px; font-weight:700; color:#1abc9c; margin-top:4px; text-align:right;">
+          ${amountText}
+        </div>
+      `;
+
+      card.addEventListener('click', () => {
+        activeStaffVoucher = voc;
+        renderStaffVoucherList(); // 선택 표시를 위해 리스트 다시 그림
+        loadStaffVoucherDetail(voc);
+        playNotificationSound('beep');
+      });
+
+      staffVoucherList.appendChild(card);
     });
   }
 
-  if (editScanBtn) {
-    editScanBtn.addEventListener('click', () => {
-      if (mockVoucher) mockVoucher.classList.remove('scanned');
-      if (scanSuccessMessage) scanSuccessMessage.classList.add('hidden');
-      if (scanViewStep1) scanViewStep1.classList.remove('hidden');
-      playNotificationSound('beep');
+  // 행원 상세 뷰 바인딩
+  function loadStaffVoucherDetail(voc) {
+    if (!staffNoSelection || !staffDetailContent) return;
+    staffNoSelection.classList.add('hidden');
+    staffDetailContent.classList.remove('hidden');
+
+    sDetailId.textContent = voc.id;
+    sDetailStatusSelect.value = voc.status;
+    sDetailTime.textContent = `접수 시간: ${voc.createdAt}`;
+
+    // 모의 이미지 주입
+    if (sDetailImageBox) {
+      sDetailImageBox.style.background = voc.imageUrl;
+      sDetailImageBox.style.borderRadius = "6px";
+      sDetailImageBox.innerHTML = `
+        <div style="padding:10px; color:#333; height:100%; display:flex; flex-direction:column; justify-content:space-between; box-sizing:border-box;">
+          <div style="font-weight:700; font-size:11px; border-bottom:1px solid rgba(0,0,0,0.1); padding-bottom:4px;">접수 이미지 아카이빙</div>
+          <div style="font-size:11px; font-weight:700;">
+            [전표종류] ${voc.type}<br>
+            [제출고객] ${voc.customer.name}
+          </div>
+          <div style="font-size:8.5px; color:#7f8c8d; text-align:right;">iM뱅크 전자 서류고 보관용</div>
+        </div>
+      `;
+    }
+
+    // 고객 수정 여부 대조분석 판독
+    let isModified = false;
+    let modifiedFieldsList = [];
+    
+    if (voc.type === 'MULTI_TRANSFER') {
+      // 대량 송금 대조
+      const orig = voc.ocrOriginalData.recipients;
+      const draft = voc.ocrData.recipients;
+      if (orig.length !== draft.length) {
+        isModified = true;
+        modifiedFieldsList.push('수취 건수 변경');
+      } else {
+        for (let i = 0; i < orig.length; i++) {
+          if (orig[i].bank !== draft[i].bank || orig[i].account !== draft[i].account || orig[i].name !== draft[i].name || orig[i].amount !== draft[i].amount) {
+            isModified = true;
+            modifiedFieldsList.push(`수취인 ${i+1} 정보 수정됨`);
+          }
+        }
+      }
+    } else {
+      // 표준 대조
+      Object.keys(voc.ocrOriginalData).forEach(k => {
+        if (voc.ocrOriginalData[k] !== voc.ocrData[k]) {
+          isModified = true;
+          modifiedFieldsList.push(k);
+        }
+      });
+    }
+
+    if (sDetailModifiedBadge) {
+      if (isModified) {
+        sDetailModifiedBadge.className = 'info-alert-box';
+        sDetailModifiedBadge.style.backgroundColor = '#FFF9E6';
+        sDetailModifiedBadge.style.border = '1px solid #FFEAA7';
+        sDetailModifiedBadge.style.color = '#B37D00';
+        sDetailModifiedBadge.innerHTML = `<i class="fa-solid fa-user-pen"></i> <strong>고객 수정 정보 감지:</strong> 수기 스캔 OCR 결과 대비 고객이 직접 보정하여 제출한 항목이 존재합니다. [수정 항목: ${modifiedFieldsList.join(', ')}]`;
+      } else {
+        sDetailModifiedBadge.className = 'info-alert-box';
+        sDetailModifiedBadge.style.backgroundColor = '#EBF8F6';
+        sDetailModifiedBadge.style.border = '1px solid rgba(0,186,174,0.15)';
+        sDetailModifiedBadge.style.color = 'var(--brand-mint-dark)';
+        sDetailModifiedBadge.innerHTML = `<i class="fa-solid fa-circle-check"></i> <strong>수정 내역 없음:</strong> 고객이 OCR 판독 결과 원본 그대로 임시 제출을 완료했습니다.`;
+      }
+    }
+
+    // 폼 렌더링
+    sDetailStandardBox.classList.add('hidden');
+    sDetailMultiBox.classList.add('hidden');
+
+    if (voc.type === 'MULTI_TRANSFER') {
+      sDetailMultiBox.classList.remove('hidden');
+      document.getElementById('s-multi-total-count').textContent = `총 ${voc.ocrData.totalCount}건`;
+      document.getElementById('s-multi-total-amount').textContent = `총 금액 ${voc.ocrData.totalAmount.toLocaleString()}원`;
+
+      const tbody = document.getElementById('s-multi-table-body');
+      if (tbody) {
+        tbody.innerHTML = '';
+        voc.ocrData.recipients.forEach((r, idx) => {
+          const tr = document.createElement('tr');
+          tr.style.borderBottom = "1px solid var(--light-gray)";
+          tr.innerHTML = `
+            <td style="padding:6px; font-weight:700;">${idx+1}</td>
+            <td style="padding:6px;">${r.bank}</td>
+            <td style="padding:6px; font-weight:700; font-family:monospace;">${r.account}</td>
+            <td style="padding:6px;">${r.name}</td>
+            <td style="padding:6px; text-align:right; font-weight:800;">${r.amount.toLocaleString()}원</td>
+          `;
+          tbody.appendChild(tr);
+        });
+      }
+    } else {
+      sDetailStandardBox.classList.remove('hidden');
+      sDetailStandardBox.innerHTML = '';
+
+      const labels = {
+        withdrawalAccount: "출금계좌번호",
+        bank: "수취은행",
+        recipientAccount: "수취계좌번호",
+        recipientName: "예금주명",
+        amount: "송금금액",
+        sender: "보내는 사람",
+        purpose: "송금 목적",
+        depositAccount: "입금계좌번호",
+        depositor: "입금인",
+        cashOrCheck: "현금/수표 구분"
+      };
+
+      Object.keys(voc.ocrData).forEach(k => {
+        const val = voc.ocrData[k];
+        const row = document.createElement('div');
+        row.style.display = "flex";
+        row.style.justifyContent = "space-between";
+        row.style.borderBottom = "1px solid #f1f2f6";
+        row.style.padding = "8px 0";
+        row.style.fontSize = "12px";
+
+        // 이 필드가 수정되었는지 여부
+        const isFieldModified = voc.ocrOriginalData[k] !== val;
+        const modifiedStyle = isFieldModified ? 'color:#d63031; font-weight:800; background-color:#fff2f4; padding:2px 6px; border-radius:4px;' : 'font-weight:700;';
+
+        row.innerHTML = `
+          <span style="color:#7f8c8d;">${labels[k] || k}</span>
+          <span style="${modifiedStyle}">${k === 'amount' ? val.toLocaleString() + '원' : val}</span>
+        `;
+        sDetailStandardBox.appendChild(row);
+      });
+    }
+  }
+
+  // 처리상태 드롭다운 강제 변경 연동
+  if (sDetailStatusSelect) {
+    sDetailStatusSelect.addEventListener('change', (e) => {
+      if (activeStaffVoucher) {
+        activeStaffVoucher.status = e.target.value;
+        activeStaffVoucher.updatedAt = new Date().toISOString().replace('T', ' ').substring(0, 16);
+        renderStaffVoucherList();
+        showToast(`전표 상태가 '${e.target.value}'(으)로 갱신되었습니다.`);
+      }
+    });
+  }
+
+  // [확인 완료] 버튼 클릭 시
+  if (sDetailConfirmBtn) {
+    sDetailConfirmBtn.addEventListener('click', () => {
+      if (activeStaffVoucher) {
+        activeStaffVoucher.status = 'COMPLETED';
+        activeStaffVoucher.updatedAt = new Date().toISOString().replace('T', ' ').substring(0, 16);
+        if (sDetailStatusSelect) sDetailStatusSelect.value = 'COMPLETED';
+        renderStaffVoucherList();
+        playNotificationSound('double');
+        showToast('전표 처리가 최종 완료(COMPLETED) 승인되었습니다.');
+      }
     });
   }
 
@@ -1958,6 +2992,10 @@ document.addEventListener('DOMContentLoaded', async () => {
               defaultRadio.checked = true;
               defaultRadio.dispatchEvent(new Event('change'));
             }
+          } else if (pendingModalId === 'transfer-voucher-modal') {
+            if (typeof gotoScanStep === 'function') {
+              gotoScanStep(1);
+            }
           }
         }
         pendingModalId = null;
@@ -1979,6 +3017,10 @@ document.addEventListener('DOMContentLoaded', async () => {
           if (defaultRadio) {
             defaultRadio.checked = true;
             defaultRadio.dispatchEvent(new Event('change'));
+          }
+        } else if (targetModalId === 'transfer-voucher-modal') {
+          if (typeof gotoScanStep === 'function') {
+            gotoScanStep(1);
           }
         }
       }
@@ -2030,14 +3072,22 @@ document.addEventListener('DOMContentLoaded', async () => {
   // 닫기 버튼 이벤트 바인딩
   const setupModalClose = (closeBtnEl, modalEl) => {
     if (closeBtnEl && modalEl) {
-      closeBtnEl.addEventListener('click', () => {
+      const handleClose = () => {
         modalEl.classList.add('hidden');
+        if (modalEl.id === 'transfer-voucher-modal') {
+          if (typeof gotoScanStep === 'function') {
+            gotoScanStep(1);
+          }
+        }
         playNotificationSound('beep');
-      });
+      };
+      
+      closeBtnEl.addEventListener('click', handleClose);
+      
       // 오버레이 배경 클릭 시 닫기
       modalEl.addEventListener('click', (e) => {
         if (e.target === modalEl) {
-          modalEl.classList.add('hidden');
+          handleClose();
         }
       });
     }
@@ -2047,5 +3097,130 @@ document.addEventListener('DOMContentLoaded', async () => {
   setupModalClose(closeChecklistBtn, checklistModal);
   setupModalClose(closeFinancialTestBtn, financialTestModal);
   setupModalClose(closeTransferVoucherBtn, transferVoucherModal);
+
+  const closeStaffBtn = document.getElementById('exit-staff-mode-btn');
+  setupModalClose(closeStaffBtn, staffTerminalModal);
+
+  // --- 내가 보낸 전표 목록 조회 및 상세 팝업 제어 ---
+  const sentVouchersList = document.getElementById('sent-vouchers-list');
+  const sentVouchersCount = document.getElementById('sent-vouchers-count');
+  
+  const sentVoucherDetailModal = document.getElementById('sent-voucher-detail-modal');
+  const closeSentVoucherDetailBtn = document.getElementById('close-sent-voucher-detail-btn');
+  const closeSentVoucherDetailBtnBottom = document.getElementById('close-sent-voucher-detail-btn-bottom');
+
+  window.renderMySentVoucherList = function() {
+    if (!sentVouchersList || !sentVouchersCount) return;
+    
+    // 내가 보낸 전표만 필터링 (데모 샘플 데이터와 격리)
+    const mySentList = (window.staffVoucherDb || []).filter(item => item.isMySent === true);
+    sentVouchersCount.textContent = `${mySentList.length}건`;
+
+    if (mySentList.length === 0) {
+      sentVouchersList.innerHTML = '<div style="font-size: 11.5px; color: var(--cool-gray); text-align: center; padding: 12px 0;">최근 전송한 전표 내역이 없습니다.</div>';
+      return;
+    }
+
+    sentVouchersList.innerHTML = '';
+    mySentList.forEach(item => {
+      const card = document.createElement('div');
+      card.className = 'my-sent-card';
+      card.style.padding = '10px 12px';
+      card.style.border = '1px solid var(--light-gray)';
+      card.style.borderRadius = '8px';
+      card.style.backgroundColor = '#fff';
+      card.style.cursor = 'pointer';
+      card.style.display = 'flex';
+      card.style.justifyContent = 'space-between';
+      card.style.alignItems = 'center';
+      card.style.boxShadow = 'var(--shadow-xs)';
+      card.style.transition = 'all 0.2s';
+
+      card.addEventListener('mouseenter', () => { card.style.borderColor = 'var(--brand-mint)'; });
+      card.addEventListener('mouseleave', () => { card.style.borderColor = 'var(--light-gray)'; });
+
+      const dateStr = item.createdAt ? item.createdAt.substring(11) : '';
+
+      card.innerHTML = `
+        <div>
+          <div style="font-weight: 700; font-size: 12px; color: var(--dark-text);">${item.type === 'MASS_TRANSFER' ? '대량 이체 전표' : '단일 이체 전표'}</div>
+          <div style="font-size: 10.5px; color: var(--cool-gray); margin-top: 4px;">접수번호: ${item.id} | ${dateStr}</div>
+        </div>
+        <div style="text-align: right;">
+          <div style="font-weight: 800; font-size: 12.5px; color: var(--brand-mint-dark);">${item.totalAmount.toLocaleString()}원</div>
+          <div style="font-size: 9.5px; color: var(--cool-gray); margin-top: 2px;">상세 보기 <i class="fa-solid fa-chevron-right" style="font-size: 8px;"></i></div>
+        </div>
+      `;
+
+      card.addEventListener('click', () => {
+        openSentVoucherDetail(item);
+      });
+
+      sentVouchersList.appendChild(card);
+    });
+  };
+
+  function openSentVoucherDetail(item) {
+    if (!sentVoucherDetailModal) return;
+    
+    document.getElementById('detail-view-ticket-id').textContent = item.id;
+    document.getElementById('detail-view-type').textContent = item.type === 'MASS_TRANSFER' ? '대량 이체' : '단일 이체';
+    document.getElementById('detail-view-time').textContent = item.createdAt;
+    document.getElementById('detail-view-amount').textContent = `${item.totalAmount.toLocaleString()}원`;
+
+    const statusEl = document.getElementById('detail-view-status');
+    if (statusEl) {
+      if (item.status === 'WAITING') {
+        statusEl.textContent = '창구 대기중';
+        statusEl.style.backgroundColor = '#e3fcef';
+        statusEl.style.color = '#00a389';
+      } else {
+        statusEl.textContent = '처리 완료';
+        statusEl.style.backgroundColor = '#f1f2f6';
+        statusEl.style.color = '#7f8c8d';
+      }
+    }
+
+    const tbody = document.getElementById('detail-view-transactions-body');
+    if (tbody) {
+      tbody.innerHTML = '';
+      const txs = item.transactions || [];
+      txs.forEach(t => {
+        const tr = document.createElement('tr');
+        tr.style.borderBottom = '1px solid var(--light-gray)';
+        
+        const bankVal = t.bank || '-';
+        const accountVal = t.accountNumber || t.recipientAccount || '-';
+        const holderVal = t.accountHolder || t.recipientName || '-';
+        const amtVal = t.amount ? `${t.amount.toLocaleString()}원` : '0원';
+
+        tr.innerHTML = `
+          <td style="padding: 8px; font-weight: 700;">${bankVal}</td>
+          <td style="padding: 8px; color: var(--dark-gray); font-family: monospace; word-break: break-all;">${accountVal}</td>
+          <td style="padding: 8px;">${holderVal}</td>
+          <td style="padding: 8px; text-align: right; font-weight: 700;">${amtVal}</td>
+        `;
+        tbody.appendChild(tr);
+      });
+    }
+
+    sentVoucherDetailModal.classList.remove('hidden');
+    playNotificationSound('beep');
+  }
+
+  if (sentVoucherDetailModal) {
+    const closeDetail = () => {
+      sentVoucherDetailModal.classList.add('hidden');
+      playNotificationSound('beep');
+    };
+    if (closeSentVoucherDetailBtn) closeSentVoucherDetailBtn.addEventListener('click', closeDetail);
+    if (closeSentVoucherDetailBtnBottom) closeSentVoucherDetailBtnBottom.addEventListener('click', closeDetail);
+    
+    sentVoucherDetailModal.addEventListener('click', (e) => {
+      if (e.target === sentVoucherDetailModal) {
+        closeDetail();
+      }
+    });
+  }
 
 });
