@@ -306,157 +306,157 @@
     </div>
   </div>
 
-  <!-- 최초 1회 개인정보 및 사전 전송 동의 모달 (공통) -->
+  <!-- 최초 1회 개인정보 및 서비스 이용 동의 모달 (공통 - 자세히 보기 상세 UI) -->
   <div id="common-consent-modal" class="modal-overlay hidden">
     <div class="modal-content animate-slide-up" style="max-height: 82vh; display: flex; flex-direction: column; overflow: hidden; max-width: 440px;">
-      <div class="modal-header" style="background-color: var(--brand-mint-light); border-bottom: 1px solid rgba(0, 186, 174, 0.15);">
+      <div class="modal-header" style="background-color: var(--brand-mint-light); border-bottom: 1px solid rgba(0, 186, 174, 0.15); padding: 14px 16px;">
         <div class="modal-header-title">
           <i class="fa-solid fa-shield-halved" style="color: var(--brand-mint); font-size: 16px;"></i>
-          <h3 style="font-size: 14px; font-weight: 700; color: var(--brand-mint-dark);">[iM SmartQ 이용을 위한 개인정보 안내]</h3>
+          <h3 style="font-size: 13.5px; font-weight: 700; color: var(--brand-mint-dark);">iM SmartQ 개인정보 처리 안내</h3>
         </div>
         <button class="close-btn" id="close-common-consent-modal-btn">&times;</button>
       </div>
+      
       <div class="modal-body" style="padding: 16px; overflow-y: auto; flex: 1;">
         <p class="form-desc" style="margin-bottom: 14px; line-height: 1.5; color: var(--dark-gray); font-size: 12px;">
-          iM SmartQ는 관련 법령(개인정보보호법 제15조 등) 및 개인정보위 2026 작성지침에 의거하여 고객님의 동의를 받고 최소한의 필수 개인정보만 수집합니다.
+          iM SmartQ는 <strong>개인정보 보호법 제15조 및 2026.4 개정 지침</strong>에 따라 서비스 제공에 필요한 최소한의 개인정보를 구분하여 수집합니다.
         </p>
-        
-        <!-- 약관 아코디언 목록 -->
-        <div class="consent-accordion-group" style="margin-bottom: 16px;">
+
+        <!-- 약관 체크 및 상세보기 리스트 -->
+        <div class="consent-flow-wrapper" style="display: flex; flex-direction: column; gap: 10px; margin-bottom: 16px;">
           
-          <!-- 1. 개인정보 처리방침 -->
-          <div class="consent-accordion-item">
-            <div class="consent-accordion-header" onclick="this.nextElementSibling.classList.toggle('open'); this.querySelector('.consent-accordion-toggle-icon').style.transform = this.nextElementSibling.classList.contains('open') ? 'rotate(180deg)' : 'rotate(0deg)';">
-              <div class="consent-accordion-title">
-                <span class="badge-required">필수확인</span>
-                <span>iM SmartQ 개인정보 처리방침</span>
-              </div>
-              <i class="fa-solid fa-chevron-down consent-accordion-toggle-icon"></i>
+          <!-- 전체 동의 칩 -->
+          <div class="consent-row-header" style="background-color: var(--brand-mint-light); padding: 12px; border-radius: 8px; border: 1px solid rgba(0, 186, 174, 0.2); display: flex; align-items: center; margin-bottom: 6px;">
+            <label class="checkbox-container" style="font-weight: 700; width: 100%; margin: 0;">
+              <input type="checkbox" id="agree-all-consents">
+              <span class="checkmark"></span>
+              <span class="checkbox-label" style="color: var(--brand-mint-dark); font-size: 13px;">약관 및 동의서 전체 동의하기</span>
+            </label>
+          </div>
+
+          <!-- 1. 처리방침 동의 행 -->
+          <div class="consent-row-item" style="border: 1px solid var(--light-gray); border-radius: 8px; padding: 4px 12px; background-color: var(--white);">
+            <div class="consent-row-main" style="display: flex; justify-content: space-between; align-items: center; padding: 8px 0;">
+              <label class="checkbox-container" style="margin: 0;">
+                <input type="checkbox" class="individual-consent" id="agree-policy-check">
+                <span class="checkmark"></span>
+                <span class="checkbox-label" style="font-size: 12px; font-weight: 600;"><span style="color: var(--brand-mint); font-weight: 700;">[필수]</span> 개인정보 처리방침 확인</span>
+              </label>
+              <button type="button" class="btn-consent-detail" data-target="detail-policy" style="background: none; border: none; font-size: 11.5px; color: var(--cool-gray); cursor: pointer; display: flex; align-items: center; gap: 4px; font-weight: 600; padding: 4px 0;">
+                <span>자세히</span> <i class="fa-solid fa-chevron-down" style="font-size: 9px; transition: transform 0.2s;"></i>
+              </button>
             </div>
-            <div class="consent-accordion-content">
-              <div class="consent-text-box"><strong>제1조 (개인정보의 처리 목적)</strong>
-iM SmartQ는 다음의 목적을 위해 개인정보를 처리합니다.
-- 영업점 방문 고객의 대기번호 발급 및 대기순서 안내
-- 고객의 대기상태 및 호출 알림 제공
-- 창구 업무 이용을 위한 사전정보 입력 및 서류 작성 지원
-- 고객이 입력한 정보의 영업점 업무 담당자 전달
-- 서비스 이용 기록 및 시스템 안정성 확보
-
-<strong>제2조 (처리하는 개인정보의 항목)</strong>
-- 대기번호 및 알림: 대기번호, 발권시간, 연락처(전화번호)
-- 사전 서류 작성: 성명, 생년월일, 연락처, 주소, 금융거래 항목 정보
-- 시스템 자동 수집: 접속 일시, 쿠키, 기기 정보, 오류 로그
-
-<strong>제3조 (개인정보의 처리 및 보유기간)</strong>
-개인정보는 수집·이용 목적이 달성된 후 지체 없이 파기하는 것을 원칙으로 합니다.
-- 대기 알림 서비스 정보: 업무 제공 완료 후 당일 영업일 마감 시 즉시 파기
-- 사전작성 정보: 창구 업무 처리가 완료되는 즉시 지체 없이 파기
-
-<strong>제4조 (개인정보의 제3자 제공)</strong>
-iM SmartQ는 이용자의 개인정보를 원칙적으로 외부에 제공하지 않으며, 이용자가 사전에 동의한 경우나 법령의 특별한 규정이 있는 경우에만 제공합니다.
-
-<strong>제5조 (개인정보 처리의 위탁)</strong>
-서비스 운영 및 알림 발송 업무는 관련 법령에 따른 안전 조치를 마친 공식 위탁 전문 대행업체에 한해 위탁을 운영 및 제한합니다.
-
-<strong>제6조 (개인정보의 파기)</strong>
-보유기간이 경과하거나 처리 목적이 달성된 개인정보는 전자적 재생 불가능한 방법으로 즉시 삭제합니다.
-
-<strong>제7조 (개인정보의 안전성 확보조치)</strong>
-시스템 접근 권한 관리, 네트워크 전송 구간 암호화, 보안 프로그램 최신 상태 유지 조치를 적용합니다.
-
-<strong>제8조 (이용자의 권리)</strong>
-이용자는 언제든지 본인의 개인정보 열람, 정정, 삭제 및 처리정지를 요구할 권리가 있습니다.
-
-<strong>제9조 (개인정보 보호책임자)</strong>
-개인정보 보호 담당부서: iM뱅크 정보보호부 (공식 문의 절차 준용)
-
-<strong>제10조 (개인정보 처리방침의 변경)</strong>
-본 방침은 시행일(2026년 4월 1일)부터 적용되며 변경 시 화면을 통해 고지합니다.</div>
+            <div id="detail-policy" class="consent-detail-panel hidden" style="border-top: 1px solid var(--light-gray); margin-top: 0; margin-bottom: 6px; overflow: hidden; background-color: var(--background-gray); border-radius: 4px;">
+              <div class="consent-text-box" style="padding: 10px; font-size: 10.5px; max-height: 150px; overflow-y: auto; color: var(--dark-gray); line-height: 1.5; font-family: inherit;">
+                <strong>[iM SmartQ 개인정보 처리방침 전문]</strong><br><br>
+                iM SmartQ는 이용자의 개인정보를 안전하게 보호하고 관련 법령을 준수하기 위해 다음과 같이 개인정보를 처리합니다.<br><br>
+                <strong>제1조 (개인정보의 처리 목적)</strong><br>
+                수집된 정보는 다음 목적 이외의 용도로 사용되지 않습니다.<br>
+                - 영업점 방문 고객의 대기번호 발급 및 대기 순서 실시간 안내<br>
+                - 대기 상태 및 호출 알림 서비스 제공<br>
+                - 모바일 사전 정보 입력 및 창구 단말 연동 지원<br>
+                - 서비스 이용 기록 및 시스템 보안 관리<br><br>
+                <strong>제2조 (처리하는 개인정보의 항목)</strong><br>
+                - 번호표 및 알림톡: 대기번호, 발권시간, 지점명, 연락처(전화번호)<br>
+                - 사전작성 기능: 성명, 생년월일, 연락처, 주소, 금융거래 항목 정보<br>
+                - 자동 생성 항목: 접속 일시, 쿠키, 기기 및 브라우저 명세, 접속 로그<br><br>
+                <strong>제3조 (개인정보의 처리 및 보유기간)</strong><br>
+                - <strong>이용 목적이 달성되면 즉시(당일 영업일 종료 시) 파기하는 것을 원칙으로 합니다.</strong><br>
+                - 사전 입력된 전표 정보는 고객이 창구에서 업무 처리를 완료함과 동시에 단말 상에서 지체 없이 영구 파기합니다.<br><br>
+                <strong>제4조 (개인정보의 제3자 제공)</strong><br>
+                - 원칙적으로 제3자에게 정보를 제공하지 않으며, 정보주체의 사전 동의나 관계 법령의 특별 규정이 있는 경우에 한해서만 엄격하게 제한 제공합니다.<br><br>
+                <strong>제5조 (개인정보 처리의 위탁)</strong><br>
+                - 효율적인 서비스 제공을 위해 알림톡 발송 업무 등을 전문 대행업체에 한해 안전 조치 계약 하에 위탁합니다.<br><br>
+                <strong>제6조 (개인정보의 파기 절차 및 방법)</strong><br>
+                - 전자적 파일은 재생 불가능한 기술적 방법으로 즉시 영구 삭제하며, 인쇄물 등은 분쇄 또는 소각합니다.<br><br>
+                <strong>제7조 (개인정보 보호 조치)</strong><br>
+                - 접근 권한 제어, 개인정보 전송 구간 SSL 암호화 적용, 정기적 시스템 점검을 이행합니다.<br><br>
+                <strong>제8조 (정보주체의 권리)</strong><br>
+                - 이용자는 언제든지 자신의 개인정보에 대해 열람, 정정, 삭제 및 처리 정지를 요청할 수 있습니다.<br><br>
+                <strong>제9조 (개인정보 보호책임자)</strong><br>
+                - iM뱅크 개인정보 보호책임자 및 정보보호부 담당 (공식 창구 준용)<br><br>
+                <strong>제10조 (변경 고지)</strong><br>
+                - 본 방침은 2026년 4월 1일부터 시행되며, 개정 시 서비스 공지사항을 통해 상세 고지합니다.
+              </div>
             </div>
           </div>
 
-          <!-- 2. 필수 동의서 -->
-          <div class="consent-accordion-item">
-            <div class="consent-accordion-header" onclick="this.nextElementSibling.classList.toggle('open'); this.querySelector('.consent-accordion-toggle-icon').style.transform = this.nextElementSibling.classList.contains('open') ? 'rotate(180deg)' : 'rotate(0deg)';">
-              <div class="consent-accordion-title">
-                <span class="badge-required">필수동의</span>
-                <span>[필수] 개인정보 수집 및 이용 동의</span>
-              </div>
-              <i class="fa-solid fa-chevron-down consent-accordion-toggle-icon"></i>
+          <!-- 2. 필수 동의서 행 -->
+          <div class="consent-row-item" style="border: 1px solid var(--light-gray); border-radius: 8px; padding: 4px 12px; background-color: var(--white);">
+            <div class="consent-row-main" style="display: flex; justify-content: space-between; align-items: center; padding: 8px 0;">
+              <label class="checkbox-container" style="margin: 0;">
+                <input type="checkbox" class="individual-consent" id="agree-required-check">
+                <span class="checkmark"></span>
+                <span class="checkbox-label" style="font-size: 12px; font-weight: 600;"><span style="color: var(--brand-mint); font-weight: 700;">[필수]</span> 개인정보 수집·이용 동의</span>
+              </label>
+              <button type="button" class="btn-consent-detail" data-target="detail-required" style="background: none; border: none; font-size: 11.5px; color: var(--cool-gray); cursor: pointer; display: flex; align-items: center; gap: 4px; font-weight: 600; padding: 4px 0;">
+                <span>자세히</span> <i class="fa-solid fa-chevron-down" style="font-size: 9px; transition: transform 0.2s;"></i>
+              </button>
             </div>
-            <div class="consent-accordion-content">
-              <div class="consent-text-box"><strong>1. 수집 및 이용 목적</strong>
-- 영업점 대기번호 발급, 대기 순서 안내 및 알림톡 호출
-- 사전 입력한 모바일 전표 정보의 창구 단말기 연동 전송
-
-<strong>2. 수집하는 개인정보 항목</strong>
-- 성명, 연락처(전화번호), 발권 정보 및 고객이 직접 입력한 서류 작성 정보
-
-<strong>3. 보유 및 이용 기간</strong>
-- 서비스 완료 또는 업무가 종결되는 즉시 (당일 영업 마감 후) 지체 없이 영구 파기
-
-<strong>4. 동의 거부 권리 및 불이익</strong>
-- 귀하는 동의를 거부할 수 있으나, 필수 동의를 거부할 경우 대기 알림 서비스 및 모바일 서류 사전 작성(SmartQ) 기능 이용이 제한될 수 있습니다.</div>
+            <div id="detail-required" class="consent-detail-panel hidden" style="border-top: 1px solid var(--light-gray); margin-top: 0; margin-bottom: 6px; overflow: hidden; background-color: var(--background-gray); border-radius: 4px;">
+              <div style="padding: 10px; font-size: 11px;">
+                <table style="width: 100%; border-collapse: collapse; background-color: var(--white); border: 1px solid var(--light-gray); margin-bottom: 0;">
+                  <tr>
+                    <td style="border: 1px solid var(--light-gray); padding: 6px 8px; background-color: var(--background-gray); font-weight: 700; width: 30%; font-size: 10.5px;">수집·이용 목적</td>
+                    <td style="border: 1px solid var(--light-gray); padding: 6px 8px; line-height: 1.4; font-size: 10.5px;">대기번호 발권, 호출 알림톡 발송 및 사전 모바일 서류 전송 연동</td>
+                  </tr>
+                  <tr>
+                    <td style="border: 1px solid var(--light-gray); padding: 6px 8px; background-color: var(--background-gray); font-weight: 700; font-size: 10.5px;">수집 항목</td>
+                    <td style="border: 1px solid var(--light-gray); padding: 6px 8px; line-height: 1.4; font-size: 10.5px;">성명, 연락처(전화번호), 고객이 입력한 거래 양식 항목 정보</td>
+                  </tr>
+                  <tr>
+                    <td style="border: 1px solid var(--light-gray); padding: 6px 8px; background-color: var(--background-gray); font-weight: 700; color: #D0021B; font-size: 10.5px;">보유·이용 기간</td>
+                    <td style="border: 1px solid var(--light-gray); padding: 6px 8px; line-height: 1.4; font-weight: 700; color: #D0021B; font-size: 10.5px;">영업점 방문 및 창구 거래 완료 시 즉시 영구 파기 (당일 마감 시 즉시 소멸)</td>
+                  </tr>
+                  <tr>
+                    <td style="border: 1px solid var(--light-gray); padding: 6px 8px; background-color: var(--background-gray); font-weight: 700; font-size: 10.5px;">거부 시 불이익</td>
+                    <td style="border: 1px solid var(--light-gray); padding: 6px 8px; line-height: 1.4; font-size: 10.5px;">동의를 거부하실 수 있으나, 미동의 시 SmartQ 모바일 사전 작성 및 대기 서비스 이용이 제한됩니다.</td>
+                  </tr>
+                </table>
+              </div>
             </div>
           </div>
 
-          <!-- 3. 선택 동의서 -->
-          <div class="consent-accordion-item">
-            <div class="consent-accordion-header" onclick="this.nextElementSibling.classList.toggle('open'); this.querySelector('.consent-accordion-toggle-icon').style.transform = this.nextElementSibling.classList.contains('open') ? 'rotate(180deg)' : 'rotate(0deg)';">
-              <div class="consent-accordion-title">
-                <span class="badge-optional">선택동의</span>
-                <span>[선택] 마케팅 목적 수집 및 이용 동의</span>
-              </div>
-              <i class="fa-solid fa-chevron-down consent-accordion-toggle-icon"></i>
+          <!-- 3. 선택 동의서 행 -->
+          <div class="consent-row-item" style="border: 1px solid var(--light-gray); border-radius: 8px; padding: 4px 12px; background-color: var(--white);">
+            <div class="consent-row-main" style="display: flex; justify-content: space-between; align-items: center; padding: 8px 0;">
+              <label class="checkbox-container" style="margin: 0;">
+                <input type="checkbox" class="individual-consent" id="agree-optional-check">
+                <span class="checkmark"></span>
+                <span class="checkbox-label" style="font-size: 12px; font-weight: 600;"><span style="color: var(--cool-gray); font-weight: 700;">[선택]</span> 개인정보 수집·이용 동의</span>
+              </label>
+              <button type="button" class="btn-consent-detail" data-target="detail-optional" style="background: none; border: none; font-size: 11.5px; color: var(--cool-gray); cursor: pointer; display: flex; align-items: center; gap: 4px; font-weight: 600; padding: 4px 0;">
+                <span>자세히</span> <i class="fa-solid fa-chevron-down" style="font-size: 9px; transition: transform 0.2s;"></i>
+              </button>
             </div>
-            <div class="consent-accordion-content">
-              <div class="consent-text-box"><strong>1. 수집 및 이용 목적</strong>
-- iM SmartQ 이용 행태 분석을 통한 서비스 최적화 및 맞춤형 금융 상품 추천 안내
-
-<strong>2. 수집하는 개인정보 항목</strong>
-- 서비스 이용 기록, 기기 접속 정보, 관심 금융 카테고리 정보
-
-<strong>3. 보유 및 이용 기간</strong>
-- 동의일로부터 동의 철회 시까지 혹은 관계 법령에서 정한 보존 기한 준수
-
-<strong>4. 동의 거부 권리 및 불이익</strong>
-- 귀하는 본 선택 동의를 거부할 권리가 있으며, 동의하지 않으셔도 iM SmartQ의 기본적인 대기 번호표 발권 및 사전 서류 작성 기능은 아무런 불이익 없이 모두 정상 이용하실 수 있습니다.</div>
+            <div id="detail-optional" class="consent-detail-panel hidden" style="border-top: 1px solid var(--light-gray); margin-top: 0; margin-bottom: 6px; overflow: hidden; background-color: var(--background-gray); border-radius: 4px;">
+              <div style="padding: 10px; font-size: 11px;">
+                <table style="width: 100%; border-collapse: collapse; background-color: var(--white); border: 1px solid var(--light-gray); margin-bottom: 0;">
+                  <tr>
+                    <td style="border: 1px solid var(--light-gray); padding: 6px 8px; background-color: var(--background-gray); font-weight: 700; width: 30%; font-size: 10.5px;">수집·이용 목적</td>
+                    <td style="border: 1px solid var(--light-gray); padding: 6px 8px; line-height: 1.4; font-size: 10.5px;">iM SmartQ 서비스 분석 및 개선, 고객 맞춤형 우대 혜택 및 금융상품 추천 서비스 제공</td>
+                  </tr>
+                  <tr>
+                    <td style="border: 1px solid var(--light-gray); padding: 6px 8px; background-color: var(--background-gray); font-weight: 700; font-size: 10.5px;">수집 항목</td>
+                    <td style="border: 1px solid var(--light-gray); padding: 6px 8px; line-height: 1.4; font-size: 10.5px;">관심 금융 카테고리, 서비스 이용 기록, 접속 통계 및 기기 사양</td>
+                  </tr>
+                  <tr>
+                    <td style="border: 1px solid var(--light-gray); padding: 6px 8px; background-color: var(--background-gray); font-weight: 700; font-size: 10.5px;">보유·이용 기간</td>
+                    <td style="border: 1px solid var(--light-gray); padding: 6px 8px; line-height: 1.4; font-weight: 700; font-size: 10.5px;">동의 철회 시 또는 회원 탈퇴 시 즉시 파기</td>
+                  </tr>
+                  <tr>
+                    <td style="border: 1px solid var(--light-gray); padding: 6px 8px; background-color: var(--background-gray); font-weight: 700; color: #008BA6; font-size: 10.5px;">거부 시 불이익</td>
+                    <td style="border: 1px solid var(--light-gray); padding: 6px 8px; line-height: 1.4; font-weight: 700; color: #008BA6; font-size: 10.5px;"><strong>동의를 거부하시더라도 SmartQ의 대기 발권, 사전 작성 및 기본 서비스는 아무런 차별 없이 전면 정상 이용하실 수 있습니다.</strong></td>
+                  </tr>
+                </table>
+              </div>
             </div>
           </div>
 
         </div>
 
-        <!-- 동의 체크박스 그룹 -->
-        <div class="consent-checkbox-check-group" style="display: flex; flex-direction: column; gap: 10px; background-color: var(--background-gray); padding: 12px; border-radius: 8px; border: 1px solid var(--light-gray);">
-          
-          <label class="checkbox-container" style="font-weight: 700;">
-            <input type="checkbox" id="agree-all-consents">
-            <span class="checkmark"></span>
-            <span class="checkbox-label" style="color: var(--brand-mint-dark); font-size: 13px;">위 약관에 전체 동의합니다.</span>
-          </label>
-          
-          <hr style="border: 0; border-top: 1px solid var(--light-gray); margin: 6px 0;">
-
-          <label class="checkbox-container">
-            <input type="checkbox" class="individual-consent" id="agree-policy-check">
-            <span class="checkmark"></span>
-            <span class="checkbox-label" style="font-size: 12px; color: var(--dark-gray);"><span style="color: var(--brand-mint); font-weight: bold;">[필수]</span> 개인정보 처리방침을 확인하였습니다.</span>
-          </label>
-
-          <label class="checkbox-container">
-            <input type="checkbox" class="individual-consent" id="agree-required-check">
-            <span class="checkmark"></span>
-            <span class="checkbox-label" style="font-size: 12px; color: var(--dark-gray);"><span style="color: var(--brand-mint); font-weight: bold;">[필수]</span> 필수 개인정보 수집 및 이용에 동의합니다.</span>
-          </label>
-
-          <label class="checkbox-container">
-            <input type="checkbox" class="individual-consent" id="agree-optional-check">
-            <span class="checkmark"></span>
-            <span class="checkbox-label" style="font-size: 12px; color: var(--dark-gray);"><span style="color: var(--cool-gray); font-weight: bold;">[선택]</span> 마케팅 목적 개인정보 수집·이용 동의</span>
-          </label>
-
-        </div>
       </div>
+      
       <div class="modal-footer" style="padding: 12px 16px; border-top: 1px solid var(--light-gray); background-color: var(--white); display: flex; justify-content: center; align-items: center;">
         <button id="submit-common-consent-btn" class="submit-form-btn" style="margin-top: 0; width: 100%;">
           <span>동의하고 시작하기</span>

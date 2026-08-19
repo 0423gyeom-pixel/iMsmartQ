@@ -1879,6 +1879,28 @@ document.addEventListener('DOMContentLoaded', async () => {
     });
   });
 
+  // 약관 상세 펼치기 토글 제어 리스너
+  const consentDetailBtns = document.querySelectorAll('.btn-consent-detail');
+  consentDetailBtns.forEach(btn => {
+    btn.addEventListener('click', function(e) {
+      e.stopPropagation();
+      const targetId = this.getAttribute('data-target');
+      const panel = document.getElementById(targetId);
+      const icon = this.querySelector('i');
+      
+      if (panel) {
+        panel.classList.toggle('hidden');
+        if (icon) {
+          if (panel.classList.contains('hidden')) {
+            icon.style.transform = 'rotate(0deg)';
+          } else {
+            icon.style.transform = 'rotate(180deg)';
+          }
+        }
+      }
+    });
+  });
+
   // 동의 모달 닫기
   if (closeCommonConsentBtn && commonConsentModal) {
     closeCommonConsentBtn.addEventListener('click', () => {
