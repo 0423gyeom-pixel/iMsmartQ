@@ -333,13 +333,11 @@ document.addEventListener('DOMContentLoaded', async () => {
   
   const reportUserName = document.getElementById('report-user-name');
   const reportUserPhone = document.getElementById('report-user-phone');
-  const cifName = document.getElementById('cif-name');
-  const cifPhone = document.getElementById('cif-phone');
 
-  // 대분류(제신고성 vs 신규) 선택에 따른 토글
+  // 대분류 선택에 따른 토글
   const dynamicReportFields = document.getElementById('dynamic-report-fields');
 
-  // 제신고성 업무의 대상 및 세부항목 선택에 따른 동적 필수 정보 입력란 렌더링 함수
+  // 대분류 및 세부항목 선택에 따른 동적 필수 정보 입력란 렌더링 함수
   function updateDynamicReportFields() {
     if (!dynamicReportFields) return;
     
@@ -347,50 +345,149 @@ document.addEventListener('DOMContentLoaded', async () => {
     const selectedWorkRadio = document.querySelector('input[name="pre-work-type"]:checked');
     const selectedWorkType = selectedWorkRadio ? selectedWorkRadio.value : 'cif';
     
-    if (selectedWorkType === 'cif') {
-      dynamicReportFields.innerHTML = '';
-      return;
-    }
-    
-    const targetVal = selectedWorkType; // cif를 제외한 card, bankbook, otp, mbank 값 자체가 제신고 대상 타겟이 됨
-    const checkedDetailRadio = document.querySelector(`input[name="detail-${targetVal}-val"]:checked`);
-    const detailVal = checkedDetailRadio ? checkedDetailRadio.value : '분실신고';
+    // 선택된 소분류 칩의 라디오 값 가져오기
+    const checkedDetailRadio = document.querySelector(`input[name="detail-${selectedWorkType}-val"]:checked`);
+    const detailVal = checkedDetailRadio ? checkedDetailRadio.value : '';
     
     let html = '';
     
-    if (targetVal === 'card') {
-      if (detailVal === '분실신고') {
+    if (selectedWorkType === 'cif') {
+      // 1. 신규 신청
+      if (detailVal === '예/적금 신규') {
         html = `
           <div class="form-group">
-            <label class="form-label">분실 카드 종류</label>
-            <select class="form-input" id="report-card-type">
-              <option value="신용카드">신용카드</option>
-              <option value="체크카드">체크카드</option>
-              <option value="법인카드">법인카드</option>
+            <label class="form-label">가입 상품 구분</label>
+            <select class="form-input" id="cif-dep-type">
+              <option value="정기예금">정기예금</option>
+              <option value="정기적금">정기적금</option>
+              <option value="자유적금">자유적금</option>
+              <option value="주택청약종합저축">주택청약종합저축</option>
             </select>
           </div>
           <div class="form-group">
-            <label class="form-label">분실 일시</label>
-            <input type="datetime-local" class="form-input" id="report-card-loss-time" required>
+            <label class="form-label">가입 기간 (개월)</label>
+            <select class="form-input" id="cif-dep-period">
+              <option value="12개월">12개월</option>
+              <option value="24개월">24개월</option>
+              <option value="36개월">36개월</option>
+            </select>
           </div>
           <div class="form-group">
-            <label class="form-label">분실 장소</label>
-            <input type="text" class="form-input" id="report-card-loss-place" placeholder="예: 대구시청 인근, 대중교통 등" required>
+            <label class="form-label">가입 금액 (원)</label>
+            <input type="text" class="form-input" id="cif-dep-amount" placeholder="예: 1,000,000" required>
+          </div>
+          <div class="form-group">
+            <label class="form-label">만기시 처리 방식</label>
+            <select class="form-input" id="cif-dep-expiry-type">
+              <option value="만기 자동해지 후 지정계좌 입금">만기 자동해지 후 지정계좌 입금</option>
+              <option value="만기 자동재예치 (원금+이자)">만기 자동재예치 (원금+이자)</option>
+              <option value="만기 직접 해지">만기 직접 해지</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label class="form-label">출금 계좌번호 (연동용)</label>
+            <input type="text" inputmode="numeric" class="form-input" id="cif-dep-withdraw-acc" placeholder="연결할 계좌번호 입력 (- 제외)" required>
           </div>
         `;
-      } else if (detailVal === '재발급') {
+      } else if (detailVal === '체크/신용카드 신규') {
+        html = `
+          <div class="form-group">
+            <label class="form-label">희망 카드 유형</label>
+            <div class="form-radio-group" style="grid-template-columns: repeat(2, 1fr); gap: 6px; margin-bottom: 8px;">
+              <label class="radio-card" style="padding: 0;">
+                <input type="radio" name="cif-card-class" value="체크카드" checked>
+                <span class="radio-content" style="padding: 8px 4px; font-size: 11px; text-align: center;">체크카드</span>
+              </label>
+              <label class="radio-card" style="padding: 0;">
+                <input type="radio" name="cif-card-class" value="신용카드">
+                <span class="radio-content" style="padding: 8px 4px; font-size: 11px; text-align: center;">신용카드</span>
+              </label>
+            </div>
+          </div>
+          <div class="form-group">
+            <label class="form-label">희망 카드 명칭</label>
+            <select class="form-input" id="cif-card-name">
+              <option value="iM원 카드">iM원 카드 (기본 쇼핑/생활 혜택)</option>
+              <option value="iM트래블 카드">iM트래블 카드 (해외 결제/환전 수수료 면제)</option>
+              <option value="iM아이 카드">iM아이 카드 (교육/문화 할인 혜택)</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label class="form-label">결제 계좌번호</label>
+            <input type="text" inputmode="numeric" class="form-input" id="cif-card-pay-acc" placeholder="카드 대금 결제 계좌번호 입력" required>
+          </div>
+          <div class="form-group">
+            <label class="form-label">명세서 수령 방법</label>
+            <select class="form-input" id="cif-card-statement-type">
+              <option value="모바일 알림 (앱 PUSH)">모바일 알림 (앱 PUSH)</option>
+              <option value="이메일 고지">이메일 고지</option>
+              <option value="종이 우편물 고지">종이 우편물 고지</option>
+            </select>
+          </div>
+        `;
+      } else if (detailVal === '전자금융 신규') {
+        html = `
+          <div class="form-group">
+            <label class="form-label">희망 로그인 ID 설정</label>
+            <input type="text" class="form-input" id="cif-ebank-id" placeholder="희망 아이디 입력 (6~12자)" required>
+          </div>
+          <div class="form-group">
+            <label class="form-label">1일 이체 한도 설정</label>
+            <select class="form-input" id="cif-ebank-day-limit">
+              <option value="1,000만원">1,000만원</option>
+              <option value="5,000만원">5,000만원</option>
+              <option value="1억원">1억원</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label class="form-label">1회 이체 한도 설정</label>
+            <select class="form-input" id="cif-ebank-once-limit">
+              <option value="1,000만원">1,000만원</option>
+              <option value="5,000만원">5,000만원</option>
+            </select>
+          </div>
+          <div class="form-group checkbox-group" style="margin-bottom: 12px;">
+            <label class="checkbox-container">
+              <input type="checkbox" id="cif-ebank-push-agree" checked>
+              <span class="checkmark"></span>
+              <span class="checkbox-label" style="font-size: 11.5px;">스마트폰 입출금 push 실시간 무료 알림 서비스 신청</span>
+            </label>
+          </div>
+        `;
+      }
+    } else if (selectedWorkType === 'report') {
+      // 2. 제신고 & 변경
+      if (detailVal === '고객정보 변경') {
+        html = `
+          <div class="form-group">
+            <label class="form-label">변경할 자택 주소</label>
+            <input type="text" class="form-input" id="report-new-address" placeholder="새로운 도로명 주소를 입력해 주세요" required>
+          </div>
+          <div class="form-group">
+            <label class="form-label">변경할 이메일 주소</label>
+            <input type="email" class="form-input" id="report-new-email" placeholder="새로운 이메일 입력" required>
+          </div>
+          <div class="form-group">
+            <label class="form-label">우편물 수령처 변경</label>
+            <select class="form-input" id="report-new-mail-deliver">
+              <option value="자택">자택으로 변경</option>
+              <option value="직장">직장으로 변경</option>
+              <option value="모바일/이메일 대체 수령">모바일 / 이메일 대체 수령 신청</option>
+            </select>
+          </div>
+        `;
+      } else if (detailVal === '카드 재발급') {
         html = `
           <div class="form-group">
             <label class="form-label">재발급 사유</label>
             <select class="form-input" id="report-card-reissue-reason">
               <option value="분실/도난">분실 / 도난</option>
-              <option value="훼손">훼손</option>
-              <option value="자성(MS) 손상">자성(MS) 손상</option>
-              <option value="유효기간 만료">유효기간 만료</option>
+              <option value="훼손">훼손 (마그네틱/칩 인식 오류)</option>
+              <option value="유효기간 만료">유효기간 만료 임박</option>
             </select>
           </div>
           <div class="form-group">
-            <label class="form-label">수령 방법</label>
+            <label class="form-label">재발급 카드 수령지</label>
             <div class="form-radio-group" style="grid-template-columns: repeat(3, 1fr); gap: 6px; margin-bottom: 8px;">
               <label class="radio-card" style="padding: 0;">
                 <input type="radio" name="report-card-delivery" value="자택" checked>
@@ -411,208 +508,153 @@ document.addEventListener('DOMContentLoaded', async () => {
             <input type="text" class="form-input" id="report-card-delivery-address" placeholder="주소를 정확히 입력해 주세요" required>
           </div>
         `;
-      } else if (detailVal === '비밀번호 변경') {
+      } else if (detailVal === '결제계좌/결제일 변경') {
         html = `
           <div class="form-group">
-            <label class="form-label">대상 카드 번호 (마지막 4자리)</label>
-            <input type="text" inputmode="numeric" class="form-input" id="report-card-num-last" placeholder="예: 1234" maxlength="4" required>
-          </div>
-          <div class="form-group">
-            <label class="form-label">새로운 비밀번호 (숫자 4자리)</label>
-            <input type="password" inputmode="numeric" class="form-input" id="report-card-new-pw" placeholder="비밀번호 4자리 입력" maxlength="4" required>
-          </div>
-          <div class="form-group">
-            <label class="form-label">비밀번호 확인</label>
-            <input type="password" inputmode="numeric" class="form-input" id="report-card-new-pw-confirm" placeholder="비밀번호 다시 입력" maxlength="4" required>
-          </div>
-        `;
-      }
-    } else if (targetVal === 'bankbook') {
-      if (detailVal === '분실신고') {
-        html = `
-          <div class="form-group">
-            <label class="form-label">대상 계좌번호</label>
-            <input type="text" inputmode="numeric" class="form-input" id="report-book-acc" placeholder="연계된 계좌번호 입력 (- 제외)" required>
-          </div>
-          <div class="form-group">
-            <label class="form-label">분실 일시</label>
-            <input type="datetime-local" class="form-input" id="report-book-loss-time" required>
-          </div>
-        `;
-      } else if (detailVal === '재발급') {
-        html = `
-          <div class="form-group">
-            <label class="form-label">재발급 사유</label>
-            <select class="form-input" id="report-book-reissue-reason">
-              <option value="분실/도난">분실 / 도난</option>
-              <option value="훼손">훼손</option>
-              <option value="인감/서명 변경">인감 / 서명 변경</option>
-              <option value="통장 면수 완료(이월)">통장 면수 완료 (이월)</option>
+            <label class="form-label">대상 카드사 구분</label>
+            <select class="form-input" id="report-card-provider">
+              <option value="iM카드(자체)">iM카드 (자체)</option>
+              <option value="BC카드">BC카드</option>
             </select>
           </div>
           <div class="form-group">
-            <label class="form-label">거래 방식 선택</label>
+            <label class="form-label">희망 결제일 변경</label>
+            <select class="form-input" id="report-card-payday">
+              <option value="매월 13일 (추천)">매월 13일 (전월 1일~말일 결제대상 기간 일치)</option>
+              <option value="매월 1일">매월 1일</option>
+              <option value="매월 5일">매월 5일</option>
+              <option value="매월 25일">매월 25일</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label class="form-label">변경할 카드 대금 결제 계좌번호</label>
+            <input type="text" inputmode="numeric" class="form-input" id="report-card-new-account" placeholder="새로운 대금 결제 계좌번호 입력" required>
+          </div>
+        `;
+      }
+    } else if (selectedWorkType === 'autodebit') {
+      // 3. 자동이체 등록
+      if (detailVal === '계좌간 자동이체 신청') {
+        html = `
+          <div class="form-group">
+            <label class="form-label">출금 계좌번호</label>
+            <input type="text" inputmode="numeric" class="form-input" id="autodebit-withdraw-acc" placeholder="출금할 내 계좌번호 입력" required>
+          </div>
+          <div class="form-group">
+            <label class="form-label">입금 은행명</label>
+            <input type="text" class="form-input" id="autodebit-deposit-bank" placeholder="예: iM뱅크, 신한은행 등" required>
+          </div>
+          <div class="form-group">
+            <label class="form-label">입금 계좌번호</label>
+            <input type="text" inputmode="numeric" class="form-input" id="autodebit-deposit-acc" placeholder="상대방 입금 계좌번호 입력" required>
+          </div>
+          <div class="form-group">
+            <label class="form-label">매월 이체 희망 금액 (원)</label>
+            <input type="text" class="form-input" id="autodebit-amount" placeholder="예: 300,000" required>
+          </div>
+          <div class="form-group">
+            <label class="form-label">매월 이체 희망일</label>
+            <select class="form-input" id="autodebit-day">
+              <option value="매월 5일">매월 5일</option>
+              <option value="매월 10일">매월 10일</option>
+              <option value="매월 25일">매월 25일</option>
+            </select>
+          </div>
+        `;
+      } else if (detailVal === '공과금 자동이체 신청') {
+        html = `
+          <div class="form-group">
+            <label class="form-label">출금 계좌번호</label>
+            <input type="text" inputmode="numeric" class="form-input" id="autodebit-bill-withdraw-acc" placeholder="출금할 내 계좌번호 입력" required>
+          </div>
+          <div class="form-group">
+            <label class="form-label">공과금 구분</label>
+            <select class="form-input" id="autodebit-bill-type">
+              <option value="아파트 관리비">아파트 관리비</option>
+              <option value="도시가스 요금">도시가스 요금</option>
+              <option value="한전 전기요금">한전 전기요금</option>
+              <option value="국민연금 납부">국민연금 납부</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label class="form-label">납부자 번호 (지로/고객번호)</label>
+            <input type="text" class="form-input" id="autodebit-bill-customer-num" placeholder="지로 고지서의 고객번호 9~12자리 입력" required>
+          </div>
+        `;
+      }
+    } else if (selectedWorkType === 'doc') {
+      // 4. 기초 서류 작성
+      if (detailVal === '고객확인제도(CDD/EDD)') {
+        html = `
+          <div class="form-group">
+            <label class="form-label">금융 거래 목적</label>
+            <select class="form-input" id="doc-cdd-purpose">
+              <option value="급여 및 생활비">급여 및 생활비</option>
+              <option value="저축 및 투자">저축 및 투자</option>
+              <option value="사업 자금 거래">사업 자금 거래</option>
+              <option value="대출 원리금 상환">대출 원리금 상환</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label class="form-label">자금 원천 구분</label>
+            <select class="form-input" id="doc-cdd-source">
+              <option value="근로소득 (급여)">근로소득 (급여)</option>
+              <option value="사업소득">사업소득</option>
+              <option value="부동산 임대소득/양도">부동산 임대소득 / 양도</option>
+              <option value="상속 / 증여 / 차입">상속 / 증여 / 차입</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label class="form-label">본인이 이 계좌의 실제 소유자입니까?</label>
             <div class="form-radio-group" style="grid-template-columns: repeat(2, 1fr); gap: 6px;">
               <label class="radio-card" style="padding: 0;">
-                <input type="radio" name="report-book-sign-type" value="서명" checked>
-                <span class="radio-content" style="padding: 8px 4px; font-size: 11px; text-align: center;">서명 거래</span>
+                <input type="radio" name="doc-cdd-realowner" value="예 (실제 소유자)" checked>
+                <span class="radio-content" style="padding: 8px 4px; font-size: 11.5px; text-align: center;">예 (실제 소유자)</span>
               </label>
               <label class="radio-card" style="padding: 0;">
-                <input type="radio" name="report-book-sign-type" value="인감">
-                <span class="radio-content" style="padding: 8px 4px; font-size: 11px; text-align: center;">인감 도장 거래</span>
+                <input type="radio" name="doc-cdd-realowner" value="아니오 (타인 대리)">
+                <span class="radio-content" style="padding: 8px 4px; font-size: 11.5px; text-align: center;">아니오 (대리 발급 등)</span>
               </label>
             </div>
           </div>
         `;
-      } else if (detailVal === 'MS재수록') {
+      } else if (detailVal === 'FATCA 거주지 확인') {
         html = `
           <div class="form-group">
-            <label class="form-label">재수록 대상 계좌번호</label>
-            <input type="text" inputmode="numeric" class="form-input" id="report-book-ms-acc" placeholder="마그네틱이 훼손된 계좌번호 입력" required>
-          </div>
-          <div class="info-alert-box" style="background-color: var(--brand-mint-light); border: 1px solid var(--brand-mint); border-radius: 8px; padding: 10px; font-size: 11.5px; color: var(--brand-mint-dark); font-weight: 600; line-height: 1.4; margin-bottom: 8px;">
-            <i class="fa-solid fa-circle-info"></i> 마그네틱(MS) 띠 훼손으로 인한 IC/CD기 인식 오류 상태를 정상 복구하는 서비스 신청서입니다.
-          </div>
-        `;
-      } else if (detailVal === '인감 서명 변경') {
-        html = `
-          <div class="form-group">
-            <label class="form-label">대상 계좌번호</label>
-            <input type="text" inputmode="numeric" class="form-input" id="report-book-seal-acc" placeholder="인감/서명을 변경할 계좌번호 입력" required>
-          </div>
-          <div class="form-group">
-            <label class="form-label">변경 구분</label>
-            <select class="form-input" id="report-book-seal-type">
-              <option value="기존 서명 -> 새 서명">기존 서명 -> 새로운 서명</option>
-              <option value="기존 인감 -> 새 인감">기존 인감 -> 새로운 인감</option>
-              <option value="인감 -> 서명">인감 도장 -> 서명 변경</option>
-              <option value="서명 -> 인감">서명 -> 인감 도장 변경</option>
-            </select>
-          </div>
-        `;
-      } else if (detailVal === '비밀번호 변경') {
-        html = `
-          <div class="form-group">
-            <label class="form-label">대상 계좌번호</label>
-            <input type="text" inputmode="numeric" class="form-input" id="report-book-pw-acc" placeholder="비밀번호를 변경할 계좌번호 입력" required>
-          </div>
-          <div class="form-group">
-            <label class="form-label">새로운 통장 비밀번호 (숫자 4자리)</label>
-            <input type="password" inputmode="numeric" class="form-input" id="report-book-new-pw" placeholder="비밀번호 4자리 입력" maxlength="4" required>
-          </div>
-          <div class="form-group">
-            <label class="form-label">비밀번호 확인</label>
-            <input type="password" inputmode="numeric" class="form-input" id="report-book-new-pw-confirm" placeholder="비밀번호 다시 입력" maxlength="4" required>
-          </div>
-        `;
-      }
-    } else if (targetVal === 'otp') {
-      if (detailVal === '분실신고') {
-        html = `
-          <div class="form-group">
-            <label class="form-label">분실 기기 유형</label>
-            <select class="form-input" id="report-otp-loss-type">
-              <option value="토큰형 OTP">토큰형 OTP</option>
-              <option value="카드형 OTP">카드형 OTP</option>
-              <option value="보안카드(시크리티카드)">보안카드 (시크리티 카드)</option>
-            </select>
-          </div>
-          <div class="form-group">
-            <label class="form-label">분실 일시</label>
-            <input type="datetime-local" class="form-input" id="report-otp-loss-time" required>
-          </div>
-        `;
-      } else if (detailVal === '재발급') {
-        html = `
-          <div class="form-group">
-            <label class="form-label">재발급 사유</label>
-            <select class="form-input" id="report-otp-reissue-reason">
-              <option value="분실/도난">분실 / 도난</option>
-              <option value="배터리 방전">배터리 방전 (단말기 꺼짐)</option>
-              <option value="단말기 파손/액정 훼손">단말기 파손 / 액정 훼손</option>
-              <option value="시간 불일치 오류(Ldn)">시간 불일치 오류 (Ldn)</option>
-            </select>
-          </div>
-          <div class="form-group">
-            <label class="form-label">희망 기기 종류</label>
-            <div class="form-radio-group" style="grid-template-columns: repeat(2, 1fr); gap: 6px;">
+            <label class="form-label">본인은 미국 시민권자 또는 미국 거주자입니까?</label>
+            <div class="form-radio-group" style="grid-template-columns: repeat(2, 1fr); gap: 6px; margin-bottom: 8px;">
               <label class="radio-card" style="padding: 0;">
-                <input type="radio" name="report-otp-device-type" value="토큰형(수수료 3,000원)" checked>
-                <span class="radio-content" style="padding: 8px 4px; font-size: 11px; text-align: center;">토큰형 OTP<br>(3,000원)</span>
+                <input type="radio" name="doc-fatca-us-check" value="아니오" checked>
+                <span class="radio-content" style="padding: 8px 4px; font-size: 11px; text-align: center;">아니오 (해당 없음)</span>
               </label>
               <label class="radio-card" style="padding: 0;">
-                <input type="radio" name="report-otp-device-type" value="카드형(수수료 10,000원)">
-                <span class="radio-content" style="padding: 8px 4px; font-size: 11px; text-align: center;">카드형 스마트 OTP<br>(10,000원)</span>
-              </label>
-            </div>
-          </div>
-        `;
-      } else if (detailVal === '신고 해제') {
-        html = `
-          <div class="form-group">
-            <label class="form-label">습득 기기 일련번호</label>
-            <input type="text" class="form-input" id="report-otp-unlock-serial" placeholder="단말 뒷면 일련번호 8~10자리 입력" required>
-          </div>
-          <div class="form-group">
-            <label class="form-label">신고 해제 사유</label>
-            <input type="text" class="form-input" id="report-otp-unlock-reason" placeholder="예: 분실 단말기 자체 습득 등" required>
-          </div>
-        `;
-      } else if (detailVal === '이용등록 및 해지') {
-        html = `
-          <div class="form-group">
-            <label class="form-label">신청 구분</label>
-            <div class="form-radio-group" style="grid-template-columns: repeat(2, 1fr); gap: 6px;">
-              <label class="radio-card" style="padding: 0;">
-                <input type="radio" name="report-otp-reg-status" value="등록" checked>
-                <span class="radio-content" style="padding: 8px 4px; font-size: 11px; text-align: center;">타행 OTP 등록</span>
-              </label>
-              <label class="radio-card" style="padding: 0;">
-                <input type="radio" name="report-otp-reg-status" value="해지">
-                <span class="radio-content" style="padding: 8px 4px; font-size: 11px; text-align: center;">이용 해지</span>
+                <input type="radio" name="doc-fatca-us-check" value="예">
+                <span class="radio-content" style="padding: 8px 4px; font-size: 11px; text-align: center;">예 (미국 납세자)</span>
               </label>
             </div>
           </div>
           <div class="form-group">
-            <label class="form-label">OTP 발급 기관</label>
-            <input type="text" class="form-input" id="report-otp-reg-vendor" placeholder="예: 국민은행, 신한은행 등" required>
-          </div>
-          <div class="form-group">
-            <label class="form-label">OTP 기기 일련번호</label>
-            <input type="text" class="form-input" id="report-otp-reg-serial" placeholder="기기 뒷면 일련번호 입력" required>
-          </div>
-        `;
-      } else if (detailVal === '비밀번호 변경') {
-        html = `
-          <div class="form-group">
-            <label class="form-label">새로운 OTP PIN 번호 (숫자 4~8자리)</label>
-            <input type="password" inputmode="numeric" class="form-input" id="report-otp-new-pin" placeholder="PIN 번호 입력" required>
-          </div>
-          <div class="info-alert-box" style="background-color: var(--brand-mint-light); border: 1px solid var(--brand-mint); border-radius: 8px; padding: 10px; font-size: 11.5px; color: var(--brand-mint-dark); font-weight: 600; line-height: 1.4; margin-bottom: 8px;">
-            <i class="fa-solid fa-circle-info"></i> OTP 비밀번호 5회 이상 입력 오류 초과로 인한 락 잠금 상태를 초기화하고 신규 PIN을 설정하는 서식입니다.
-          </div>
-        `;
-      }
-    } else if (targetVal === 'mbank') {
-      if (detailVal === '비밀번호 변경') {
-        html = `
-          <div class="form-group">
-            <label class="form-label">뱅킹 사용자 ID</label>
-            <input type="text" class="form-input" id="report-mbank-id" placeholder="iM뱅크 로그인 아이디 입력" required>
+            <label class="form-label">국적 및 납세 국가</label>
+            <input type="text" class="form-input" id="doc-fatca-nationality" value="대한민국" required>
           </div>
           <div class="form-group checkbox-group" style="margin-bottom: 12px;">
             <label class="checkbox-container">
-              <input type="checkbox" id="report-mbank-lock-clear" checked>
+              <input type="checkbox" id="doc-fatca-cert-agree" checked>
               <span class="checkmark"></span>
-              <span class="checkbox-label">로그인 비밀번호 5회 초과 잠김 오류 해제 신청 포함</span>
+              <span class="checkbox-label" style="font-size: 11.5px;">해외금융계좌신고(FATCA) 거주지 본인 확인 확약에 동의합니다.</span>
             </label>
-          </div>
-          <div class="form-group">
-            <label class="form-label">새로운 뱅킹 비밀번호 (숫자 6자리)</label>
-            <input type="password" inputmode="numeric" class="form-input" id="report-mbank-new-pw" placeholder="새로운 뱅킹 비밀번호 입력" maxlength="6" required>
           </div>
         `;
       }
+    } else if (selectedWorkType === 'security') {
+      // 5. 창구 보안 업무 (사전 작성 불가 비대상 경고창 노출)
+      html = `
+        <div class="info-alert-box" style="background-color: #FFF2F4; border: 1px solid #FFCCD3; border-radius: 8px; padding: 12px; font-size: 12.0px; color: #D0021B; line-height: 1.6; margin-bottom: 8px; box-sizing: border-box; text-align: left;">
+          <h4 style="margin: 0 0 6px 0; font-weight: 700; font-size: 12.5px;"><i class="fa-solid fa-triangle-exclamation"></i> 사전 작성 및 전송 제한 안내</h4>
+          계좌 비밀번호 변경, 비밀번호 재설정/오입력 해제, 그리고 OTP/보안카드 실물 재발급 업무는 <strong>웹 보안 및 금융 사고 예방 규정</strong>에 의거하여 모바일 사전 입력이 제한됩니다.<br><br>
+          해당 업무는 번호표 호출 시 영업점 창구의 <strong>보안 핀패드(Pinpad) 직접 입력</strong> 및 <strong>실물 신분증 대조 확인</strong>이 필수적이므로 행원 앞에서 직접 안전하게 처리해 주시기 바랍니다.
+        </div>
+      `;
     }
     
     dynamicReportFields.innerHTML = html;
@@ -637,40 +679,22 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
   }
 
-  // 대분류(제신고성 vs 신규) 선택에 따른 토글
   // 작성할 업무 대분류(5단 라디오 카드) 선택에 따른 토글
   preWorkTypeRadios.forEach(radio => {
     radio.addEventListener('change', (e) => {
       const type = e.target.value;
-      if (type === 'cif') {
-        if (reportFieldsGroup) reportFieldsGroup.classList.add('hidden');
-        if (cifFieldsGroup) cifFieldsGroup.classList.remove('hidden');
-        
-        // 필수 값 지정
-        if (reportUserName) reportUserName.required = false;
-        if (reportUserPhone) reportUserPhone.required = false;
-        if (cifName) cifName.required = true;
-        if (cifPhone) cifPhone.required = true;
-      } else {
-        // card, bankbook, otp, mbank 등 제신고 계열일 때
-        if (reportFieldsGroup) reportFieldsGroup.classList.remove('hidden');
-        if (cifFieldsGroup) cifFieldsGroup.classList.add('hidden');
-        
-        // 필수 값 지정
-        if (reportUserName) reportUserName.required = true;
-        if (reportUserPhone) reportUserPhone.required = true;
-        if (cifName) cifName.required = false;
-        if (cifPhone) cifPhone.required = false;
-        
-        // 선택된 제신고 대상의 세부 칩 그룹(detail-card 등)만 노출하고 나머지는 숨김
-        reportDetailGroups.forEach(group => {
-          group.classList.add('hidden');
-        });
-        const activeGroup = document.getElementById(`detail-${type}`);
-        if (activeGroup) {
-          activeGroup.classList.remove('hidden');
-        }
+      
+      // 모든 세부 칩 그룹을 일단 다 숨김
+      reportDetailGroups.forEach(group => {
+        group.classList.add('hidden');
+      });
+      
+      // 현재 선택된 대분류에 매칭되는 소분류 칩 그룹만 활성화
+      const activeGroup = document.getElementById(`detail-${type}`);
+      if (activeGroup) {
+        activeGroup.classList.remove('hidden');
       }
+      
       // 동적 입력 필드 실시간 갱신
       updateDynamicReportFields();
     });
@@ -703,29 +727,23 @@ document.addEventListener('DOMContentLoaded', async () => {
       setTimeout(() => {
         const selectedWorkRadio = document.querySelector('input[name="pre-work-type"]:checked');
         const selectedWorkType = selectedWorkRadio ? selectedWorkRadio.value : 'cif';
-        let nameVal = '';
-        let displayJobText = '';
         
-        if (selectedWorkType === 'cif') {
-          nameVal = cifName ? cifName.value : '';
-          displayJobText = '신규(CIF) 등록';
-        } else {
-          nameVal = reportUserName ? reportUserName.value : '';
-          
-          const targetNames = {
-            card: '카드',
-            bankbook: '통장',
-            otp: 'OTP/보안카드',
-            mbank: '모바일 뱅킹'
-          };
-          const targetNameText = targetNames[selectedWorkType] || '카드';
-          
-          // 선택된 칩 세부 값 획득
-          const checkedDetailRadio = document.querySelector(`input[name="detail-${selectedWorkType}-val"]:checked`);
-          const detailText = checkedDetailRadio ? checkedDetailRadio.value : '';
-          
-          displayJobText = `제신고 (${targetNameText} - ${detailText})`;
-        }
+        const nameVal = reportUserName ? reportUserName.value : '';
+        
+        const targetNames = {
+          cif: '신규 신청',
+          report: '제신고 & 변경',
+          autodebit: '자동이체 등록',
+          doc: '기초 서류 작성',
+          security: '창구 보안 업무'
+        };
+        const targetNameText = targetNames[selectedWorkType] || '신규 신청';
+        
+        // 선택된 칩 세부 값 획득
+        const checkedDetailRadio = document.querySelector(`input[name="detail-${selectedWorkType}-val"]:checked`);
+        const detailText = checkedDetailRadio ? checkedDetailRadio.value : '';
+        
+        const displayJobText = `${targetNameText} (${detailText})`;
         
         // Update success message UI
         if (displayName) displayName.textContent = nameVal;
