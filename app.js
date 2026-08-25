@@ -2298,31 +2298,38 @@ document.addEventListener('DOMContentLoaded', async () => {
       const video = document.getElementById('camera-stream');
       const canvas = document.getElementById('camera-canvas');
       
-      // 1. 실시간 후면 카메라 스트림이 돌고 있는 경우 -> 비디오 화면 그대로 캡처!
+      // 1. 실시간 후면 카메라 스트림이 돌고 있는 경우 → 비디오 화면 그대로 캡처!
       if (activeStream && video && canvas) {
         const ctx = canvas.getContext('2d');
-        // 비디오 해상도로 캔버스 크기 맞춤
         canvas.width = video.videoWidth || video.clientWidth;
         canvas.height = video.videoHeight || video.clientHeight;
-        
-        // 프레임 그리기
         ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
-        
-        // DataURL 찰칵 이미지 추출
         const imgDataUrl = canvas.toDataURL('image/jpeg');
-        
-        // 카메라 스트림 정리 및 끄기
-        stopActiveCameraStream();
-        
-        // 캡처 이미지 주입 분석 실행!
-        executeVoucherCapture(imgDataUrl);
-      } else {
-        // 2. 카메라 미연동 시 폴백 구동 (파일/카메라앱 다이얼로그)
-        const realCameraInput = document.getElementById('real-camera-input');
-        if (realCameraInput) {
-          realCameraInput.click();
+
+        if (selectedVoucherType === 'MASS_TRANSFER') {
+          // ── 대량이체: 카메라 스트림 유지 → 연속 촬영 ──
+          executeVoucherCapture(imgDataUrl);
+          // 촬영 플래시 효과 (스트림 유지한 채 시각 피드백)
+          video.style.opacity = '0.2';
+          setTimeout(() => { video.style.opacity = '1'; }, 120);
         } else {
-          executeVoucherCapture();
+          // ── 단일이체: 촬영 후 카메라 스트림 종료 ──
+          stopActiveCameraStream();
+          executeVoucherCapture(imgDataUrl);
+        }
+      } else {
+        // 2. 카메라 미연동 또는 스트림 없음 → 재시동 시도
+        if (selectedVoucherType === 'MASS_TRANSFER') {
+          // 대량이체: 카메라를 다시 켜서 연속 촬영 재개
+          startActiveCameraStream();
+          showToast('카메라를 다시 시작합니다. 잠시 후 촬영하세요.');
+        } else {
+          const realCameraInput = document.getElementById('real-camera-input');
+          if (realCameraInput) {
+            realCameraInput.click();
+          } else {
+            executeVoucherCapture();
+          }
         }
       }
     });
