@@ -13,7 +13,7 @@
   <!-- FontAwesome for icons -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <!-- v 파라미터: 배포/수정 시 값을 올려 브라우저 CSS 캐시를 무효화 -->
-  <link rel="stylesheet" href="style.css?v=20260825_no_exclamation">
+  <link rel="stylesheet" href="style.css?v=20260825_easy_icon_box">
 </head>
 <body>
   <div class="mobile-web-container">
@@ -101,33 +101,52 @@
         
         <!-- 1. 송금전표 사진찍기 대형 버튼 -->
         <button class="easy-card-btn easy-scan-btn-large" id="btn-easy-scan">
-          <div class="easy-voucher-img-box">
-            <img src="easy_voucher.png" alt="송금전표" />
+          <div class="easy-icon-box scan">
+            <svg class="easy-svg-icon" viewBox="0 0 24 24" fill="none" stroke="#4A90E2" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+              <polyline points="14 2 14 8 20 8"></polyline>
+              <line x1="16" y1="13" x2="8" y2="13"></line>
+              <line x1="16" y1="17" x2="8" y2="17"></line>
+              <polyline points="10 9 9 9 8 9"></polyline>
+            </svg>
           </div>
-          <span class="easy-scan-text">
-            송금전표<br>사진찍기
-          </span>
+          <span class="easy-scan-text">송금전표 사진찍기</span>
         </button>
 
         <!-- 2. 미리작성 / 서류 챙기기 2분할 레이아웃 -->
         <div class="easy-split-row">
           <!-- 미리작성 -->
           <button class="easy-card-btn easy-split-btn" id="btn-easy-pre-writing">
-            <img src="easy_pencil.png" alt="미리작성" />
+            <div class="easy-icon-box paper-pencil">
+              <svg class="easy-svg-icon" viewBox="0 0 24 24" fill="none" stroke="#00C7A9" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M12 20h9"></path>
+                <path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"></path>
+              </svg>
+            </div>
             <span>미리작성</span>
           </button>
           
           <!-- 서류 챙기기 (기존 체크리스트 매핑) -->
           <button class="easy-card-btn easy-split-btn" id="btn-easy-checklist">
-            <img src="easy_check.png" alt="서류 챙기기" />
+            <div class="easy-icon-box checklist">
+              <svg class="easy-svg-icon" viewBox="0 0 24 24" fill="none" stroke="#8bb300" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                <polyline points="9 11 12 14 22 4"></polyline>
+                <path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"></path>
+              </svg>
+            </div>
             <span>서류 챙기기</span>
           </button>
         </div>
 
         <!-- 3. 금융성향 알아보기 가로 바형 버튼 -->
         <button class="easy-card-btn easy-bar-btn" id="btn-easy-financial-test">
-          <div class="easy-search-icon-circle">
-            <i class="fa-solid fa-magnifying-glass"></i>
+          <div class="easy-icon-box investment">
+            <svg class="easy-svg-icon" viewBox="0 0 24 24" fill="none" stroke="#F5A623" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="11" cy="11" r="8"></circle>
+              <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+              <line x1="11" y1="8" x2="11" y2="14"></line>
+              <line x1="8" y1="11" x2="14" y2="11"></line>
+            </svg>
           </div>
           <span>금융성향 알아보기</span>
         </button>

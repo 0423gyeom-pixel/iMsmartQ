@@ -4081,19 +4081,21 @@ input:checked + .slider:before {
 .easy-card-btn {
   background-color: #ffffff !important;
   border: 3px solid var(--brand-mint) !important;
-  border-radius: 16px !important;
+  border-radius: 18px !important;
   cursor: pointer;
   box-shadow: var(--shadow-sm) !important;
   box-sizing: border-box !important;
   display: flex !important;
-  transition: transform 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease !important;
+  justify-content: center !important;
+  align-items: center !important;
+  transition: transform 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease, background-color 0.2s ease !important;
   width: 100%;
-  align-items: center;
 }
 
 .easy-card-btn:hover {
   transform: translateY(-2px);
   border-color: var(--brand-mint-dark) !important;
+  background-color: #f6fdfc !important;
   box-shadow: var(--shadow-md) !important;
 }
 
@@ -4101,31 +4103,50 @@ input:checked + .slider:before {
   transform: translateY(0);
 }
 
+/* 쉬운 모드 전용 퀵 아이콘 박스 */
+.easy-icon-box {
+  width: clamp(38px, 4.8cqh, 48px);
+  height: clamp(38px, 4.8cqh, 48px);
+  border-radius: clamp(10px, 1.4cqh, 14px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.easy-icon-box.scan {
+  background-color: rgba(74, 144, 226, 0.12);
+}
+
+.easy-icon-box.paper-pencil {
+  background-color: rgba(0, 199, 169, 0.12);
+}
+
+.easy-icon-box.checklist {
+  background-color: rgba(209, 232, 52, 0.18);
+}
+
+.easy-icon-box.investment {
+  background-color: rgba(245, 166, 35, 0.12);
+}
+
+.easy-svg-icon {
+  width: clamp(20px, 2.6cqh, 26px);
+  height: clamp(20px, 2.6cqh, 26px);
+  display: block;
+}
+
 /* 1. 송금전표 스캔 대형 버튼 내부 스타일 */
 .easy-scan-btn-large {
   flex-direction: row;
   justify-content: center !important;
-  gap: clamp(24px, 5cqw, 40px) !important;
-  padding: clamp(20px, 3cqh, 28px) clamp(22px, 4cqw, 36px);
-}
-
-.easy-voucher-img-box {
-  width: 45%;
-  max-width: 195px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.easy-voucher-img-box img {
-  width: 100%;
-  height: auto;
-  object-fit: contain;
-  display: block;
+  align-items: center !important;
+  gap: clamp(10px, 2.5cqw, 16px) !important;
+  padding: clamp(16px, 2.5cqh, 24px) 16px;
 }
 
 .easy-scan-text {
-  font-size: clamp(30px, 4.3cqh, 38px);
+  font-size: clamp(26px, 3.8cqh, 32px);
   font-weight: 900;
   color: var(--brand-mint-dark);
   text-align: left;
@@ -4144,25 +4165,21 @@ input:checked + .slider:before {
 
 .easy-split-btn {
   flex: 1;
-  flex-direction: column;
+  flex-direction: row;
   align-items: center;
   justify-content: center;
-  gap: 10px;
-  padding: clamp(24px, 3.2cqh, 32px) 12px;
-}
-
-.easy-split-btn img {
-  width: clamp(68px, 9.5cqh, 82px);
-  height: clamp(68px, 9.5cqh, 82px);
-  object-fit: contain;
-  display: block;
+  gap: clamp(6px, 1.5cqw, 10px) !important;
+  padding: clamp(16px, 2.5cqh, 24px) 10px;
 }
 
 .easy-split-btn span {
-  font-size: clamp(23px, 3cqh, 27px);
+  font-size: clamp(20px, 2.9cqh, 25px);
   font-weight: 900;
   color: #111111;
   font-family: 'Pretendard', sans-serif;
+  letter-spacing: -0.5px;
+  text-align: left;
+  white-space: nowrap;
 }
 
 /* 3. 금융성향 테스트 가로 바형 버튼 스타일 */
@@ -4170,31 +4187,18 @@ input:checked + .slider:before {
   flex-direction: row;
   justify-content: center;
   align-items: center;
-  gap: 10px;
-  padding: clamp(16px, 2.2cqh, 22px) 20px;
-}
-
-.easy-search-icon-circle {
-  width: 36px;
-  height: 36px;
-  border-radius: 50%;
-  background-color: #fff4eb;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  flex-shrink: 0;
-}
-
-.easy-search-icon-circle i {
-  color: #ff9f43;
-  font-size: 18px;
+  gap: clamp(10px, 2.5cqw, 16px) !important;
+  padding: clamp(14px, 2.2cqh, 20px) 16px;
 }
 
 .easy-bar-btn span {
-  font-size: clamp(22px, 3cqh, 25px);
+  font-size: clamp(21px, 3.1cqh, 26px);
   font-weight: 900;
   color: #111111;
   font-family: 'Pretendard', sans-serif;
+  letter-spacing: -0.5px;
+  text-align: left;
+  white-space: nowrap;
 }
 
 /* ------------------ PC 환경에서 높이 균등 상속 및 배열 안정화 ------------------ */
@@ -4206,13 +4210,12 @@ input:checked + .slider:before {
   }
   
   .easy-scan-btn-large {
-    flex: 1.5; /* 전표 스캔이 PC에서 세로로 조금 더 높은 비율 차지 */
-    flex-direction: row;
-    padding: 24px 32px;
+    flex: 1.2;
+    padding: 24px;
   }
   
   .easy-split-row {
-    flex: 1.5;
+    flex: 1.2;
     gap: 16px;
   }
   
@@ -4222,87 +4225,61 @@ input:checked + .slider:before {
   }
   
   .easy-bar-btn {
-    flex: 0.8;
-    padding: 16px 20px;
-  }
-  
-  .easy-voucher-img-box {
-    max-width: 160px;
+    flex: 1;
+    padding: 20px;
   }
   
   .easy-scan-text {
     font-size: 32px;
   }
   .easy-split-btn span {
-    font-size: 24px;
+    font-size: 26px;
   }
   .easy-bar-btn span {
-    font-size: 22px;
+    font-size: 26px;
   }
 }
 
 /* 모바일 뷰포트에서 쉬운 모드 가동 시 높이 균등 비분할로 화면에 꽉 채우기 */
 @media screen and (max-width: 1023px) {
   #easy-mode-layout-container {
-    flex: 0 0 52cqh; /* 명시적인 52% 비례 세로 영역을 부여하여 잘림 및 겹침 방지 */
+    flex: 0 0 52cqh;
     min-height: 0;
-    gap: 8px; /* 촘촘하게 간격을 유지해 겹치지 않음 */
+    gap: 10px;
   }
 
   .easy-scan-btn-large {
-    flex: 1.3;
+    flex: 1.1;
     min-height: 0;
-    padding: clamp(10px, 1.5cqh, 16px) clamp(16px, 3cqw, 24px) !important;
-    gap: clamp(12px, 3cqw, 20px) !important;
-  }
-
-  .easy-voucher-img-box {
-    width: 42%; /* 1번 전표 이미지 대폭 상향 (32% -> 42%) */
-    max-width: 175px;
+    padding: clamp(10px, 1.6cqh, 18px) 16px !important;
   }
 
   .easy-scan-text {
-    font-size: clamp(27px, 4.2cqh, 34px); /* 글씨 크기 웅장하게 상향 */
+    font-size: clamp(24px, 3.6cqh, 30px);
   }
 
   .easy-split-row {
-    flex: 1.3;
+    flex: 1.1;
     min-height: 0;
-    gap: 8px;
+    gap: 10px;
   }
 
   .easy-split-btn {
-    padding: clamp(10px, 1.5cqh, 18px) 10px !important;
-    gap: 6px;
-  }
-
-  .easy-split-btn img {
-    width: clamp(52px, 6.8cqh, 68px); /* 반반 아이콘 크기 복원 및 확대 */
-    height: clamp(52px, 6.8cqh, 68px);
+    padding: clamp(10px, 1.6cqh, 18px) 8px !important;
   }
 
   .easy-split-btn span {
-    font-size: clamp(21px, 3cqh, 24px); /* 2행 한글 타이틀 대폭 확대 */
+    font-size: clamp(19px, 2.7cqh, 24px);
   }
 
   .easy-bar-btn {
     flex: 1;
     min-height: 0;
-    padding: clamp(10px, 1.5cqh, 14px) 16px !important;
-    gap: 12px !important;
-  }
-
-  .easy-search-icon-circle {
-    width: 44px !important; /* 돋보기 원 크기 확대 */
-    height: 44px !important;
-  }
-
-  .easy-search-icon-circle i {
-    font-size: 22px !important; /* 돋보기 아이콘 확대 */
+    padding: clamp(10px, 1.5cqh, 16px) 16px !important;
   }
 
   .easy-bar-btn span {
-    font-size: clamp(23px, 3.4cqh, 27px); /* 3행 금융성향 알아보기 글씨 대폭 확대 */
+    font-size: clamp(20px, 2.9cqh, 25px);
   }
 }
 
