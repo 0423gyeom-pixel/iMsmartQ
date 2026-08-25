@@ -1253,6 +1253,44 @@ document.addEventListener('DOMContentLoaded', async () => {
     if (progressPctEl) progressPctEl.textContent = `${percentage}%`;
   }
 
+  // 체크리스트 모달 전체 초기화 함수 (검색창, 맞춤형 질문 컨테이너, 체크 목록, 진척도)
+  window.resetChecklistModal = function() {
+    const searchInput = document.getElementById('checklist-search-input');
+    const dropdown = document.getElementById('checklist-dropdown-results');
+    if (searchInput) searchInput.value = '';
+    if (dropdown) dropdown.style.display = 'none';
+
+    // 문진 답변 및 체크리스트 상태 객체 초기화
+    for (const key in checkedAnswers) {
+      delete checkedAnswers[key];
+    }
+    for (const key in checkedState) {
+      checkedState[key] = [];
+    }
+
+    activeTab = 'personal_new';
+
+    // 맞춤 서류 확인 문진 컨테이너 완벽 숨김 및 비움
+    if (checklistQuestionsContainer) {
+      checklistQuestionsContainer.style.display = 'none';
+      checklistQuestionsContainer.innerHTML = '';
+    }
+
+    // 서류 목록 안내문구로 리셋
+    if (checklistItemsEl) {
+      checklistItemsEl.innerHTML = '<div style="font-size: 12px; color: var(--cool-gray); text-align: center; padding: 24px 0;">조회하실 업무명을 검색하여 선택해 주세요.</div>';
+    }
+
+    // 진척도 게이지 0% 리셋
+    if (progressBarEl) progressBarEl.style.width = '0%';
+    if (progressPctEl) progressPctEl.textContent = '0%';
+
+    // 탭 버튼 active 클래스 리셋
+    if (tabButtons) {
+      tabButtons.forEach(btn => btn.classList.remove('active'));
+    }
+  };
+
   // --- AI 일괄 서류 확인 시뮬레이션 상태 변수 ---
   let aiCurrentStep = 0;
   let aiTotalSteps = 0;
@@ -3550,8 +3588,10 @@ document.addEventListener('DOMContentLoaded', async () => {
   const easyChecklistBtn = document.getElementById('btn-easy-checklist');
   if (easyChecklistBtn && checklistModal) {
     easyChecklistBtn.addEventListener('click', () => {
-      checklistModal.classList.remove('hidden');
-      renderChecklist(); // 진척도 및 체크리스트 강제 렌더링
+      if (typeof resetChecklistModal === 'function') {
+        resetChecklistModal();
+      }
+      openModalWithConsentCheck('checklist-modal');
       playNotificationSound('beep');
     });
   }
@@ -3609,8 +3649,10 @@ document.addEventListener('DOMContentLoaded', async () => {
   // 체크리스트 모달 열기
   if (quickChecklistBtn && checklistModal) {
     quickChecklistBtn.addEventListener('click', () => {
-      checklistModal.classList.remove('hidden');
-      renderChecklist(); // 진척도 및 체크리스트 강제 렌더링
+      if (typeof resetChecklistModal === 'function') {
+        resetChecklistModal();
+      }
+      openModalWithConsentCheck('checklist-modal');
       playNotificationSound('beep');
     });
   }
@@ -3640,6 +3682,11 @@ document.addEventListener('DOMContentLoaded', async () => {
           // 금융성향 테스트 모달을 X 나 배경클릭으로 닫을 때도 즉시 상태 초기화 리셋!
           if (typeof resetFinancialQuiz === 'function') {
             resetFinancialQuiz();
+          }
+        } else if (modalEl.id === 'checklist-modal') {
+          // 체크리스트 모달을 X 나 배경클릭으로 닫을 때 맞춤 질문, 검색창, 체크항목 완벽 리셋!
+          if (typeof resetChecklistModal === 'function') {
+            resetChecklistModal();
           }
         }
         playNotificationSound('beep');
@@ -3869,17 +3916,13 @@ document.addEventListener('DOMContentLoaded', async () => {
       }
     });
 
-    // 5. 체크리스트 모달이 처음 열릴 때 검색 입력창 및 추천 초기화
+    // 5. 체크리스트 모달이 처음 열릴 때 전체 상태 초기화
     const checklistBtn = document.getElementById('btn-quick-checklist');
     if (checklistBtn) {
       checklistBtn.addEventListener('click', () => {
-        checklistSearchInput.value = '';
-        checklistDropdownResults.style.display = 'none';
-        if (checklistItemsEl) {
-          checklistItemsEl.innerHTML = '<div style="font-size: 12px; color: var(--cool-gray); text-align: center; padding: 24px 0;">조회하실 업무명을 검색하여 선택해 주세요.</div>';
+        if (typeof resetChecklistModal === 'function') {
+          resetChecklistModal();
         }
-        if (progressBarEl) progressBarEl.style.width = '0%';
-        if (progressPctEl) progressPctEl.textContent = '0%';
       });
     }
   }
