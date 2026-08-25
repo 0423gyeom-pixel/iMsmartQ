@@ -3345,7 +3345,7 @@ input:checked + .slider:before {
 }
 
 .quick-card-btn {
-  padding: 16px 12px;
+  padding: 18px 12px;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -3356,8 +3356,8 @@ input:checked + .slider:before {
 }
 
 .quick-card-icon-wrapper {
-  width: 48px; /* 화면 확대 시에도 소멸하지 않는 안정적인 고정 크기 */
-  height: 48px;
+  width: 58px; /* 아이콘 원형 박스 크기 확대 (48px -> 58px) */
+  height: 58px;
   border-radius: 28%;
   flex-shrink: 0;
   margin-bottom: 8px;
@@ -3367,13 +3367,13 @@ input:checked + .slider:before {
 }
 
 .quick-svg-icon {
-  width: 24px;
-  height: 24px;
+  width: 30px; /* SVG 아이콘 자체 크기 확대 (24px -> 30px) */
+  height: 30px;
   stroke-width: 2.1;
 }
 
 .quick-card-title {
-  font-size: clamp(13.5px, 3.8cqw, 16px); /* 화면 너비 비례로 글자 찌그러짐 방지 */
+  font-size: clamp(15.5px, 4.3cqw, 18.5px); /* 폰트 크기 확대 (13.5~16px -> 15.5~18.5px) */
   font-weight: 800;
   letter-spacing: -0.4px;
   line-height: 1.3;
