@@ -173,22 +173,24 @@ body {
 }
 
 .delay-badge {
-  background-color: #FFF3CD;
-  color: #856404;
-  font-size: 10px;
-  font-weight: 700;
-  padding: 2px 6px;
-  border-radius: 4px;
+  background: linear-gradient(135deg, #ff9f43 0%, #ff5252 100%);
+  color: #ffffff;
+  font-size: 11px;
+  font-weight: 800;
+  padding: 2.5px 8px;
+  border-radius: 10px;
+  box-shadow: 0 2px 5px rgba(255, 82, 82, 0.3);
 }
 
 .delay-badge.completed {
-  background-color: #E2E3E5;
-  color: #383D41;
+  background: #e2e8f0;
+  color: #64748b;
+  box-shadow: none;
 }
 
 .delay-badge.warning {
-  background-color: var(--warning-bg);
-  color: var(--warning-red);
+  background: var(--warning-red);
+  color: #ffffff;
 }
 
 .delay-desc {
@@ -199,36 +201,50 @@ body {
 
 .delay-btn {
   width: 100%;
-  padding: 12px;
-  background-color: var(--white);
-  border: 1px solid var(--light-gray);
-  border-radius: 10px;
-  color: var(--dark-text);
-  font-size: 13px;
-  font-weight: 700;
+  padding: 12px 18px;
+  background: linear-gradient(135deg, #f0fdfa 0%, #e6fffa 100%);
+  border: 1.5px solid var(--brand-mint);
+  border-radius: 12px;
+  color: var(--brand-mint-dark);
+  font-size: 14px;
+  font-weight: 800;
   cursor: pointer;
   display: flex;
   justify-content: center;
   align-items: center;
-  gap: 6px;
+  gap: 8px;
+  box-shadow: 0 3px 10px rgba(0, 186, 174, 0.12);
   transition: all 0.2s ease;
 }
 
 .delay-btn:hover {
-  background-color: var(--brand-mint-light);
-  border-color: var(--brand-mint);
-  color: var(--brand-mint-dark);
+  background: linear-gradient(135deg, #e6fffa 0%, #ccfbf1 100%);
+  border-color: var(--brand-mint-dark);
+  box-shadow: 0 4px 14px rgba(0, 186, 174, 0.2);
+  transform: translateY(-1px);
+}
+
+.delay-btn:active {
+  transform: translateY(1px);
 }
 
 .delay-btn:disabled {
-  background-color: #f8f9fa;
+  background: #f8f9fa;
   border-color: #e9ecef;
   color: #adb5bd;
+  box-shadow: none;
   cursor: not-allowed;
+  transform: none;
 }
 
 .delay-btn i {
-  font-size: 14px;
+  font-size: 16px;
+  color: var(--brand-mint);
+  transition: transform 0.3s ease;
+}
+
+.delay-btn:hover i {
+  transform: rotate(180deg);
 }
 
 .ticket-number {
@@ -3301,32 +3317,46 @@ input:checked + .slider:before {
   position: relative;
   width: 100%;
   flex: 1 1 auto;
-  padding: clamp(7px, 1.3cqh, 15px) clamp(11px, 3.6cqw, 18px);
-  font-size: clamp(11.5px, 1.68cqh, 16px);
-  font-weight: 800;
+  padding: clamp(9px, 1.6cqh, 16px) clamp(14px, 4cqw, 22px);
+  font-size: clamp(13px, 1.9cqh, 16.5px);
+  font-weight: 900;
+  letter-spacing: -0.3px;
   border-radius: clamp(10px, 1.6cqh, 16px);
-  gap: 5px;
+  background: linear-gradient(135deg, #f0fdfa 0%, #e6fffa 100%);
+  border: 1.5px solid var(--brand-mint);
+  color: var(--brand-mint-dark);
+  gap: 8px;
   white-space: nowrap;
   overflow: visible;
+  box-shadow: 0 3px 10px rgba(0, 186, 174, 0.12);
+  transition: all 0.2s ease;
 }
 
 .delay-btn i {
-  font-size: clamp(12px, 1.78cqh, 17px);
+  font-size: clamp(14px, 2.05cqh, 18px);
+  color: var(--brand-mint);
 }
 
 .delay-btn .delay-badge {
   position: absolute;
   top: -0.75em;
   right: -5px;
-  font-size: clamp(8.5px, 1.22cqh, 11.5px);
-  padding: 1.5px 6px;
-  border-radius: 6px;
+  font-size: clamp(9.5px, 1.35cqh, 12px);
+  font-weight: 900;
+  padding: 2.5px 8px;
+  border-radius: 10px;
   border: 1.5px solid var(--card-bg);
-  line-height: 1.5;
+  background: linear-gradient(135deg, #ff9f43 0%, #ff5252 100%);
+  color: #ffffff;
+  line-height: 1.4;
   white-space: nowrap;
+  box-shadow: 0 2px 6px rgba(255, 82, 82, 0.35);
 }
 
 .delay-btn:disabled .delay-badge {
+  background: #e2e8f0;
+  color: #64748b;
+  box-shadow: none;
   border-color: #f8f9fa;
 }
 
@@ -3603,14 +3633,15 @@ input:checked + .slider:before {
 
   .delay-btn {
     padding: 14px 22px;
-    font-size: 15px;
+    font-size: 15.5px;
+    font-weight: 900;
     border-radius: 14px;
   }
 
-  .delay-btn i { font-size: 16px; }
+  .delay-btn i { font-size: 17px; }
 
   .delay-btn .delay-badge {
-    font-size: 11px;
+    font-size: 11.5px;
     border-color: var(--white);
   }
 
