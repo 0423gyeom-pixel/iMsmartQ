@@ -3556,13 +3556,21 @@ input:checked + .slider:before {
   .ticket-number-label { font-size: 15px; }
   .highlight-num { font-size: 56px; }
 
+  .ticket-hero {
+    flex-direction: row !important;
+    justify-content: space-between !important;
+    align-items: center !important;
+    gap: 20px !important;
+  }
+
   .accent-backdrop-container {
-    position: absolute;
-    right: 30px;
-    top: 50%;
-    transform: translateY(-50%);
+    position: relative !important;
+    right: auto !important;
+    top: auto !important;
+    transform: none !important;
     padding: 14px 26px;
     border-radius: 14px;
+    flex-shrink: 0 !important;
   }
 
   .business-category .label { font-size: 13px; }
@@ -4010,4 +4018,10 @@ input:checked + .slider:before {
 .s-badge-rejected {
   background-color: #ff7675;
   color: #d63031;
+}
+
+/* 체크리스트 검색 드롭다운 선택지 호버 스타일 */
+.checklist-opt-item:hover {
+  background-color: #f5f6f8 !important;
+  color: var(--brand-mint-dark) !important;
 }

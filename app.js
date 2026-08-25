@@ -143,6 +143,26 @@ document.addEventListener('DOMContentLoaded', async () => {
       "icon": "fa-solid fa-wallet",
       "matchTypes": ["deposit"],
       "lastUpdated": "2026-07-14 21:10"
+    },
+    {
+      "id": "im-safe-fund-fallback",
+      "category": "펀드",
+      "name": "iM 단기국공채 증권투자신탁",
+      "rate": "채권형 안정추구",
+      "benefit": "정부 및 공공기관이 발행한 국공채 위주로 투자하여 원금 손실 가능성을 철저히 방지하고 시중금리 플러스 알파의 안정적 수익을 지향하는 펀드",
+      "icon": "fa-solid fa-shield-halved",
+      "matchTypes": ["safe"],
+      "lastUpdated": "2026-07-14 21:10"
+    },
+    {
+      "id": "im-aggressive-fund-fallback",
+      "category": "펀드",
+      "name": "iM 글로벌 AI 테크 주식형 펀드",
+      "rate": "주식형 고위험고수익",
+      "benefit": "글로벌 AI 혁신 기술 대형주(엔비디아, 마이크로소프트 등)에 집중 투자하여 초과 수익률을 노리는 액티브 주식형 펀드",
+      "icon": "fa-solid fa-fire-flame-curved",
+      "matchTypes": ["aggressive"],
+      "lastUpdated": "2026-07-14 21:10"
     }
   ];
 
@@ -897,37 +917,307 @@ document.addEventListener('DOMContentLoaded', async () => {
   // ==========================================================================
   // --- 10. 업무별 필요 서류 체크리스트 제어 ---
   // ==========================================================================
-  const checklistData = {
-    card: [
-      { text: "본인 실명 확인 증표 (신분증)", desc: "주민등록증, 운전면허증, 여권 등 (만 17세 이상)" },
-      { text: "소득 증빙 서류 (한도 제한 해제 필요 시)", desc: "직장인의 경우 건강보험 자격득실확인서, 재직증명서 등" },
-      { text: "대리인 신청 시 위임장", desc: "본인 인감도장 및 인감증명서 추가 위임 필요" }
-    ],
-    bankbook: [
-      { text: "본인 실명 확인 증표 (신분증)", desc: "주민등록증, 운전면허증 등" },
-      { text: "거래 인감 또는 본인 서명", desc: "통장에 등록할 거래 수단 준비" },
-      { text: "금융거래 목적 증빙 서류", desc: "급여통장(재직증명서), 사업자통장(물품계약서) 등 목적 증빙 필수" }
-    ],
-    irp: [
-      { text: "본인 신분증", desc: "실명 확인용 신분증 필수" },
-      { text: "가입 자격 증빙 서류", desc: "재직증명서, 근로소득원천징수영수증 또는 사업자등록증명원 등" },
-      { text: "타사 퇴직금 이전 시 이전 의뢰서", desc: "기존 가입한 퇴직금 계좌 보유 확인서 등 연계 서류" }
-    ]
+  // --- 7대 금융 업무별 동적 질문 및 서류 조건 정의 ---
+  const checklistConfig = {
+    personal_new: {
+      questions: [
+        {
+          id: "q_p_job",
+          title: "가입자의 직업 구분을 선택해 주세요.",
+          options: [
+            { text: "직장인 (근로소득자)", val: "employee" },
+            { text: "주부 / 학생 / 무직", val: "none" },
+            { text: "개인사업자", val: "business" }
+          ]
+        },
+        {
+          id: "q_p_purpose",
+          title: "금융거래 목적 증빙 방법을 선택해 주세요.",
+          options: [
+            { text: "급여 이체용", val: "salary" },
+            { text: "공과금 이체용", val: "utility" },
+            { text: "사업 거래용", val: "biz_deal" }
+          ]
+        }
+      ],
+      getDocuments: (answers) => {
+        const docs = [
+          { text: "본인 실명 확인 증표 (신분증)", desc: "주민등록증, 운전면허증, 여권 등 (만 17세 이상)" },
+          { text: "거래인감 또는 본인 서명", desc: "통장에 등록할 도장 또는 서명 준비" }
+        ];
+        
+        if (answers.q_p_job === 'employee' || answers.q_p_purpose === 'salary') {
+          docs.push({ text: "재직증명서", desc: "회사 발행 3개월 이내 원본" });
+          docs.push({ text: "건강보험자격득실확인서", desc: "국민건강보험공단 발행본" });
+        }
+        if (answers.q_p_job === 'business' || answers.q_p_purpose === 'biz_deal') {
+          docs.push({ text: "사업자등록증명원", desc: "홈택스 발급 3개월 이내" });
+          docs.push({ text: "부가가치세과세표준증명원", desc: "최근 연도 발급 필수" });
+        }
+        if (answers.q_p_job === 'none' && answers.q_p_purpose === 'utility') {
+          docs.push({ text: "공과금 영수증", desc: "본인 명의 아파트관리비 고지서 또는 전기/가스 영수증" });
+        }
+        return docs;
+      }
+    },
+    rent_loan: {
+      questions: [
+        {
+          id: "q_r_income",
+          title: "소득 증빙 구분을 선택해 주세요.",
+          options: [
+            { text: "근로소득자 (직장인)", val: "salary" },
+            { text: "사업소득자 (개인사업)", val: "business" },
+            { text: "소득 없음 (추정 소득 활용)", val: "none" }
+          ]
+        },
+        {
+          id: "q_r_house",
+          title: "임차 대상 주택의 종류는 무엇인가요?",
+          options: [
+            { text: "아파트 / 주거용 오피스텔", val: "apt" },
+            { text: "다세대 빌라 / 연립주택", val: "villa" },
+            { text: "단독 / 다가구 주택", val: "house" }
+          ]
+        }
+      ],
+      getDocuments: (answers) => {
+        const docs = [
+          { text: "확정일자부 임대차계약서 원본", desc: "주민센터 등에서 확정일자를 부여받은 계약서 필수" },
+          { text: "임차주택 등기사항전부증명원 (등기부등본)", desc: "말소사항 포함 최근 발행분" },
+          { text: "주민등록등본 및 초본 (최근 5년 주소변동 포함)", desc: "주민등록번호 전체 표시본" },
+          { text: "가족관계증명서 (상세)", desc: "배우자 유무 확인용" }
+        ];
+        if (answers.q_r_income === 'salary') {
+          docs.push({ text: "재직증명서", desc: "회사 발행본" });
+          docs.push({ text: "근로소득원천징수영수증", desc: "최근 2개년 회사 발행 직인 날인본" });
+        } else if (answers.q_r_income === 'business') {
+          docs.push({ text: "사업자등록증 사본 및 소득금액증명원", desc: "국세청 발급 최근 연도 소득 증빙" });
+        } else if (answers.q_r_income === 'none') {
+          docs.push({ text: "연금수령증명서 또는 신용카드 사용내역서", desc: "최근 1년 건강보험료 납부확인서 등 대체 증빙" });
+        }
+        if (answers.q_r_house === 'house') {
+          docs.push({ text: "전입세대열람내역 (도로명/지번 둘 다)", desc: "주민센터에서 임대차계약서 지참 후 발급 가능" });
+        }
+        return docs;
+      }
+    },
+    home_loan: {
+      questions: [
+        {
+          id: "q_h_use",
+          title: "대출 자금의 용도가 무엇인가요?",
+          options: [
+            { text: "주택 구입용 자금", val: "purchase" },
+            { text: "생활 안정용 자금", val: "living" }
+          ]
+        },
+        {
+          id: "q_h_income",
+          title: "차주의 소득 확인 방법을 선택해 주세요.",
+          options: [
+            { text: "소득금액증명원 제출", val: "tax_proof" },
+            { text: "근로소득 원천징수영수증 제출", val: "salary_proof" }
+          ]
+        }
+      ],
+      getDocuments: (answers) => {
+        const docs = [
+          { text: "등기사항전부증명원 (등기부등본)", desc: "대상 주택 정보 열람용" },
+          { text: "인감증명서 2통 및 인감도장", desc: "대출 약정 및 근저당권 설정용" },
+          { text: "주민등록등본 및 초본", desc: "최근 주소 이력 전체 포함본" }
+        ];
+        if (answers.q_h_use === 'purchase') {
+          docs.push({ text: "매매계약서 원본", desc: "소유권 이전 전 매매 사실 입증용" });
+        } else if (answers.q_h_use === 'living') {
+          docs.push({ text: "등기필증 (집문서)", desc: "근저당 설정을 위한 실물 집문서 지참 필수" });
+          docs.push({ text: "기존 대출 잔액 확인서", desc: "타행 대출 상환 연계 시 준비" });
+        }
+        if (answers.q_h_income === 'tax_proof') {
+          docs.push({ text: "소득금액증명원", desc: "세무서 또는 홈택스 발급분" });
+        } else if (answers.q_h_income === 'salary_proof') {
+          docs.push({ text: "최근 2개년 근로소득원천징수영수증", desc: "근무지 발행 직인 날인본" });
+        }
+        return docs;
+      }
+    },
+    corporate_new: {
+      questions: [
+        {
+          id: "q_c_type",
+          title: "법인의 조직 형태가 무엇인가요?",
+          options: [
+            { text: "주식회사", val: "stock" },
+            { text: "유한회사 / 합명회사", val: "limited" }
+          ]
+        },
+        {
+          id: "q_c_visitor",
+          title: "영업점 내방자는 누구인가요?",
+          options: [
+            { text: "대표이사 직접 내방", val: "ceo" },
+            { text: "대리인 임직원 내방", val: "employee" }
+          ]
+        }
+      ],
+      getDocuments: (answers) => {
+        const docs = [
+          { text: "법인등기사항전부증명원 (법인등기부등본)", desc: "발급일로부터 3개월 이내 원본" },
+          { text: "법인 인감증명서", desc: "발급일로부터 3개월 이내 원본" },
+          { text: "법인 인감도장", desc: "서류 및 약정서 날인용 실물 지참" },
+          { text: "법인 정관 및 주주명부", desc: "정관은 원본대조필 법인인감 날인본" }
+        ];
+        if (answers.q_c_visitor === 'ceo') {
+          docs.push({ text: "대표이사 실명 확인 신분증", desc: "주민등록증 또는 운전면허증" });
+        } else if (answers.q_c_visitor === 'employee') {
+          docs.push({ text: "내방인(대리인) 신분증", desc: "주민등록증 또는 운전면허증" });
+          docs.push({ text: "위임장 (법인인감 날인)", desc: "업무 위임 내역 기재 필수" });
+          docs.push({ text: "대리인 재직증명서", desc: "법인 발행 임직원 증빙 서류" });
+        }
+        return docs;
+      }
+    },
+    corporate_loan: {
+      questions: [
+        {
+          id: "q_cl_security",
+          title: "원하시는 대출의 담보 유형을 선택해 주세요.",
+          options: [
+            { text: "부동산 담보 대출", val: "estate" },
+            { text: "보증서 발급 대출 (신보/기보)", val: "guarantee" },
+            { text: "신용 대출", val: "credit" }
+          ]
+        },
+        {
+          id: "q_cl_guarantor",
+          title: "대표이사 연대보증인 동반 여부를 선택해 주세요.",
+          options: [
+            { text: "대표이사 연대보증 동반함", val: "ceo_guarantor" },
+            { text: "연대보증 없음 (순수 담보/보증서)", val: "no_guarantor" }
+          ]
+        }
+      ],
+      getDocuments: (answers) => {
+        const docs = [
+          { text: "사업자등록증명원 및 법인등기부등본", desc: "3개월 이내 원본" },
+          { text: "법인인감증명서 및 법인인감도장", desc: "체결용 서류 지참" },
+          { text: "최근 3개년도 법인 재무제표", desc: "국세청 홈택스 또는 회계사 확인 날인본" },
+          { text: "국세 및 지방세 납세증명서", desc: "체납 여부 확인용 유효기간 이내본" }
+        ];
+        if (answers.q_cl_security === 'estate') {
+          docs.push({ text: "부동산 등기필증 및 등기부등본", desc: "담보물 제공 권리 확인 서류" });
+        } else if (answers.q_cl_security === 'guarantee') {
+          docs.push({ text: "신용보증기금/기술보증기금 보증서 원본", desc: "사전 승인된 보증서 지참" });
+        }
+        if (answers.q_cl_guarantor === 'ceo_guarantor') {
+          docs.push({ text: "대표이사 개인 인감증명서 및 주민등록초본", desc: "연대보증인 자격 증빙 서류" });
+          docs.push({ text: "대표이사 개인 인감도장 및 신분증", desc: "동반 방문 및 날인 필수" });
+        }
+        return docs;
+      }
+    },
+    proxy_work: {
+      questions: [
+        {
+          id: "q_pr_owner",
+          title: "본인(위임자)의 고객 성격을 선택해 주세요.",
+          options: [
+            { text: "개인 고객 (성인)", val: "individual" },
+            { text: "미성년자 자녀", val: "minor" },
+            { text: "법인 고객", val: "corporate" }
+          ]
+        },
+        {
+          id: "q_pr_type",
+          title: "대리 처리하실 업무의 유형이 무엇인가요?",
+          options: [
+            { text: "예적금 해지 및 예금 출금", val: "cancel" },
+            { text: "신규 계좌 개설", val: "new_acc" },
+            { text: "카드 및 보안매체/비밀번호 변경", val: "security" }
+          ]
+        }
+      ],
+      getDocuments: (answers) => {
+        const docs = [
+          { text: "대리인(내방자) 실물 신분증", desc: "주민등록증 또는 운전면허증" },
+          { text: "위임장 원본", desc: "위임자 인감 날인 필수 (미성년자 제외)" }
+        ];
+        if (answers.q_pr_owner === 'individual') {
+          docs.push({ text: "위임자 본인 인감증명서 (3개월 이내)", desc: "주민센터 발행 개인인감증명서 원본" });
+        } else if (answers.q_pr_owner === 'minor') {
+          docs.shift(); // 위임장 제거
+          docs.push({ text: "가족관계증명서 (상세/주민번호 공개)", desc: "내방자와 미성년자 자녀의 친권 증빙용" });
+          docs.push({ text: "미성년자 자녀 기준 기본증명서 (상세)", desc: "친권권리 확인을 위한 상세 필수" });
+          docs.push({ text: "법정대리인 동의서", desc: "은행 창구 비치 서식 작성" });
+        } else if (answers.q_pr_owner === 'corporate') {
+          docs.push({ text: "법인 인감증명서 및 위임장(법인인감 날인)", desc: "법인 자산 인출 권한 대조용" });
+        }
+        if (answers.q_pr_type === 'cancel') {
+          docs.push({ text: "거래 통장 실물 및 등록 도장", desc: "인감도장 지참 시 예금 출금 가능" });
+        }
+        return docs;
+      }
+    },
+    inheritance_work: {
+      questions: [
+        {
+          id: "q_in_agree",
+          title: "상속인들의 동의 및 방문 형태가 무엇인가요?",
+          options: [
+            { text: "상속인 전원 동의 및 공동 청구", val: "all_agree" },
+            { text: "상속인 중 1인의 단독 상속 청구", val: "single_claim" }
+          ]
+        },
+        {
+          id: "q_in_will",
+          title: "피상속인(사망자)의 유언장 유무를 선택해 주세요.",
+          options: [
+            { text: "유언장 없음 (법정 상속)", val: "no_will" },
+            { text: "유언공증서 / 법원 공인 유언서 있음", val: "will_exist" }
+          ]
+        }
+      ],
+      getDocuments: (answers) => {
+        const docs = [
+          { text: "피상속인(사망자) 폐쇄가족관계증명서 (상세)", desc: "주민등록번호 전체 공개 및 사망 기재본" },
+          { text: "피상속인(사망자) 기본증명서 (상세)", desc: "사망일시 및 사망사실 확인용" },
+          { text: "상속인 전원의 주민등록초본 및 신분증 사본", desc: "상속 자격 검증용" },
+          { text: "상속재산 분할협의서", desc: "상속인 전원의 인감날인 필수 서식" }
+        ];
+        if (answers.q_in_agree === 'all_agree') {
+          docs.push({ text: "상속인 전원 인감증명서 각 1통", desc: "분할협의서 인감 대조용" });
+          docs.push({ text: "내방하지 않은 상속인의 위임장 및 인감증명서", desc: "대리 청구 시 필요" });
+        } else if (answers.q_in_agree === 'single_claim') {
+          docs.push({ text: "상속재산 단독 청구 합의서", desc: "상속자 전원의 단독 청구 동의 인감 날인본" });
+        }
+        if (answers.q_in_will === 'will_exist') {
+          docs.push({ text: "검인필 유언서 원본 또는 유언공정증서 원본", desc: "법원 검인 절차를 거친 증빙서류 필수" });
+        }
+        return docs;
+      }
+    }
   };
 
+  const checkedAnswers = {}; // 문진 답변 결과 보관용
   const checkedState = {
-    card: [false, false, false],
-    bankbook: [false, false, false],
-    irp: [false, false, false]
+    personal_new: [],
+    rent_loan: [],
+    home_loan: [],
+    corporate_new: [],
+    corporate_loan: [],
+    proxy_work: [],
+    inheritance_work: []
   };
 
-  let activeTab = 'card';
+  let activeTab = 'personal_new';
   const tabButtons = document.querySelectorAll('.tab-btn');
   const checklistItemsEl = document.getElementById('checklist-items');
   const progressBarEl = document.getElementById('checklist-progress-bar');
   const progressPctEl = document.getElementById('checklist-progress-pct');
+  const checklistQuestionsContainer = document.getElementById('checklist-questions-container');
 
   function updateChecklistProgress() {
+    if (!checkedState[activeTab]) return;
     const total = checkedState[activeTab].length;
     const checkedCount = checkedState[activeTab].filter(Boolean).length;
     const percentage = total > 0 ? Math.round((checkedCount / total) * 100) : 0;
@@ -962,168 +1252,61 @@ document.addEventListener('DOMContentLoaded', async () => {
   const aiConfirmBtn = document.getElementById('ai-confirm-btn');
   const aiBatchStartBtn = document.getElementById('ai-batch-start-btn');
 
-  // AI 판별용 모의 서류 템플릿
-  const aiMockDocTemplates = {
-    card: [
-      `<div class="mock-doc-header">
-        <span class="mock-doc-title">주민등록증</span>
-        <span class="mock-doc-watermark">사본</span>
-      </div>
-      <div class="mock-doc-body">
-        <div class="mock-doc-row"><span class="mock-doc-label">성명</span><span class="mock-doc-value">홍길동</span></div>
-        <div class="mock-doc-row"><span class="mock-doc-label">주민등록번호</span><span class="mock-doc-value">860101 - <span class="mock-doc-masked">*******</span></span></div>
-        <div class="mock-doc-row"><span class="mock-doc-label">발급일자</span><span class="mock-doc-value">2023.05.12</span></div>
-      </div>
-      <div class="mock-doc-footer"><span>대구광역시 북구청장</span><span>[적합 서류]</span></div>`,
-      `<div class="mock-doc-header">
-        <span class="mock-doc-title">건강보험자격득실확인서</span>
-        <span class="mock-doc-watermark">제출용</span>
-      </div>
-      <div class="mock-doc-body">
-        <div class="mock-doc-row"><span class="mock-doc-label">가입자 성명</span><span class="mock-doc-value">홍길동</span></div>
-        <div class="mock-doc-row"><span class="mock-doc-label">주민등록번호</span><span class="mock-doc-value">860101 - <span class="mock-doc-unmasked-red">1234567</span></span></div>
-        <div class="mock-doc-row"><span class="mock-doc-label">발급일자</span><span class="mock-doc-value">2026.06.18</span></div>
-      </div>
-      <div class="mock-doc-footer"><span>국민건강보험공단</span><span>[마스킹 누락]</span></div>`,
-      `<div class="mock-doc-header">
-        <span class="mock-doc-title">위임장 (Power of Attorney)</span>
-        <span class="mock-doc-watermark">원본</span>
-      </div>
-      <div class="mock-doc-body">
-        <div class="mock-doc-row"><span class="mock-doc-label">위임인</span><span class="mock-doc-value">김철수</span></div>
-        <div class="mock-doc-row"><span class="mock-doc-label">수임인</span><span class="mock-doc-value">홍길동</span></div>
-        <div class="mock-doc-row"><span class="mock-doc-label">서명날인</span><span class="mock-doc-value">인감날인 완료</span></div>
-      </div>
-      <div class="mock-doc-footer"><span>인감증명서 첨부 확인</span><span>[적합 서류]</span></div>`
-    ],
-    bankbook: [
-      `<div class="mock-doc-header">
-        <span class="mock-doc-title">운전면허증</span>
-        <span class="mock-doc-watermark">사본</span>
-      </div>
-      <div class="mock-doc-body">
-        <div class="mock-doc-row"><span class="mock-doc-label">성명</span><span class="mock-doc-value">홍길동</span></div>
-        <div class="mock-doc-row"><span class="mock-doc-label">면허번호</span><span class="mock-doc-value">12-34-567890-12</span></div>
-        <div class="mock-doc-row"><span class="mock-doc-label">주민등록번호</span><span class="mock-doc-value">860101 - <span class="mock-doc-masked">*******</span></span></div>
-      </div>
-      <div class="mock-doc-footer"><span>경찰청장</span><span>[적합 서류]</span></div>`,
-      `<div class="mock-doc-header">
-        <span class="mock-doc-title">인감대장 및 서명 등록서</span>
-        <span class="mock-doc-watermark">등록용</span>
-      </div>
-      <div class="mock-doc-body">
-        <div class="mock-doc-row"><span class="mock-doc-label">등록인</span><span class="mock-doc-value">홍길동</span></div>
-        <div class="mock-doc-row"><span class="mock-doc-label">인감인영</span><span class="mock-doc-value" style="color: var(--warning-red); font-weight: bold;">(인)</span></div>
-        <div class="mock-doc-row"><span class="mock-doc-label">등록방식</span><span class="mock-doc-value">거래 도장 실물 대조</span></div>
-      </div>
-      <div class="mock-doc-footer"><span>iM Bank 대구본점</span><span>[적합 서류]</span></div>`,
-      `<div class="mock-doc-header">
-        <span class="mock-doc-title">재직증명서</span>
-        <span class="mock-doc-watermark">제출용</span>
-      </div>
-      <div class="mock-doc-body">
-        <div class="mock-doc-row"><span class="mock-doc-label">성명</span><span class="mock-doc-value">홍길동</span></div>
-        <div class="mock-doc-row"><span class="mock-doc-label">회사명</span><span class="mock-doc-value">(주)아이엠테크</span></div>
-        <div class="mock-doc-row"><span class="mock-doc-label">발급일자</span><span class="mock-doc-value" style="color: var(--warning-red); font-weight: bold;">2025.10.15</span></div>
-      </div>
-      <div class="mock-doc-footer"><span>(주)아이엠테크 대표이사</span><span>[기간 경과]</span></div>`
-    ],
-    irp: [
-      `<div class="mock-doc-header">
-        <span class="mock-doc-title">주민등록증</span>
-        <span class="mock-doc-watermark">사본</span>
-      </div>
-      <div class="mock-doc-body">
-        <div class="mock-doc-row"><span class="mock-doc-label">성명</span><span class="mock-doc-value">홍길동</span></div>
-        <div class="mock-doc-row"><span class="mock-doc-label">주민등록번호</span><span class="mock-doc-value">860101 - <span class="mock-doc-masked">*******</span></span></div>
-      </div>
-      <div class="mock-doc-footer"><span>대구광역시 북구청장</span><span>[적합 서류]</span></div>`,
-      `<div class="mock-doc-header">
-        <span class="mock-doc-title">근로소득 원천징수영수증</span>
-        <span class="mock-doc-watermark">제출용</span>
-      </div>
-      <div class="mock-doc-body">
-        <div class="mock-doc-row"><span class="mock-doc-label">소득자</span><span class="mock-doc-value">홍길동</span></div>
-        <div class="mock-doc-row"><span class="mock-doc-label">징수의무자</span><span class="mock-doc-value">(주)아이엠테크</span></div>
-        <div class="mock-doc-row"><span class="mock-doc-label">귀속년도</span><span class="mock-doc-value">2025년</span></div>
-      </div>
-      <div class="mock-doc-footer"><span>세무서장 확인완료</span><span>[적합 서류]</span></div>`,
-      `<div class="mock-doc-header">
-        <span class="mock-doc-title">퇴직연금 계좌 이전 의뢰서</span>
-        <span class="mock-doc-watermark">제출용</span>
-      </div>
-      <div class="mock-doc-body">
-        <div class="mock-doc-row"><span class="mock-doc-label">신청인</span><span class="mock-doc-value">홍길동</span></div>
-        <div class="mock-doc-row"><span class="mock-doc-label">이전대상기관</span><span class="mock-doc-value">A생명보험</span></div>
-        <div class="mock-doc-row"><span class="mock-doc-label">이수기관</span><span class="mock-doc-value">iM Bank</span></div>
-      </div>
-      <div class="mock-doc-footer"><span>연금자산관리센터</span><span>[적합 서류]</span></div>`
-    ]
-  };
+  // AI 판별용 모의 서류 템플릿 (7대 동적 서류 수에 대응하기 위해 Proxy로 동적 생성)
+  const aiMockDocTemplates = new Proxy({}, {
+    get: function(target, tabName) {
+      const config = checklistConfig[tabName];
+      if (!config) return [];
+      const items = config.getDocuments(checkedAnswers);
+      return items.map((item) => {
+        return `
+          <div class="mock-doc-header">
+            <span class="mock-doc-title">${item.text}</span>
+            <span class="mock-doc-watermark">제출용</span>
+          </div>
+          <div class="mock-doc-body">
+            <div class="mock-doc-row"><span class="mock-doc-label">제출 부서</span><span class="mock-doc-value">iM Bank 영업점 창구</span></div>
+            <div class="mock-doc-row"><span class="mock-doc-label">서류 설명</span><span class="mock-doc-value">${item.desc}</span></div>
+            <div class="mock-doc-row"><span class="mock-doc-label">상태</span><span class="mock-doc-value" style="color: var(--brand-mint-dark); font-weight: bold;">AI 판독 완료</span></div>
+          </div>
+          <div class="mock-doc-footer"><span>iM SmartQ AI OCR 엔진</span><span>[적합 서류]</span></div>
+        `;
+      });
+    }
+  });
 
-  // AI 판별 결과 시나리오 맵
-  const aiVerifyScenarios = {
-    card: [
-      {
-        readiness: '100%',
-        suitability: '적합',
-        guide: '본인 실명 확인 증표로 유효하며, 유효기간 및 주민등록번호 뒷자리 마스킹 처리가 올바르게 검증되었습니다. 즉시 사용이 가능합니다.',
-        isSuccess: true
-      },
-      {
-        readiness: '65%',
-        suitability: '부적합',
-        guide: '<b>[진단 의견] 주민등록번호 뒷자리 노출</b><br>금융거래 보호를 위해 주민등록번호 뒷자리(7자리)가 노출된 서류는 제출할 수 없습니다. 뒷자리를 가린 후 다시 준비해 주시기 바랍니다.',
-        isSuccess: false
-      },
-      {
-        readiness: '100%',
-        suitability: '적합',
-        guide: '본인 인감도장 날인 및 위임 의사가 규정에 맞춰 작성되었으며, 본인서명사실확인서 또는 인감증명서가 유효하게 첨부되었음을 확인하였습니다.',
-        isSuccess: true
-      }
-    ],
-    bankbook: [
-      {
-        readiness: '100%',
-        suitability: '적합',
-        guide: '본인 실명 확인 증표로 유효하며, 스캔 화질이 깨끗하고 주민등록번호 뒷자리가 정상적으로 마스킹되어 바로 확인 가능합니다.',
-        isSuccess: true
-      },
-      {
-        readiness: '100%',
-        suitability: '적합',
-        guide: '등록할 거래 인감 날인상태가 뚜렷하며 식별에 이상이 없습니다. 본인 서명 등록인 경우 대조 가능 상태입니다.',
-        isSuccess: true
-      },
-      {
-        readiness: '50%',
-        suitability: '부적합',
-        guide: '<b>[진단 의견] 발급일자 기준 초과 (3개월 경과)</b><br>제출하신 목적 증빙 서류의 발급일자가 3개월을 초과한 것으로 식별되었습니다. 최근 3개월 이내에 발급된 최신 증빙 서류로 다시 준비해 주시기 바랍니다.',
-        isSuccess: false
-      }
-    ],
-    irp: [
-      {
-        readiness: '100%',
-        suitability: '적합',
-        guide: '실명 증표 요건을 충족합니다. 뒷자리 마스킹 처리 상태가 양호합니다.',
-        isSuccess: true
-      },
-      {
-        readiness: '100%',
-        suitability: '적합',
-        guide: '가입 자격을 증명하는 소득 관련 증빙 서류의 내용이 세무서 등록 원본과 일치하며 정상 발급본임을 확인했습니다.',
-        isSuccess: true
-      },
-      {
-        readiness: '100%',
-        suitability: '적합',
-        guide: '대체 이체 계좌 이전 동의 정보가 당사 규정에 적합하게 내용이 기재되어 검증되었습니다.',
-        isSuccess: true
-      }
-    ]
-  };
+  // AI 판별 결과 시나리오 맵 (Proxy를 사용해 동적 생성)
+  const aiVerifyScenarios = new Proxy({}, {
+    get: function(target, tabName) {
+      const config = checklistConfig[tabName];
+      if (!config) return [];
+      const items = config.getDocuments(checkedAnswers);
+      return items.map((item, idx) => {
+        if (item.text.includes("신분증") || item.text.includes("주민등록")) {
+          return {
+            readiness: '100%',
+            suitability: '적합',
+            guide: '본인 실명 확인 증표로 유효하며, 주민등록번호 뒷자리 마스킹 처리가 올바르게 검증되었습니다. 즉시 사용이 가능합니다.',
+            isSuccess: true
+          };
+        }
+        if (idx === 1) {
+          return {
+            readiness: '80%',
+            suitability: '적합 (보완 권고)',
+            guide: `제출하신 [${item.text}] 서류의 발급 일자 및 도장 날인 상태는 유효하나, 일부 민감 개인정보에 대한 안전 마스킹 처리를 권장합니다.`,
+            isSuccess: true
+          };
+        }
+        return {
+          readiness: '100%',
+          suitability: '적합',
+          guide: `[${item.text}] 서류 구비 요건이 완벽하게 충족되었습니다. iM Bank 규정에 적합하여 바로 창구 제출이 가능합니다.`,
+          isSuccess: true
+        };
+      });
+    }
+  });
 
   // 탭 클릭 이벤트 바인딩
   if (tabButtons) {
@@ -1137,14 +1320,125 @@ document.addEventListener('DOMContentLoaded', async () => {
     });
   }
 
-  // 체크리스트 아이템 동적 렌더링 함수
-  function renderChecklist() {
+  // 상황 문진 질문 렌더링 및 답변 관리 함수
+  function renderChecklistQuestions() {
+    if (!checklistQuestionsContainer) return;
+
+    // 만약 검색창에 입력된 텍스트가 없으면(초기 상태/선택안함), 질문 영역을 강제 숨김 처리 후 즉시 리턴
+    const searchInput = document.getElementById('checklist-search-input');
+    if (!searchInput || searchInput.value.trim() === '') {
+      checklistQuestionsContainer.style.display = 'none';
+      checklistQuestionsContainer.innerHTML = '';
+      return;
+    }
+    
+    const config = checklistConfig[activeTab];
+    if (!config || !config.questions || config.questions.length === 0) {
+      checklistQuestionsContainer.style.display = 'none';
+      checklistQuestionsContainer.innerHTML = '';
+      return;
+    }
+
+    checklistQuestionsContainer.style.display = 'block';
+    checklistQuestionsContainer.innerHTML = '';
+
+    // 질문 헤더 제목
+    const headerTitle = document.createElement('div');
+    headerTitle.style.cssText = "font-size: 13px; font-weight: 800; color: var(--brand-mint-dark); margin-bottom: 12px; display: flex; align-items: center; gap: 6px;";
+    headerTitle.innerHTML = `<i class="fa-solid fa-circle-question" style="color: var(--brand-mint);"></i><span>맞춤 서류를 확인하기 위해 몇 가지를 선택해 주세요.</span>`;
+    checklistQuestionsContainer.appendChild(headerTitle);
+
+    config.questions.forEach((q) => {
+      // 답변이 지정되지 않았다면 첫 번째 옵션값으로 자동 초기 설정
+      if (checkedAnswers[q.id] === undefined) {
+        checkedAnswers[q.id] = q.options[0].val;
+      }
+
+      const qBox = document.createElement('div');
+      qBox.style.cssText = "margin-bottom: 12px; display: flex; flex-direction: column; gap: 6px;";
+      
+      const qTitle = document.createElement('div');
+      qTitle.style.cssText = "font-size: 11.5px; font-weight: 700; color: var(--dark-text);";
+      qTitle.textContent = q.title;
+      qBox.appendChild(qTitle);
+
+      const chipsWrapper = document.createElement('div');
+      chipsWrapper.style.cssText = "display: flex; flex-wrap: wrap; gap: 8px;";
+
+      q.options.forEach((opt) => {
+        const label = document.createElement('label');
+        const isActive = checkedAnswers[q.id] === opt.val;
+        
+        label.style.cssText = `
+          padding: 6px 12px;
+          border-radius: 20px;
+          border: 1.5px solid ${isActive ? 'var(--brand-mint)' : 'var(--light-gray)'};
+          background-color: ${isActive ? 'var(--brand-mint-light)' : '#ffffff'};
+          color: ${isActive ? 'var(--brand-mint-dark)' : 'var(--dark-gray)'};
+          font-size: 11px;
+          font-weight: 700;
+          cursor: pointer;
+          transition: all 0.15s;
+          display: flex;
+          align-items: center;
+          gap: 4px;
+        `;
+
+        label.innerHTML = `
+          <input type="radio" name="${q.id}" value="${opt.val}" ${isActive ? 'checked' : ''} style="display: none;">
+          <span>${opt.text}</span>
+        `;
+
+        const radio = label.querySelector('input');
+        radio.addEventListener('change', () => {
+          checkedAnswers[q.id] = opt.val;
+          playNotificationSound('click');
+          
+          // 상황 질문(맞춤형 선택지)이 변경되었으므로, 이전에 체크했던 체크박스 이력을 완벽 리셋하여 찌꺼기 방지!
+          if (checkedState[activeTab]) {
+            checkedState[activeTab] = [];
+          }
+          
+          // 라디오 변경 시 문진 다시 그려서 보더 색상 피드백을 주고 서류 리스트 리프레시!
+          renderChecklistQuestions();
+          renderChecklistItemsOnly();
+        });
+
+        chipsWrapper.appendChild(label);
+      });
+
+      qBox.appendChild(chipsWrapper);
+      checklistQuestionsContainer.appendChild(qBox);
+    });
+  }
+
+  // 실제 필요 서류들만 드로잉하는 헬퍼 함수
+  function renderChecklistItemsOnly() {
     if (!checklistItemsEl) return;
     checklistItemsEl.innerHTML = '';
+
+    const config = checklistConfig[activeTab];
+    if (!config) return;
+
+    // 동적으로 계산된 서류들 취득
+    const items = config.getDocuments(checkedAnswers);
+
+    // 가변 상태배열 크기 자동 조정 (기존 체크 데이터 유지용)
+    if (!checkedState[activeTab]) {
+      checkedState[activeTab] = [];
+    }
     
-    const items = checklistData[activeTab] || [];
-    const states = checkedState[activeTab] || [];
-    
+    // 만약 계산된 서류 수보다 체크상태 배열이 작으면 false로 메꿔줌
+    while (checkedState[activeTab].length < items.length) {
+      checkedState[activeTab].push(false);
+    }
+    // 초과되는 인덱스는 잘라냄
+    if (checkedState[activeTab].length > items.length) {
+      checkedState[activeTab] = checkedState[activeTab].slice(0, items.length);
+    }
+
+    const states = checkedState[activeTab];
+
     items.forEach((item, index) => {
       const itemEl = document.createElement('div');
       itemEl.className = 'checklist-item';
@@ -1152,11 +1446,11 @@ document.addEventListener('DOMContentLoaded', async () => {
       const isChecked = states[index] || false;
       
       itemEl.innerHTML = `
-        <label style="display: flex; align-items: flex-start; gap: 10px; cursor: pointer;">
-          <input type="checkbox" class="checklist-checkbox" data-index="${index}" ${isChecked ? 'checked' : ''} style="margin-top: 3px;">
+        <label style="display: flex; align-items: flex-start; gap: 10px; cursor: pointer; text-align: left; width: 100%;">
+          <input type="checkbox" class="checklist-checkbox" data-index="${index}" ${isChecked ? 'checked' : ''} style="margin-top: 3px; flex-shrink: 0;">
           <div>
-            <div style="font-weight: 600; font-size: 14px; color: #2c3e50;">${item.text}</div>
-            <div style="font-size: 12px; color: #7f8c8d; margin-top: 2px;">${item.desc}</div>
+            <div style="font-weight: 600; font-size: 13.5px; color: #2c3e50;">${item.text}</div>
+            <div style="font-size: 11.5px; color: #7f8c8d; margin-top: 2px; line-height: 1.4;">${item.desc}</div>
           </div>
         </label>
       `;
@@ -1171,8 +1465,16 @@ document.addEventListener('DOMContentLoaded', async () => {
       
       checklistItemsEl.appendChild(itemEl);
     });
-    
+
     updateChecklistProgress();
+  }
+
+  // 체크리스트 아이템 동적 렌더링 메인 함수
+  function renderChecklist() {
+    // 1. 상황 질문을 그리고
+    renderChecklistQuestions();
+    // 2. 바뀐 질문 상태에 의거해 최종 서류 그리기
+    renderChecklistItemsOnly();
   }
 
   function updateChecklistProgress() {
@@ -1194,8 +1496,10 @@ document.addEventListener('DOMContentLoaded', async () => {
 
   function openAiBatchScanModal() {
     aiCurrentStep = 0;
-    if (checklistData[activeTab]) {
-      aiTotalSteps = checklistData[activeTab].length;
+    const config = checklistConfig[activeTab];
+    if (config) {
+      const items = config.getDocuments(checkedAnswers);
+      aiTotalSteps = items.length;
     } else {
       aiTotalSteps = 0;
     }
@@ -1219,8 +1523,9 @@ document.addEventListener('DOMContentLoaded', async () => {
       return;
     }
 
-    const items = checklistData[activeTab];
-    if (!items) return;
+    const config = checklistConfig[activeTab];
+    if (!config) return;
+    const items = config.getDocuments(checkedAnswers);
     const currentItem = items[aiCurrentStep];
 
     // 스캔 안내 타이틀 갱신
@@ -1268,6 +1573,27 @@ document.addEventListener('DOMContentLoaded', async () => {
     });
   }
 
+  // 개별 서류 단계 건너뛰기 (넘기기) 버튼 클릭 리스너 바인딩
+  const aiSkipStepBtn = document.getElementById('ai-skip-step-btn');
+  if (aiSkipStepBtn) {
+    aiSkipStepBtn.addEventListener('click', () => {
+      playNotificationSound('click');
+      
+      // 현재 단계를 '미진단' 처리하여 결과 배열에 누적
+      aiStepResults.push({
+        readiness: '0%',
+        suitability: '미진단',
+        guide: '서류 촬영 및 AI 진단 단계가 건너뛰어졌습니다.',
+        isSuccess: false,
+        isSkipped: true
+      });
+
+      // 다음 단계로 전환
+      aiCurrentStep++;
+      loadScanStep();
+    });
+  }
+
   function showBatchResults() {
     if (aiScanStepCamera) aiScanStepCamera.classList.add('hidden');
     if (aiResultContainer) aiResultContainer.classList.remove('hidden');
@@ -1276,22 +1602,36 @@ document.addEventListener('DOMContentLoaded', async () => {
       aiBatchResultList.innerHTML = '';
     }
 
-    const items = checklistData[activeTab];
-    if (!items) return;
+    const config = checklistConfig[activeTab];
+    if (!config) return;
+    const items = config.getDocuments(checkedAnswers);
     let fitCount = 0;
+    let skippedCount = 0;
 
-    aiStepResults.forEach((res, index) => {
-      const item = items[index];
-      if (!item) return;
+    items.forEach((item, index) => {
+      const res = aiStepResults[index] || {
+        readiness: '0%',
+        suitability: '미진단',
+        guide: '서류 촬영 및 AI 진단 단계가 생략(건너뜀)되었습니다.',
+        isSuccess: false,
+        isSkipped: true
+      };
+
+      if (res.isSkipped) {
+        skippedCount++;
+      }
+
       const resultItemEl = document.createElement('div');
       resultItemEl.className = 'ai-report-item';
       resultItemEl.style.borderBottom = '1px solid #f1f2f6';
       resultItemEl.style.padding = '12px 0';
 
-      const suitabilityStyle = res.isSuccess ? 'background-color:#e3fcef; color:#00a389;' : 'background-color:#ffebe6; color:#de350b;';
-
-      if (res.isSuccess) {
-        fitCount++;
+      let suitabilityStyle = 'background-color:#f1f2f6; color:#7f8c8d;';
+      if (!res.isSkipped) {
+        suitabilityStyle = res.isSuccess ? 'background-color:#e3fcef; color:#00a389;' : 'background-color:#ffebe6; color:#de350b;';
+        if (res.isSuccess) {
+          fitCount++;
+        }
       }
 
       resultItemEl.innerHTML = `
@@ -1309,25 +1649,39 @@ document.addEventListener('DOMContentLoaded', async () => {
     const isAllPassed = fitCount === totalCount;
     
     if (aiResultStatusTitle) {
-      aiResultStatusTitle.textContent = isAllPassed ? '서류 진단 완료 (적합)' : '서류 보완 필요 (부적합)';
-      aiResultStatusTitle.style.color = isAllPassed ? '#00a389' : '#de350b';
+      if (isAllPassed) {
+        aiResultStatusTitle.textContent = '서류 진단 완료 (적합)';
+        aiResultStatusTitle.style.color = '#00a389';
+      } else if (skippedCount > 0) {
+        aiResultStatusTitle.textContent = '일부 서류 진단 보류 (미진단 포함)';
+        aiResultStatusTitle.style.color = '#f39c12';
+      } else {
+        aiResultStatusTitle.textContent = '서류 보완 필요 (부적합)';
+        aiResultStatusTitle.style.color = '#de350b';
+      }
     }
 
     if (aiBatchSummaryText) {
-      aiBatchSummaryText.textContent = `총 ${totalCount}개 서류 중 ${fitCount}개 적합`;
+      aiBatchSummaryText.textContent = `총 ${totalCount}개 중 [적합 ${fitCount}개] [미진단 ${skippedCount}개]`;
     }
 
     if (aiBatchSummaryPct) {
       const pct = Math.round((fitCount / totalCount) * 100);
-      aiBatchSummaryPct.textContent = `${pct}%`;
+      aiBatchSummaryPct.textContent = `준비율 ${pct}%`;
     }
 
     if (aiConfirmBtn) {
-      aiConfirmBtn.addEventListener('click', () => {
+      // 결과 적용 버튼 클릭 시, 이전 리스너 누적 방지를 위해 클론 기법 적용
+      const newConfirmBtn = aiConfirmBtn.cloneNode(true);
+      aiConfirmBtn.parentNode.replaceChild(newConfirmBtn, aiConfirmBtn);
+      
+      newConfirmBtn.addEventListener('click', () => {
         items.forEach((item, idx) => {
           const res = aiStepResults[idx];
-          if (res && res.isSuccess) {
+          if (res && res.isSuccess && !res.isSkipped) {
             checkedState[activeTab][idx] = true;
+          } else {
+            checkedState[activeTab][idx] = false;
           }
         });
         renderChecklist();
@@ -2206,272 +2560,8 @@ document.addEventListener('DOMContentLoaded', async () => {
   }
 
   // ==========================================================================
-  // --- 11-B. 행원 정보 단말 (Staff View) 실시간 제어 로직 ---
+  // --- 11-B. 행원 정보 단말 (Staff View) 실시간 제어 로직 (삭제 처리) ---
   // ==========================================================================
-  const gotoStaffModeBtn = document.getElementById('goto-staff-mode-btn');
-  const exitStaffModeBtn = document.getElementById('exit-staff-mode-btn');
-  const staffTerminalModal = document.getElementById('staff-terminal-modal');
-  const staffVoucherList = document.getElementById('staff-voucher-list');
-  
-  const staffNoSelection = document.getElementById('staff-no-selection');
-  const staffDetailContent = document.getElementById('staff-detail-content');
-  
-  // 상세 데이터 바인딩 엘리먼트들
-  const sDetailId = document.getElementById('s-detail-id');
-  const sDetailStatusSelect = document.getElementById('s-detail-status-select');
-  const sDetailImageBox = document.getElementById('s-detail-image-box');
-  const sDetailModifiedBadge = document.getElementById('s-detail-modified-badge');
-  const sDetailTime = document.getElementById('s-detail-time');
-  const sDetailStandardBox = document.getElementById('s-detail-standard-box');
-  const sDetailMultiBox = document.getElementById('s-detail-multi-box');
-  const sDetailConfirmBtn = document.getElementById('s-detail-confirm-btn');
-  const sDetailRejectBtn = document.getElementById('s-detail-reject-btn');
-  const staffMultiImageTabs = document.getElementById('staff-multi-image-tabs');
-
-  let activeStaffVoucher = null; // 현재 조회 중인 전표
-  let activeStaffPreviewImageIndex = 0; // 대량 이체일 때 행원이 조회 중인 전표 썸네일 인덱스
-
-  // 행원 단말 진입
-  if (gotoStaffModeBtn && staffTerminalModal) {
-    gotoStaffModeBtn.addEventListener('click', () => {
-      staffTerminalModal.classList.remove('hidden');
-      renderStaffVoucherList();
-      playNotificationSound('beep');
-      showToast('행원 접수 단말 모드로 진입했습니다.');
-    });
-  }
-
-  // 행원 단말 이탈 (로그아웃)
-  if (exitStaffModeBtn && staffTerminalModal) {
-    exitStaffModeBtn.addEventListener('click', () => {
-      staffTerminalModal.classList.add('hidden');
-      playNotificationSound('beep');
-      showToast('고객 모드로 복귀했습니다.');
-    });
-  }
-
-  // 행원 접수 리스트 렌더링
-  function renderStaffVoucherList() {
-    if (!staffVoucherList) return;
-    staffVoucherList.innerHTML = '';
-    
-    // 뱃지 건수 업데이트
-    const badge = document.getElementById('staff-incoming-badge');
-    if (badge) badge.textContent = `${window.staffVoucherDb.length}건`;
-
-    const typeNames = {
-      SINGLE_TRANSFER: '단일 송금',
-      MULTI_TRANSFER: '대량 송금',
-      DEPOSIT: '입금 전표',
-      WITHDRAW: '출금 전표'
-    };
-
-    const statusBadges = {
-      WAITING: '<span class="s-badge s-badge-waiting">확인대기</span>',
-      CHECKING: '<span class="s-badge s-badge-checking">확인중</span>',
-      COMPLETED: '<span class="s-badge s-badge-completed">처리완료</span>',
-      REJECTED: '<span class="s-badge s-badge-rejected">보완필요</span>'
-    };
-
-    window.staffVoucherDb.forEach(voc => {
-      const card = document.createElement('div');
-      card.className = 'staff-voucher-card';
-      if (activeStaffVoucher && activeStaffVoucher.id === voc.id) {
-        card.classList.add('selected');
-      }
-      
-      let amountText = '';
-      if (voc.type === 'MULTI_TRANSFER') {
-        amountText = `${voc.ocrData.totalCount}건 / ${voc.ocrData.totalAmount.toLocaleString()}원`;
-      } else {
-        amountText = `${voc.ocrData.amount.toLocaleString()}원`;
-      }
-
-      card.innerHTML = `
-        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:6px;">
-          <strong style="font-size:12.5px; color:#2c3e50;">${typeNames[voc.type]}</strong>
-          ${statusBadges[voc.status]}
-        </div>
-        <div style="font-size:11px; color:#7f8c8d; display:flex; justify-content:space-between;">
-          <span>접수번호: ${voc.id}</span>
-          <span>${voc.createdAt.split(' ')[1]}</span>
-        </div>
-        <div style="font-size:11.5px; font-weight:700; color:#1abc9c; margin-top:4px; text-align:right;">
-          ${amountText}
-        </div>
-      `;
-
-      card.addEventListener('click', () => {
-        activeStaffVoucher = voc;
-        renderStaffVoucherList(); // 선택 표시를 위해 리스트 다시 그림
-        loadStaffVoucherDetail(voc);
-        playNotificationSound('beep');
-      });
-
-      staffVoucherList.appendChild(card);
-    });
-  }
-
-  // 행원 상세 뷰 바인딩
-  function loadStaffVoucherDetail(voc) {
-    if (!staffNoSelection || !staffDetailContent) return;
-    staffNoSelection.classList.add('hidden');
-    staffDetailContent.classList.remove('hidden');
-
-    sDetailId.textContent = voc.id;
-    sDetailStatusSelect.value = voc.status;
-    sDetailTime.textContent = `접수 시간: ${voc.createdAt}`;
-
-    // 모의 이미지 주입
-    if (sDetailImageBox) {
-      sDetailImageBox.style.background = voc.imageUrl;
-      sDetailImageBox.style.borderRadius = "6px";
-      sDetailImageBox.innerHTML = `
-        <div style="padding:10px; color:#333; height:100%; display:flex; flex-direction:column; justify-content:space-between; box-sizing:border-box;">
-          <div style="font-weight:700; font-size:11px; border-bottom:1px solid rgba(0,0,0,0.1); padding-bottom:4px;">접수 이미지 아카이빙</div>
-          <div style="font-size:11px; font-weight:700;">
-            [전표종류] ${voc.type}<br>
-            [제출고객] ${voc.customer.name}
-          </div>
-          <div style="font-size:8.5px; color:#7f8c8d; text-align:right;">iM뱅크 전자 서류고 보관용</div>
-        </div>
-      `;
-    }
-
-    // 고객 수정 여부 대조분석 판독
-    let isModified = false;
-    let modifiedFieldsList = [];
-    
-    if (voc.type === 'MULTI_TRANSFER') {
-      // 대량 송금 대조
-      const orig = voc.ocrOriginalData.recipients;
-      const draft = voc.ocrData.recipients;
-      if (orig.length !== draft.length) {
-        isModified = true;
-        modifiedFieldsList.push('수취 건수 변경');
-      } else {
-        for (let i = 0; i < orig.length; i++) {
-          if (orig[i].bank !== draft[i].bank || orig[i].account !== draft[i].account || orig[i].name !== draft[i].name || orig[i].amount !== draft[i].amount) {
-            isModified = true;
-            modifiedFieldsList.push(`수취인 ${i+1} 정보 수정됨`);
-          }
-        }
-      }
-    } else {
-      // 표준 대조
-      Object.keys(voc.ocrOriginalData).forEach(k => {
-        if (voc.ocrOriginalData[k] !== voc.ocrData[k]) {
-          isModified = true;
-          modifiedFieldsList.push(k);
-        }
-      });
-    }
-
-    if (sDetailModifiedBadge) {
-      if (isModified) {
-        sDetailModifiedBadge.className = 'info-alert-box';
-        sDetailModifiedBadge.style.backgroundColor = '#FFF9E6';
-        sDetailModifiedBadge.style.border = '1px solid #FFEAA7';
-        sDetailModifiedBadge.style.color = '#B37D00';
-        sDetailModifiedBadge.innerHTML = `<i class="fa-solid fa-user-pen"></i> <strong>고객 수정 정보 감지:</strong> 수기 스캔 OCR 결과 대비 고객이 직접 보정하여 제출한 항목이 존재합니다. [수정 항목: ${modifiedFieldsList.join(', ')}]`;
-      } else {
-        sDetailModifiedBadge.className = 'info-alert-box';
-        sDetailModifiedBadge.style.backgroundColor = '#EBF8F6';
-        sDetailModifiedBadge.style.border = '1px solid rgba(0,186,174,0.15)';
-        sDetailModifiedBadge.style.color = 'var(--brand-mint-dark)';
-        sDetailModifiedBadge.innerHTML = `<i class="fa-solid fa-circle-check"></i> <strong>수정 내역 없음:</strong> 고객이 OCR 판독 결과 원본 그대로 임시 제출을 완료했습니다.`;
-      }
-    }
-
-    // 폼 렌더링
-    sDetailStandardBox.classList.add('hidden');
-    sDetailMultiBox.classList.add('hidden');
-
-    if (voc.type === 'MULTI_TRANSFER') {
-      sDetailMultiBox.classList.remove('hidden');
-      document.getElementById('s-multi-total-count').textContent = `총 ${voc.ocrData.totalCount}건`;
-      document.getElementById('s-multi-total-amount').textContent = `총 금액 ${voc.ocrData.totalAmount.toLocaleString()}원`;
-
-      const tbody = document.getElementById('s-multi-table-body');
-      if (tbody) {
-        tbody.innerHTML = '';
-        voc.ocrData.recipients.forEach((r, idx) => {
-          const tr = document.createElement('tr');
-          tr.style.borderBottom = "1px solid var(--light-gray)";
-          tr.innerHTML = `
-            <td style="padding:6px; font-weight:700;">${idx+1}</td>
-            <td style="padding:6px;">${r.bank}</td>
-            <td style="padding:6px; font-weight:700; font-family:monospace;">${r.account}</td>
-            <td style="padding:6px;">${r.name}</td>
-            <td style="padding:6px; text-align:right; font-weight:800;">${r.amount.toLocaleString()}원</td>
-          `;
-          tbody.appendChild(tr);
-        });
-      }
-    } else {
-      sDetailStandardBox.classList.remove('hidden');
-      sDetailStandardBox.innerHTML = '';
-
-      const labels = {
-        withdrawalAccount: "출금계좌번호",
-        bank: "수취은행",
-        recipientAccount: "수취계좌번호",
-        recipientName: "예금주명",
-        amount: "송금금액",
-        sender: "보내는 사람",
-        purpose: "송금 목적",
-        depositAccount: "입금계좌번호",
-        depositor: "입금인",
-        cashOrCheck: "현금/수표 구분"
-      };
-
-      Object.keys(voc.ocrData).forEach(k => {
-        const val = voc.ocrData[k];
-        const row = document.createElement('div');
-        row.style.display = "flex";
-        row.style.justifyContent = "space-between";
-        row.style.borderBottom = "1px solid #f1f2f6";
-        row.style.padding = "8px 0";
-        row.style.fontSize = "12px";
-
-        // 이 필드가 수정되었는지 여부
-        const isFieldModified = voc.ocrOriginalData[k] !== val;
-        const modifiedStyle = isFieldModified ? 'color:#d63031; font-weight:800; background-color:#fff2f4; padding:2px 6px; border-radius:4px;' : 'font-weight:700;';
-
-        row.innerHTML = `
-          <span style="color:#7f8c8d;">${labels[k] || k}</span>
-          <span style="${modifiedStyle}">${k === 'amount' ? val.toLocaleString() + '원' : val}</span>
-        `;
-        sDetailStandardBox.appendChild(row);
-      });
-    }
-  }
-
-  // 처리상태 드롭다운 강제 변경 연동
-  if (sDetailStatusSelect) {
-    sDetailStatusSelect.addEventListener('change', (e) => {
-      if (activeStaffVoucher) {
-        activeStaffVoucher.status = e.target.value;
-        activeStaffVoucher.updatedAt = new Date().toISOString().replace('T', ' ').substring(0, 16);
-        renderStaffVoucherList();
-        showToast(`전표 상태가 '${e.target.value}'(으)로 갱신되었습니다.`);
-      }
-    });
-  }
-
-  // [확인 완료] 버튼 클릭 시
-  if (sDetailConfirmBtn) {
-    sDetailConfirmBtn.addEventListener('click', () => {
-      if (activeStaffVoucher) {
-        activeStaffVoucher.status = 'COMPLETED';
-        activeStaffVoucher.updatedAt = new Date().toISOString().replace('T', ' ').substring(0, 16);
-        if (sDetailStatusSelect) sDetailStatusSelect.value = 'COMPLETED';
-        renderStaffVoucherList();
-        playNotificationSound('double');
-        showToast('전표 처리가 최종 완료(COMPLETED) 승인되었습니다.');
-      }
-    });
-  }
 
   // ==========================================================================
   // --- 12. 금융 상품 성향 테스트 제어 ---
@@ -2610,12 +2700,79 @@ document.addEventListener('DOMContentLoaded', async () => {
           desc: "대구·경북의 주요 명소를 찾아가 위치인증(GPS) 미션을 격파하는 액티브한 저축을 즐기며, 최고 연 1.50%p에 달하는 챌린저 우대금리를 쟁취해내는 미션 정복러입니다."
         }
       }
+    },
+
+    invest: {
+      title: "투자 성향 진단",
+      icon: "fa-solid fa-chart-line",
+      questions: [
+        {
+          q: "Q1. 본인의 금융 투자 상품(주식, 펀드 등)에 대한 지식 및 경험 수준은?",
+          options: [
+            { text: "주식, 채권, 파생상품 등 투자 상품의 원리와 위험성에 대해 풍부한 이해를 갖춤", score: { aggressive: 3, safe: 0 } },
+            { text: "펀드나 예적금 위주로 투자해 봤으며 기본적인 금융 상품 구조는 이해함", score: { aggressive: 1, safe: 1 } },
+            { text: "투자 금융 상품에 대한 지식이 거의 없으며 예적금 이외에는 거래한 적이 없음", score: { aggressive: 0, safe: 3 } }
+          ]
+        },
+        {
+          q: "Q2. 투자한 자산의 평가 금액이 시장 변동성으로 인해 하루 만에 -10% 급락했을 때 당신의 반응은?",
+          options: [
+            { text: "시장의 일시적인 변동이므로 무덤덤하게 버티거나 저점 추가 매수 기회로 활용", score: { aggressive: 3, safe: 0 } },
+            { text: "불안하긴 하지만 원금 손실을 확정 짓지 않고 상황을 지켜보며 대기함", score: { aggressive: 1, safe: 1 } },
+            { text: "밤잠을 설칠 정도로 패닉에 빠져 추가 손실을 막기 위해 즉시 전액 매도", score: { aggressive: 0, safe: 3 } }
+          ]
+        },
+        {
+          q: "Q3. 기대 가능한 투자 수익률과 원금 손실의 위험도 중 어떤 쪽에 집중하시나요?",
+          options: [
+            { text: "원금 손실 위험이 있더라도 시중 예적금보다 2~3배 이상 높은 공격적인 수익 추구", score: { aggressive: 3, safe: 0 } },
+            { text: "안정성과 고수익을 균형 있게 고려하여 물가상승률 이상의 중위험·중수익 선호", score: { aggressive: 1, safe: 1 } },
+            { text: "단 0.1%의 원금 손실 가능성도 허용하지 않으며 예금자 보호가 가능한 자산 보전이 최우선", score: { aggressive: 0, safe: 3 } }
+          ]
+        },
+        {
+          q: "Q4. 이번 투자에 활용하고자 하는 여유 자금의 예상 예치 및 회수 기간은?",
+          options: [
+            { text: "3년 이상 길게 묶어두고 중간 변동성을 극복하며 장기 복리 효과를 노릴 자금", score: { aggressive: 3, safe: 0 } },
+            { text: "1년 내외의 적정 기간 동안 투자하여 상황에 따라 현금화가 필요할 수도 있는 자금", score: { aggressive: 1, safe: 1 } },
+            { text: "6개월 미만 단기로 굴려야 하며 필요 시 언제든 바로 인출해 사용해야 하는 자금", score: { aggressive: 0, safe: 3 } }
+          ]
+        },
+        {
+          q: "Q5. 본인의 소득 수준 및 자산 현황 대비, 이번 투자 자금의 성격과 비중은?",
+          options: [
+            { text: "전체 자산 중 일부 여유 소득으로 투자 실패 시에도 생계나 미래 계획에 영향이 없음", score: { aggressive: 3, safe: 0 } },
+            { text: "일정 기간 뒤 전세금, 학자금 등 용도가 정해져 있어 절대 잃어서는 안 되는 성격의 자금", score: { aggressive: 0, safe: 3 } }
+          ]
+        }
+      ],
+      results: {
+        safe: {
+          title: "원금 보전 최우선 안정형",
+          desc: "투자 원금의 단 1% 손실 가능성도 허용하지 않으며, 기대 수익률이 낮더라도 시중 금리 대비 안정적인 국공채 펀드 등 자산의 절대 안전 보전을 최우선 가치로 여기는 현명한 자산가입니다."
+        },
+        aggressive: {
+          title: "수익 추구 적극 공격투자형",
+          desc: "시장의 격렬한 단기 변동성을 기꺼이 감내할 준비가 되어 있으며, 글로벌 혁신 AI 기술 기업 주식 등 초과 고수익을 기대할 수 있는 액티브 성장형 상품에 비중을 과감히 실어 자산을 증식시키는 투자 모험가입니다."
+        }
+      }
     }
   };
 
   let activeCategory = 'card';
   let currentQuestionIndex = 0;
   let userScores = {};
+
+  // 금융 성향 테스트 상태 초기화 함수 (Intro 화면으로 복원)
+  window.resetFinancialQuiz = function() {
+    if (quizCardBox) quizCardBox.classList.add('hidden');
+    if (quizIntroBox) quizIntroBox.classList.remove('hidden');
+    if (quizResultBox) quizResultBox.classList.add('hidden');
+    
+    currentQuestionIndex = 0;
+    userScores = {};
+    activeCategory = 'card';
+  };
 
   // 나의 맞춤 금융 성향 테스트 아코디언 토글 제어 이벤트 리스너 바인딩
   if (gameAccordionHeader && gameAccordionContent && gameAccordionSection) {
@@ -2730,54 +2887,66 @@ document.addEventListener('DOMContentLoaded', async () => {
     if (resultTypeName) resultTypeName.textContent = result.title;
     if (resultTypeDesc) resultTypeDesc.textContent = result.desc;
 
-    // 동적 상품 카드 생성 영역
+    // 동적 상품 카드 생성 영역 (투자 성향의 경우 설명 의무 보호를 위해 상품 추천을 숨김)
+    const recTitle = document.querySelector('#quiz-result-box .recommended-title');
     const container = document.getElementById('recommended-products-container');
-    if (container) {
-      container.innerHTML = '';
-      
-      // Filter products matching winner key
-      const matchedProducts = allProducts.filter(p => p.matchTypes && p.matchTypes.includes(winner)).slice(0, 1);
-      
-      console.log(`[Quiz Result Debug] Winner: ${winner}, Matched Products Count: ${matchedProducts.length}`);
-
-      matchedProducts.forEach(prod => {
-        const card = document.createElement('div');
-        card.className = 'product-card';
+    
+    if (activeCategory === 'invest') {
+      if (recTitle) recTitle.style.display = 'none';
+      if (container) {
+        container.style.display = 'none';
+        container.innerHTML = '';
+      }
+    } else {
+      if (recTitle) recTitle.style.display = 'block';
+      if (container) {
+        container.style.display = 'block';
+        container.innerHTML = '';
         
-        // 클릭 시 상품몰 새 탭 이동
-        card.addEventListener('click', () => {
-          window.open('https://www.imbank.co.kr/com_ebz_fpm_main.act', '_blank');
+        // Filter products matching winner key
+        const matchedProducts = allProducts.filter(p => p.matchTypes && p.matchTypes.includes(winner)).slice(0, 1);
+        
+        console.log(`[Quiz Result Debug] Winner: ${winner}, Matched Products Count: ${matchedProducts.length}`);
+
+        matchedProducts.forEach(prod => {
+          const card = document.createElement('div');
+          card.className = 'product-card';
+          
+          // 클릭 시 상품몰 새 탭 이동
+          card.addEventListener('click', () => {
+            window.open('https://www.imbank.co.kr/com_ebz_fpm_main.act', '_blank');
+          });
+
+          // Left visual element
+          let visualHtml = '';
+          if (prod.category === '카드' && prod.image) {
+            visualHtml = `<img src="${prod.image}" class="product-card-image" alt="${prod.name}">`;
+          } else {
+            visualHtml = `
+              <div class="product-icon-box">
+                 <i class="${prod.icon || 'fa-solid fa-piggy-bank'}"></i>
+              </div>`;
+          }
+
+          let rateHtml = '';
+          if (prod.rate && prod.rate !== '-') {
+            rateHtml = `<span style="font-size: 12px; color: var(--brand-mint-dark); font-weight: bold; margin-bottom: 2px;">${prod.rate}</span>`;
+          }
+
+          card.innerHTML = `
+            ${visualHtml}
+            <div class="product-info">
+              <span class="product-tag">${prod.category} 추천</span>
+              <span class="product-name">${prod.name}</span>
+              ${rateHtml}
+              <span class="product-benefit">${prod.benefit}</span>
+            </div>
+            <i class="fa-solid fa-chevron-right product-arrow"></i>
+          `;
+          
+          container.appendChild(card);
         });
-
-        // Left visual element
-        let visualHtml = '';
-        if (prod.category === '카드' && prod.image) {
-          visualHtml = `<img src="${prod.image}" class="product-card-image" alt="${prod.name}">`;
-        } else {
-          visualHtml = `
-            <div class="product-icon-box">
-               <i class="${prod.icon || 'fa-solid fa-piggy-bank'}"></i>
-            </div>`;
-        }
-
-        let rateHtml = '';
-        if (prod.rate && prod.rate !== '-') {
-          rateHtml = `<span style="font-size: 12px; color: var(--brand-mint-dark); font-weight: bold; margin-bottom: 2px;">${prod.rate}</span>`;
-        }
-
-        card.innerHTML = `
-          ${visualHtml}
-          <div class="product-info">
-            <span class="product-tag">${prod.category} 추천</span>
-            <span class="product-name">${prod.name}</span>
-            ${rateHtml}
-            <span class="product-benefit">${prod.benefit}</span>
-          </div>
-          <i class="fa-solid fa-chevron-right product-arrow"></i>
-        `;
-        
-        container.appendChild(card);
-      });
+      }
     }
 
     playNotificationSound('double');
@@ -3052,6 +3221,84 @@ document.addEventListener('DOMContentLoaded', async () => {
     });
   }
 
+  // 쉬운 모드 전용 대형 송금전표 버튼 열기 연동
+  const easyScanBtn = document.getElementById('btn-easy-scan');
+  if (easyScanBtn) {
+    easyScanBtn.addEventListener('click', () => {
+      openModalWithConsentCheck('transfer-voucher-modal');
+      playNotificationSound('beep');
+    });
+  }
+
+  // 쉬운 모드 전용 미리작성 버튼 열기 연동
+  const easyPreWritingBtn = document.getElementById('btn-easy-pre-writing');
+  if (easyPreWritingBtn) {
+    easyPreWritingBtn.addEventListener('click', () => {
+      openModalWithConsentCheck('pre-writing-modal');
+      playNotificationSound('beep');
+    });
+  }
+
+  // 쉬운 모드 전용 서류체크 버튼 열기 연동
+  const easyChecklistBtn = document.getElementById('btn-easy-checklist');
+  if (easyChecklistBtn && checklistModal) {
+    easyChecklistBtn.addEventListener('click', () => {
+      checklistModal.classList.remove('hidden');
+      renderChecklist(); // 진척도 및 체크리스트 강제 렌더링
+      playNotificationSound('beep');
+    });
+  }
+
+  // 쉬운 모드 전용 금융성향 테스트 버튼 열기 연동
+  const easyFinancialTestBtn = document.getElementById('btn-easy-financial-test');
+  if (easyFinancialTestBtn) {
+    easyFinancialTestBtn.addEventListener('click', () => {
+      if (typeof resetFinancialQuiz === 'function') {
+        resetFinancialQuiz();
+      }
+      openModalWithConsentCheck('financial-test-modal');
+      playNotificationSound('beep');
+    });
+  }
+
+  // --- 쉬운 모드 (Easy Mode) 토글 시스템 제어 ---
+  const easyModeToggleBtn = document.getElementById('easy-mode-toggle-btn');
+  const easyModeLayoutContainer = document.getElementById('easy-mode-layout-container');
+  const quickMenuGrid = document.querySelector('.quick-menu-grid');
+  
+  if (easyModeToggleBtn) {
+    easyModeToggleBtn.addEventListener('click', () => {
+      const isEasyActive = easyModeLayoutContainer && !easyModeLayoutContainer.classList.contains('hidden');
+      
+      if (isEasyActive) {
+        // 쉬운 모드 끄기 처리
+        if (easyModeLayoutContainer) easyModeLayoutContainer.classList.add('hidden');
+        if (quickMenuGrid) quickMenuGrid.classList.remove('hidden'); // 기존 2x2 그리드 복원
+        
+        // 버튼 톤앤무드 복원
+        easyModeToggleBtn.style.backgroundColor = 'var(--brand-mint-light)';
+        easyModeToggleBtn.style.color = 'var(--brand-mint-dark)';
+        easyModeToggleBtn.style.border = '2px solid var(--brand-mint)';
+        easyModeToggleBtn.innerHTML = '<i class="fa-solid fa-magnifying-glass-plus"></i> 쉬운 모드 켜기';
+        
+        showToast('쉬운 모드가 해제되었습니다.');
+      } else {
+        // 쉬운 모드 켜기 처리
+        if (easyModeLayoutContainer) easyModeLayoutContainer.classList.remove('hidden');
+        if (quickMenuGrid) quickMenuGrid.classList.add('hidden'); // 기존 2x2 그리드 숨기기
+        
+        // 버튼 톤앤무드 활성화 강조 (차콜 톤으로 켜짐 표시)
+        easyModeToggleBtn.style.backgroundColor = '#2c3e50';
+        easyModeToggleBtn.style.color = '#ffffff';
+        easyModeToggleBtn.style.border = '2px solid #2c3e50';
+        easyModeToggleBtn.innerHTML = '<i class="fa-solid fa-magnifying-glass-minus"></i> 쉬운 모드 끄기';
+        
+        showToast('쉬운 모드가 활성화되었습니다. 글씨와 버튼이 시니어 전용으로 커집니다.');
+      }
+      playNotificationSound('beep');
+    });
+  }
+
   // 체크리스트 모달 열기
   if (quickChecklistBtn && checklistModal) {
     quickChecklistBtn.addEventListener('click', () => {
@@ -3064,6 +3311,10 @@ document.addEventListener('DOMContentLoaded', async () => {
   // 금융성향 테스트 모달 열기
   if (quickFinancialTestBtn) {
     quickFinancialTestBtn.addEventListener('click', () => {
+      // 모달 진입 시 이전에 풀고 있던 데이터 찌꺼기 완벽하게 초기화 리셋!
+      if (typeof resetFinancialQuiz === 'function') {
+        resetFinancialQuiz();
+      }
       openModalWithConsentCheck('financial-test-modal');
       playNotificationSound('beep');
     });
@@ -3077,6 +3328,11 @@ document.addEventListener('DOMContentLoaded', async () => {
         if (modalEl.id === 'transfer-voucher-modal') {
           if (typeof gotoScanStep === 'function') {
             gotoScanStep(1);
+          }
+        } else if (modalEl.id === 'financial-test-modal') {
+          // 금융성향 테스트 모달을 X 나 배경클릭으로 닫을 때도 즉시 상태 초기화 리셋!
+          if (typeof resetFinancialQuiz === 'function') {
+            resetFinancialQuiz();
           }
         }
         playNotificationSound('beep');
@@ -3097,9 +3353,6 @@ document.addEventListener('DOMContentLoaded', async () => {
   setupModalClose(closeChecklistBtn, checklistModal);
   setupModalClose(closeFinancialTestBtn, financialTestModal);
   setupModalClose(closeTransferVoucherBtn, transferVoucherModal);
-
-  const closeStaffBtn = document.getElementById('exit-staff-mode-btn');
-  setupModalClose(closeStaffBtn, staffTerminalModal);
 
   // --- 내가 보낸 전표 목록 조회 및 상세 팝업 제어 ---
   const sentVouchersList = document.getElementById('sent-vouchers-list');
@@ -3221,6 +3474,107 @@ document.addEventListener('DOMContentLoaded', async () => {
         closeDetail();
       }
     });
+  }
+
+  // --- 체크리스트 업무 통합 검색 및 추천 선택지 드롭다운 제어 ---
+  const checklistSearchInput = document.getElementById('checklist-search-input');
+  const checklistDropdownResults = document.getElementById('checklist-dropdown-results');
+  const checklistOptItems = document.querySelectorAll('.checklist-opt-item');
+
+  if (checklistSearchInput && checklistDropdownResults) {
+    // 1. 인풋 클릭 / 포커스 시 드롭다운 펼침
+    const showDropdown = () => {
+      checklistDropdownResults.style.display = 'block';
+      filterResults();
+    };
+
+    checklistSearchInput.addEventListener('focus', showDropdown);
+    checklistSearchInput.addEventListener('click', (e) => {
+      e.stopPropagation();
+      showDropdown();
+    });
+
+    // 2. 키 입력 시 실시간 검색어 기반 필터링
+    const filterResults = () => {
+      const query = checklistSearchInput.value.trim().toLowerCase();
+      checklistOptItems.forEach(item => {
+        const text = item.textContent.toLowerCase();
+        if (query === '' || text.includes(query)) {
+          item.style.display = 'block';
+        } else {
+          item.style.display = 'none';
+        }
+      });
+    };
+
+    checklistSearchInput.addEventListener('input', filterResults);
+
+    // 3. 선택지 클릭 시 해당 탭 클릭 강제 트리거 및 렌더링 동기화
+    checklistOptItems.forEach(item => {
+      item.addEventListener('click', (e) => {
+        e.stopPropagation();
+        const tabValue = item.getAttribute('data-val');
+        const tabName = item.textContent;
+
+        if (tabValue === 'none') {
+          checklistSearchInput.value = '';
+          // 선택안함 시 상황 질문 컨테이너도 함께 강제 숨김 및 비움
+          if (checklistQuestionsContainer) {
+            checklistQuestionsContainer.style.display = 'none';
+            checklistQuestionsContainer.innerHTML = '';
+          }
+          // 선택안함 시 체크리스트 영역 비움
+          if (checklistItemsEl) {
+            checklistItemsEl.innerHTML = '<div style="font-size: 12px; color: var(--cool-gray); text-align: center; padding: 24px 0;">조회하실 업무명을 검색하여 선택해 주세요.</div>';
+          }
+          if (progressBarEl) progressBarEl.style.width = '0%';
+          if (progressPctEl) progressPctEl.textContent = '0%';
+        } else {
+          checklistSearchInput.value = tabName;
+          
+          // 업무 변경 진입 시, 이전에 이 업무에서 선택했던 모든 문진 답변과 서류 체크 이력을 원천 리셋!
+          const config = checklistConfig[tabValue];
+          if (config && config.questions) {
+            config.questions.forEach(q => {
+              delete checkedAnswers[q.id];
+            });
+          }
+          if (checkedState[tabValue]) {
+            checkedState[tabValue] = [];
+          }
+          
+          // 숨겨진 원래의 탭 버튼 강제 클릭! (기존 JS 연동 구조 고스란히 재활용)
+          const targetTabBtn = document.querySelector(`.tab-btn[data-tab="${tabValue}"]`);
+          if (targetTabBtn) {
+            targetTabBtn.click();
+          }
+        }
+
+        checklistDropdownResults.style.display = 'none';
+        playNotificationSound('beep');
+      });
+    });
+
+    // 4. 드롭다운 바깥 클릭 시 닫기
+    document.addEventListener('click', (e) => {
+      if (!e.target.closest('.checklist-search-wrapper')) {
+        checklistDropdownResults.style.display = 'none';
+      }
+    });
+
+    // 5. 체크리스트 모달이 처음 열릴 때 검색 입력창 및 추천 초기화
+    const checklistBtn = document.getElementById('btn-quick-checklist');
+    if (checklistBtn) {
+      checklistBtn.addEventListener('click', () => {
+        checklistSearchInput.value = '';
+        checklistDropdownResults.style.display = 'none';
+        if (checklistItemsEl) {
+          checklistItemsEl.innerHTML = '<div style="font-size: 12px; color: var(--cool-gray); text-align: center; padding: 24px 0;">조회하실 업무명을 검색하여 선택해 주세요.</div>';
+        }
+        if (progressBarEl) progressBarEl.style.width = '0%';
+        if (progressPctEl) progressPctEl.textContent = '0%';
+      });
+    }
   }
 
 });

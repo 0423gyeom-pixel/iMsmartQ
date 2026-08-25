@@ -17,17 +17,30 @@
 </head>
 <body>
   <div class="mobile-web-container">
-    <!-- 헤더 (1줄 압축형) -->
+    <!-- 헤더 (1줄 압축형 - 시간 안내문구 우측 상단 통합) -->
     <header class="app-header">
       <div class="web-title-bar" style="display: flex; justify-content: space-between; align-items: center; width: 100%;">
-        <h1 class="web-title-text"><i class="fa-solid fa-ticket-simple"></i> iM뱅크 SmartQ</h1>
-        <button id="goto-staff-mode-btn" style="background: rgba(0, 186, 174, 0.1); border: 1px solid var(--brand-mint); color: var(--brand-mint-dark); padding: 4px 10px; border-radius: 20px; font-size: 11px; font-weight: 700; cursor: pointer; display: flex; align-items: center; gap: 4px;">
-          <i class="fa-solid fa-desktop"></i> 행원 단말
-        </button>
-      </div>
-      <div class="header-bottom">
-        <div class="live-indicator"></div>
-        <span class="timestamp" id="live-timestamp">오후 3:37 기준</span>
+        <h1 class="web-title-text" style="display: flex; align-items: center; gap: 4px;">
+          <!-- iM뱅크 공식 M 심볼 고화질 원본 이미지 로드 (깨짐 방지) -->
+          <img src="im_logo.png" alt="iM" style="height: clamp(14px, 2.1cqh, 19px); width: auto; object-fit: contain; flex-shrink: 0; display: block; filter: saturate(1.05);" />
+          
+          <!-- iM Bank 로고타입 구성 (동일 폰트/굵기 및 자간 간격 축소) -->
+          <span class="logo-im-bank" style="font-family: 'Inter', sans-serif; font-weight: 800; color: #2c3e50; font-size: clamp(15px, 2.2cqh, 20px); letter-spacing: -0.6px;">iM Bank</span>
+          <span class="logo-smartq" style="font-family: 'Pretendard', sans-serif; font-weight: 800; color: var(--brand-mint-dark); font-size: clamp(14px, 2cqh, 18px); letter-spacing: -0.3px; margin-left: 6px; padding-left: 6px; border-left: 1.5px solid #dcdde1; display: inline-flex; align-items: center; white-space: nowrap;">SmartQ</span>
+        </h1>
+        
+        <!-- 우측 상단 영역: 쉬운 모드 버튼 + 시간 안내문구 -->
+        <div class="header-right-group" style="display: flex; align-items: center; gap: 10px; flex-shrink: 0;">
+          <!-- 쉬운 모드 토글 버튼 (강조색 톤앤무드 유지 및 굵은 글씨) -->
+          <button id="easy-mode-toggle-btn" style="background-color: var(--brand-mint-light); color: var(--brand-mint-dark); border: 2px solid var(--brand-mint); font-size: clamp(11px, 1.5cqh, 14px); font-weight: 800; padding: 4px 10px; border-radius: 6px; display: flex; align-items: center; gap: 4px; cursor: pointer; transition: all 0.2s; white-space: nowrap;">
+            <i class="fa-solid fa-magnifying-glass-plus"></i> 쉬운 모드 켜기
+          </button>
+          
+          <div class="header-bottom" style="margin: 0; display: flex; align-items: center; gap: 6px; flex-shrink: 0;">
+            <div class="live-indicator" style="margin: 0;"></div>
+            <span class="timestamp" id="live-timestamp" style="font-size: clamp(10px, 1.42cqh, 13.5px); color: var(--cool-gray); font-weight: 500; white-space: nowrap;">오후 3:37 기준</span>
+          </div>
+        </div>
       </div>
     </header>
 
@@ -82,6 +95,42 @@
           </button>
         </div>
       </section>
+
+      <!-- 쉬운 모드 전용 대형 버튼 레이아웃 컨테이너 (기본 숨김, 모바일 번호표 바로 아래 배치) -->
+      <div id="easy-mode-layout-container" class="hidden" style="width: 100%; display: flex; flex-direction: column; margin: 0 0 16px; box-sizing: border-box; gap: 12px;">
+        
+        <!-- 1. 송금전표 스캔 대형 버튼 -->
+        <button class="quick-card-btn" id="btn-easy-scan" style="width: 100%; display: flex; flex-direction: row; align-items: center; justify-content: space-between; gap: 16px; padding: clamp(14px, 2.3cqh, 20px) clamp(16px, 3cqw, 24px); background-color: #ffffff; border: 3px solid var(--brand-mint); border-radius: 16px; cursor: pointer; box-shadow: 0 4px 12px rgba(0,0,0,0.03); box-sizing: border-box; transition: all 0.2s;">
+          <img src="easy_voucher.png" alt="송금전표" style="width: clamp(110px, 15cqw, 140px); height: auto; object-fit: contain; flex-shrink: 0;" />
+          <span style="font-size: clamp(22px, 3cqh, 27px); font-weight: 900; color: var(--brand-mint-dark); text-align: right; line-height: 1.15; font-family: 'Pretendard', sans-serif; letter-spacing: -1px;">
+            송금전표<br>스캔
+          </span>
+        </button>
+
+        <!-- 2. 미리작성 / 서류체크 2분할 레이아웃 -->
+        <div style="display: flex; gap: 12px; width: 100%; box-sizing: border-box;">
+          <!-- 미리작성 -->
+          <button class="quick-card-btn" id="btn-easy-pre-writing" style="flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 10px; padding: clamp(14px, 2cqh, 18px) 10px; background-color: #ffffff; border: 3px solid var(--brand-mint); border-radius: 16px; cursor: pointer; box-shadow: 0 4px 12px rgba(0,0,0,0.03); box-sizing: border-box; transition: all 0.2s;">
+            <img src="easy_pencil.png" alt="미리작성" style="width: clamp(48px, 6.8cqh, 56px); height: clamp(48px, 6.8cqh, 56px); object-fit: contain;" />
+            <span style="font-size: clamp(15px, 2cqh, 18px); font-weight: 800; color: #1a1a1a; font-family: 'Pretendard', sans-serif;">미리작성</span>
+          </button>
+          
+          <!-- 서류체크 (기존 체크리스트 매핑) -->
+          <button class="quick-card-btn" id="btn-easy-checklist" style="flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 10px; padding: clamp(14px, 2cqh, 18px) 10px; background-color: #ffffff; border: 3px solid var(--brand-mint); border-radius: 16px; cursor: pointer; box-shadow: 0 4px 12px rgba(0,0,0,0.03); box-sizing: border-box; transition: all 0.2s;">
+            <img src="easy_check.png" alt="서류체크" style="width: clamp(48px, 6.8cqh, 56px); height: clamp(48px, 6.8cqh, 56px); object-fit: contain;" />
+            <span style="font-size: clamp(15px, 2cqh, 18px); font-weight: 800; color: #1a1a1a; font-family: 'Pretendard', sans-serif;">서류체크</span>
+          </button>
+        </div>
+
+        <!-- 3. 금융성향 테스트 가로 바형 버튼 -->
+        <button class="quick-card-btn" id="btn-easy-financial-test" style="width: 100%; display: flex; flex-direction: row; align-items: center; justify-content: center; gap: 8px; padding: clamp(10px, 1.8cqh, 14px) 16px; background-color: #ffffff; border: 3px solid var(--brand-mint); border-radius: 16px; cursor: pointer; box-shadow: 0 4px 12px rgba(0,0,0,0.03); box-sizing: border-box; transition: all 0.2s;">
+          <div style="width: 22px; height: 22px; border-radius: 50%; background-color: #fff4eb; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
+            <i class="fa-solid fa-magnifying-glass" style="color: #ff9f43; font-size: 11px;"></i>
+          </div>
+          <span style="font-size: clamp(14px, 1.9cqh, 17px); font-weight: 800; color: #1a1a1a; font-family: 'Pretendard', sans-serif;">금융성향 테스트</span>
+        </button>
+
+      </div>
 
       <!-- 2x2 퀵 메뉴 그리드 -->
       <section class="quick-menu-grid animate-fade-in">
@@ -246,7 +295,7 @@
   </div>
 
   <!-- AI 서류 스캔 모달 (일괄 스캔 개정) -->
-  <div id="ai-scan-modal" class="modal-overlay hidden">
+  <div id="ai-scan-modal" class="modal-overlay hidden" style="z-index: 10100;">
     <div class="modal-content animate-slide-up">
       <div class="modal-header">
         <div class="modal-header-title">
@@ -279,6 +328,12 @@
           <button class="btn-scan-action btn-scan-primary" id="ai-start-scan-btn" style="margin-top: 12px; background-color: var(--brand-mint-dark); width: 100%;">
             <i class="fa-solid fa-camera"></i>
             <span>스캔 후 다음 서류 촬영</span>
+          </button>
+
+          <!-- 개별 단계 넘기기 (스킵) 버튼 -->
+          <button class="btn-scan-action btn-scan-secondary" id="ai-skip-step-btn" style="margin-top: 8px; width: 100%; border: 1.5px solid #bdc3c7; color: var(--dark-gray); font-weight: 700; height: 38px;">
+            <i class="fa-solid fa-angles-right"></i>
+            <span>이 서류 건너뛰기 (넘기기)</span>
           </button>
         </div>
 
@@ -942,147 +997,7 @@
     </div>
   </div>
 
-  <!-- 5. 행원용 정보 단말 화면 (Staff View - 별도 모달/단말 뷰로 교체 전환) -->
-  <div id="staff-terminal-modal" class="modal-overlay hidden" style="background-color: #f4f6f8; justify-content: flex-start; align-items: stretch; overflow: auto; padding: 0; z-index: 1500;">
-    <div class="staff-layout-wrapper" style="width: 100%; display: flex; flex-direction: column; height: 100vh;">
-      
-      <!-- 상단 헤더 -->
-      <header class="staff-header" style="background-color: #2c3e50; color: #fff; padding: 12px 20px; display: flex; justify-content: space-between; align-items: center; box-sizing: border-box;">
-        <div style="display: flex; align-items: center; gap: 8px;">
-          <i class="fa-solid fa-desktop" style="font-size: 18px; color: var(--brand-mint);"></i>
-          <h2 style="font-size: 15px; font-weight: 700; margin: 0; color: #fff;">iM뱅크 창구 통합 단말기 <span style="font-size: 11px; background-color: #1abc9c; color: #fff; padding: 2px 6px; border-radius: 4px; margin-left: 6px; font-weight: 400;">STAFF MODE</span></h2>
-        </div>
-        <div style="display: flex; align-items: center; gap: 12px;">
-          <span style="font-size: 12px; color: #bdc3c7;"><i class="fa-solid fa-user-tie"></i> 대구본점 영업부 김행원 주임</span>
-          <button id="exit-staff-mode-btn" style="background-color: #e74c3c; border: none; color: #fff; padding: 6px 12px; border-radius: 4px; font-size: 11.5px; font-weight: 700; cursor: pointer; display: flex; align-items: center; gap: 4px;">
-            <i class="fa-solid fa-power-off"></i> 단말 로그아웃
-          </button>
-        </div>
-      </header>
 
-      <!-- 본문 영역 (좌측: 접수 목록, 우측: 상세 패널) -->
-      <div class="staff-body-container" style="flex: 1; display: flex; overflow: hidden; box-sizing: border-box;">
-        
-        <!-- 좌측: 실시간 전표 접수 목록 -->
-        <div class="staff-sidebar" style="width: 330px; background-color: var(--white); border-right: 1px solid var(--light-gray); display: flex; flex-direction: column; overflow: hidden; box-sizing: border-box;">
-          <div style="padding: 14px; border-bottom: 1px solid var(--light-gray); background-color: #fafbfc; display: flex; justify-content: space-between; align-items: center;">
-            <span style="font-weight: 700; font-size: 12px; color: var(--charcoal);"><i class="fa-solid fa-list-check"></i> 전표 실시간 수신 현황</span>
-            <span id="staff-incoming-badge" style="background-color: var(--brand-mint); color: var(--white); font-size: 10px; font-weight: 800; padding: 2px 6px; border-radius: 10px;">0건</span>
-          </div>
-          <div id="staff-voucher-list" style="flex: 1; overflow-y: auto; padding: 8px; display: flex; flex-direction: column; gap: 8px; box-sizing: border-box;">
-            <!-- 모의 접수 전표 및 실시간 제출된 전표 카드 렌더링 -->
-          </div>
-        </div>
-
-        <!-- 우측: 접수 상세 내역 패널 -->
-        <div class="staff-detail-panel" style="flex: 1; background-color: #f8f9fa; display: flex; flex-direction: column; overflow: hidden; padding: 20px; box-sizing: border-box;">
-          
-          <div id="staff-no-selection" style="flex: 1; display: flex; flex-direction: column; justify-content: center; align-items: center; color: var(--cool-gray);">
-            <i class="fa-solid fa-receipt" style="font-size: 48px; margin-bottom: 12px; color:#bdc3c7;"></i>
-            <p style="font-size: 13px; font-weight: 700;">조회 및 승인 처리할 접수 건을 왼쪽 목록에서 선택해 주세요.</p>
-          </div>
-
-          <div id="staff-detail-content" class="hidden" style="flex: 1; display: flex; flex-direction: column; overflow: hidden; background-color: var(--white); border-radius: 12px; border: 1px solid var(--light-gray); box-shadow: 0 4px 12px rgba(0,0,0,0.05); box-sizing: border-box;">
-            <!-- 상세 정보 상단 정보 바 -->
-            <div style="background-color: #f1f2f6; padding: 12px 18px; border-bottom: 1px solid var(--light-gray); display: flex; justify-content: space-between; align-items: center; box-sizing: border-box;">
-              <div>
-                <span style="font-size: 11px; color: var(--cool-gray);">접수번호</span>
-                <h4 id="s-detail-id" style="margin: 0; font-size: 14px; font-weight: 700; color: var(--charcoal);">T2026...</h4>
-              </div>
-              <div style="display: flex; gap: 8px; align-items: center;">
-                <span style="font-size: 11.5px; color: var(--dark-gray); font-weight: 600;">상태 처리:</span>
-                <select id="s-detail-status-select" class="form-input" style="padding: 4px 8px; font-size: 11px; margin: 0; width: 110px; border-color: var(--brand-mint);">
-                  <option value="WAITING">확인대기</option>
-                  <option value="CHECKING">확인중</option>
-                  <option value="COMPLETED">처리완료</option>
-                  <option value="REJECTED">보완필요</option>
-                </select>
-              </div>
-            </div>
-
-            <!-- 상세 분할 레이아웃 -->
-            <div style="flex: 1; display: flex; overflow: hidden; box-sizing: border-box;">
-              
-              <!-- 상세 왼쪽: 전표 촬영 이미지 (대량의 경우 다중 이미지 탭 제공) -->
-              <div style="flex: 1; border-right: 1px solid var(--light-gray); padding: 16px; display: flex; flex-direction: column; overflow: hidden; box-sizing: border-box;">
-                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
-                  <h5 style="margin: 0; font-size: 11.5px; font-weight: 700; color: var(--charcoal);"><i class="fa-solid fa-image"></i> 제출 이미지 아카이브</h5>
-                  <div id="staff-multi-image-tabs" class="hidden" style="display:flex; gap:4px;">
-                    <!-- 대량 전표 탭 버튼 동적 주입: [전표 1] [전표 2] -->
-                  </div>
-                </div>
-                <div id="s-detail-image-box" style="flex: 1; background-color: #fafbfc; border: 1px solid var(--light-gray); border-radius: 8px; background-repeat: no-repeat; background-position: center; background-size: contain;"></div>
-              </div>
-
-              <!-- 상세 오른쪽: 구조화된 정보 및 대량 테이블 -->
-              <div style="flex: 1.2; padding: 16px; display: flex; flex-direction: column; overflow-y: auto; box-sizing: border-box;">
-                <h5 style="margin: 0 0 8px 0; font-size: 11.5px; font-weight: 700; color: var(--charcoal);"><i class="fa-solid fa-database"></i> 최종 구조화 거래 내역</h5>
-                
-                <!-- 수정 여부 뱃지 -->
-                <div id="s-detail-modified-badge" style="margin-bottom: 10px; padding: 6px 10px; border-radius: 6px; font-size: 11.5px; font-weight: 700; box-sizing: border-box;">
-                  <!-- 수정 여부 동적 바인딩 -->
-                </div>
-
-                <!-- 접수시간 표시 -->
-                <div style="font-size: 11px; color: var(--cool-gray); margin-bottom: 12px; text-align: right;" id="s-detail-time">
-                  접수 시간: -
-                </div>
-
-                <!-- 표준 전표 상세 (단일이체 등) -->
-                <div id="s-detail-standard-box" class="hidden" style="display: flex; flex-direction: column; gap: 8px; box-sizing: border-box;">
-                  <!-- 동적 바인딩 -->
-                </div>
-
-                <!-- 대량 이체 전용 테이블 상세 (누르면 소스 이미지 매핑 전환 기능 탑재) -->
-                <div id="s-detail-multi-box" class="hidden" style="box-sizing: border-box;">
-                  <div class="multi-summary-bar" style="background-color: var(--brand-mint-light); border: 1px solid rgba(0, 186, 174, 0.2); border-radius: 6px; padding: 8px 12px; font-size: 11.5px; font-weight: 700; display: flex; justify-content: space-between; margin-bottom: 8px; color: var(--brand-mint-dark);">
-                    <span id="s-multi-total-count">총 0건</span>
-                    <span id="s-multi-total-amount">총 금액 0원</span>
-                  </div>
-                  <div style="border: 1px solid var(--light-gray); border-radius: 8px; overflow: hidden; margin-bottom: 10px; box-sizing: border-box;">
-                    <table style="width: 100%; border-collapse: collapse; font-size: 10.5px; text-align: left;">
-                      <thead>
-                        <tr style="background-color: var(--background-gray); border-bottom: 1px solid var(--light-gray);">
-                          <th style="padding: 6px; width: 8%;">No</th>
-                          <th style="padding: 6px; width: 14%;">이미지</th>
-                          <th style="padding: 6px; width: 20%;">은행</th>
-                          <th style="padding: 6px; width: 24%;">계좌번호</th>
-                          <th style="padding: 6px; width: 16%;">예금주</th>
-                          <th style="padding: 6px; width: 18%;">금액</th>
-                        </tr>
-                      </thead>
-                      <tbody id="s-multi-table-body">
-                        <!-- 동적 바인딩 -->
-                      </tbody>
-                    </table>
-                  </div>
-                  <p style="font-size:9.5px; color:#7f8c8d; margin-top:2px;">* 테이블의 각 행을 클릭하면 해당 거래가 추출된 원본 전표 이미지로 왼쪽 뷰포트가 실시간 스위칭됩니다.</p>
-                </div>
-
-              </div>
-
-            </div>
-
-            <!-- 하단 확인완료 / 보완요청 버튼 액션 -->
-            <div style="background-color: #fafbfc; border-top: 1px solid var(--light-gray); padding: 12px 18px; display: flex; justify-content: flex-end; gap: 8px; box-sizing: border-box;">
-              <button id="s-detail-reject-btn" style="background-color: #ff7675; border: none; color: var(--white); padding: 8px 18px; border-radius: 6px; font-weight: 700; font-size: 12px; cursor: pointer; display: flex; align-items: center; gap: 6px;">
-                <i class="fa-solid fa-triangle-exclamation"></i>
-                <span>보완 요청</span>
-              </button>
-              <button id="s-detail-confirm-btn" style="background-color: var(--brand-mint); border: none; color: var(--white); padding: 8px 24px; border-radius: 6px; font-weight: 700; font-size: 12px; cursor: pointer; display: flex; align-items: center; gap: 6px; box-shadow: 0 2px 8px rgba(0, 186, 174, 0.2);">
-                <i class="fa-solid fa-circle-check"></i>
-                <span>확인 완료</span>
-              </button>
-            </div>
-
-          </div>
-
-        </div>
-
-      </div>
-
-    </div>
-  </div>
 
   <!-- 팝업 모달: 업무별 필요 서류 체크리스트 -->
   <div id="checklist-modal" class="modal-overlay hidden">
@@ -1098,11 +1013,40 @@
         <div class="checklist-content" id="checklist-container" style="border-top: none; padding: 0;">
           <p class="form-desc">방문하시는 업무에 필요한 서류가 준비되었는지 확인해 보세요.</p>
           
-          <!-- 탭 메뉴 -->
-          <div class="tab-menu" style="margin-top: 0;">
-            <button class="tab-btn active" data-tab="card">카드 개설</button>
-            <button class="tab-btn" data-tab="bankbook">통장 발급</button>
-            <button class="tab-btn" data-tab="irp">퇴직연금</button>
+          <!-- 시안 맞춤형 업무 검색창 및 선택지 목록 (기존 탭 메뉴는 숨김 처리하여 완벽 호환) -->
+          <div class="checklist-search-wrapper" style="position: relative; margin-bottom: 20px; z-index: 100;">
+            <div style="position: relative; display: flex; align-items: center;">
+              <i class="fa-solid fa-magnifying-glass" style="position: absolute; left: 14px; color: var(--cool-gray); font-size: 14px;"></i>
+              <input type="text" id="checklist-search-input" placeholder="업무명을 검색해 보세요..." style="width: 100%; padding: 12px 12px 12px 38px; border: 1.5px solid var(--light-gray); border-radius: 10px; font-size: 14px; outline: none; background-color: #f5f6f8; transition: all 0.2s; box-sizing: border-box;" autocomplete="off">
+            </div>
+            
+            <!-- 선택지 드롭다운 박스 (시안 스타일 - 7대 업무로 개편) -->
+            <div id="checklist-dropdown-results" style="display: none; position: absolute; top: 100%; left: 0; right: 0; background: #ffffff; border: 1.5px solid var(--light-gray); border-radius: 12px; box-shadow: 0 8px 24px rgba(0,0,0,0.1); max-height: 250px; overflow-y: auto; z-index: 101; margin-top: 6px; box-sizing: border-box; padding: 6px 0;">
+              <div class="checklist-opt-item" data-val="none" style="padding: 12px 16px; font-size: 14px; font-weight: 700; color: var(--dark-text); cursor: pointer; transition: background 0.15s;">선택안함</div>
+              <div class="checklist-opt-item" data-val="personal_new" style="padding: 12px 16px; font-size: 14px; font-weight: 700; color: var(--dark-text); cursor: pointer; transition: background 0.15s;">개인 신규 계좌 개설</div>
+              <div class="checklist-opt-item" data-val="rent_loan" style="padding: 12px 16px; font-size: 14px; font-weight: 700; color: var(--dark-text); cursor: pointer; transition: background 0.15s;">전세자금대출</div>
+              <div class="checklist-opt-item" data-val="home_loan" style="padding: 12px 16px; font-size: 14px; font-weight: 700; color: var(--dark-text); cursor: pointer; transition: background 0.15s;">주택담보대출</div>
+              <div class="checklist-opt-item" data-val="corporate_new" style="padding: 12px 16px; font-size: 14px; font-weight: 700; color: var(--dark-text); cursor: pointer; transition: background 0.15s;">법인 신규</div>
+              <div class="checklist-opt-item" data-val="corporate_loan" style="padding: 12px 16px; font-size: 14px; font-weight: 700; color: var(--dark-text); cursor: pointer; transition: background 0.15s;">법인 대출</div>
+              <div class="checklist-opt-item" data-val="proxy_work" style="padding: 12px 16px; font-size: 14px; font-weight: 700; color: var(--dark-text); cursor: pointer; transition: background 0.15s;">대리인 업무</div>
+              <div class="checklist-opt-item" data-val="inheritance_work" style="padding: 12px 16px; font-size: 14px; font-weight: 700; color: var(--dark-text); cursor: pointer; transition: background 0.15s;">상속 업무</div>
+            </div>
+          </div>
+
+          <!-- 상황 질문 선택 컨테이너 (동적 서류 필터링용 문진 영역) -->
+          <div id="checklist-questions-container" style="background-color: #f8f9fa; border: 1px solid var(--light-gray); border-radius: 12px; padding: 14px; margin-bottom: 20px; display: none; text-align: left; box-sizing: border-box;">
+            <!-- JS 동적 생성 -->
+          </div>
+
+          <!-- 기존 탭 메뉴 (호환성을 위해 display: none 처리 및 7대 업무 매핑) -->
+          <div class="tab-menu" style="margin-top: 0; display: none !important;">
+            <button class="tab-btn active" data-tab="personal_new">개인 신규</button>
+            <button class="tab-btn" data-tab="rent_loan">전세자금대출</button>
+            <button class="tab-btn" data-tab="home_loan">주택담보대출</button>
+            <button class="tab-btn" data-tab="corporate_new">법인 신규</button>
+            <button class="tab-btn" data-tab="corporate_loan">법인 대출</button>
+            <button class="tab-btn" data-tab="proxy_work">대리인 업무</button>
+            <button class="tab-btn" data-tab="inheritance_work">상속 업무</button>
           </div>
 
           <!-- 준비 상태 진척도 바 -->
@@ -1172,6 +1116,17 @@
                 <div class="category-info">
                   <span class="category-title">예적금 성향 진단</span>
                   <span class="category-desc">계획 vs 자유, 자금 적립 습관별 상품 진단</span>
+                </div>
+                <i class="fa-solid fa-chevron-right category-arrow"></i>
+              </div>
+                                
+              <div class="category-card" data-category="invest">
+                <div class="category-icon-box" style="background-color: #EBF3FF; color: #1B74E4;">
+                  <i class="fa-solid fa-chart-line"></i>
+                </div>
+                <div class="category-info">
+                  <span class="category-title">투자 성향 진단</span>
+                  <span class="category-desc">공격투자형 vs 안정형, 투자 스타일 맞춤 펀드 진단</span>
                 </div>
                 <i class="fa-solid fa-chevron-right category-arrow"></i>
               </div>

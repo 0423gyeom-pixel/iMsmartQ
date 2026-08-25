@@ -71,5 +71,25 @@
     "icon": "fa-solid fa-wallet",
     "matchTypes": ["deposit"],
     "lastUpdated": "2026-07-14 21:10"
+  },
+  {
+    "id": "im-safe-fund",
+    "category": "펀드",
+    "name": "iM 단기국공채 증권투자신탁",
+    "rate": "채권형 안정추구",
+    "benefit": "정부 및 공공기관이 발행한 국공채 위주로 투자하여 원금 손실 가능성을 철저히 방지하고 시중금리 플러스 알파의 안정적 수익을 지향하는 펀드",
+    "icon": "fa-solid fa-shield-halved",
+    "matchTypes": ["safe"],
+    "lastUpdated": "2026-07-14 21:10"
+  },
+  {
+    "id": "im-aggressive-fund",
+    "category": "펀드",
+    "name": "iM 글로벌 AI 테크 주식형 펀드",
+    "rate": "주식형 고위험고수익",
+    "benefit": "글로벌 AI 혁신 기술 대형주(엔비디아, 마이크로소프트 등)에 집중 투자하여 초과 수익률을 노리는 액티브 주식형 펀드",
+    "icon": "fa-solid fa-fire-flame-curved",
+    "matchTypes": ["aggressive"],
+    "lastUpdated": "2026-07-14 21:10"
   }
 ]
