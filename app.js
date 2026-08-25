@@ -1795,17 +1795,19 @@ document.addEventListener('DOMContentLoaded', async () => {
           });
         });
 
-        // 데모 중복 검사를 위한 임시 중복 데이터 1건 강제 이식 (이미지가 2장 이상일 때)
+        // 데모 중복 검사를 위한 임시 중복 데이터 이식 (이미지가 2장 이상일 때)
+        // ※ 전표 개수를 초과하지 않도록 마지막 항목을 첫 번째와 동일 데이터로 덮어씀
         if (images.length >= 2) {
-          matchedTransactions.push({
+          const lastIdx = matchedTransactions.length - 1;
+          matchedTransactions[lastIdx] = {
             bank: matchedTransactions[0].bank,
             accountNumber: matchedTransactions[0].accountNumber,
             accountHolder: matchedTransactions[0].accountHolder,
             amount: matchedTransactions[0].amount,
             description: matchedTransactions[0].description,
-            sourceImageId: images[1].id, // 다른 전표 소스이지만 데이터는 완전 중복
+            sourceImageId: images[lastIdx].id,
             ocrConfidence: 0.99
-          });
+          };
         }
 
         // 총액 계산
