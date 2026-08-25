@@ -3612,6 +3612,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   const easyModeToggleBtn = document.getElementById('easy-mode-toggle-btn');
   const easyModeLayoutContainer = document.getElementById('easy-mode-layout-container');
   const quickMenuGrid = document.querySelector('.quick-menu-grid');
+  const headerLogoSmartQ = document.querySelector('.logo-smartq');
   
   if (easyModeToggleBtn) {
     easyModeToggleBtn.addEventListener('click', () => {
@@ -3622,6 +3623,9 @@ document.addEventListener('DOMContentLoaded', async () => {
         if (easyModeLayoutContainer) easyModeLayoutContainer.classList.add('hidden');
         if (quickMenuGrid) quickMenuGrid.classList.remove('hidden'); // 기존 2x2 그리드 복원
         
+        // 로고 영문 SmartQ 복원
+        if (headerLogoSmartQ) headerLogoSmartQ.textContent = 'SmartQ';
+
         // 버튼 톤앤무드 복원
         easyModeToggleBtn.style.backgroundColor = 'var(--brand-mint-light)';
         easyModeToggleBtn.style.color = 'var(--brand-mint-dark)';
@@ -3634,6 +3638,9 @@ document.addEventListener('DOMContentLoaded', async () => {
         if (easyModeLayoutContainer) easyModeLayoutContainer.classList.remove('hidden');
         if (quickMenuGrid) quickMenuGrid.classList.add('hidden'); // 기존 2x2 그리드 숨기기
         
+        // 로고 한글 똑똑한 대기열 변환
+        if (headerLogoSmartQ) headerLogoSmartQ.textContent = '똑똑한 대기열';
+
         // 버튼 톤앤무드 활성화 강조 (차콜 톤으로 켜짐 표시)
         easyModeToggleBtn.style.backgroundColor = '#2c3e50';
         easyModeToggleBtn.style.color = '#ffffff';
