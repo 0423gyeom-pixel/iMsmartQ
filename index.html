@@ -13,7 +13,7 @@
   <!-- FontAwesome for icons -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <!-- v 파라미터: 배포/수정 시 값을 올려 브라우저 CSS 캐시를 무효화 -->
-  <link rel="stylesheet" href="style.css?v=20260825_viewfinder_lg">
+  <link rel="stylesheet" href="style.css?v=20260825_voucher_ratio">
 </head>
 <body>
   <div class="mobile-web-container">
@@ -879,10 +879,17 @@
             <!-- 실시간 웹캠/모바일 후면 카메라 스트리밍 뷰어 -->
             <video id="camera-stream" autoplay playsinline style="width: 100%; height: 100%; object-fit: cover; display: none;"></video>
             
-            <div id="demo-voucher-preview" style="width: 80%; height: 75%; background-size: contain; background-repeat: no-repeat; background-position: center; opacity: 0.9;"></div>
+            <div id="demo-voucher-preview" style="width: 88%; height: 80%; background-size: contain; background-repeat: no-repeat; background-position: center; opacity: 0.9;"></div>
             
-            <div class="camera-guide" style="position: absolute; width: 85%; height: 80%; border: 2px dashed #00BAC6; box-shadow: 0 0 0 9999px rgba(0,0,0,0.5); pointer-events: none; border-radius: 4px;"></div>
-            <div class="scan-laser" id="laser-effect" style="position: absolute; width: 85%; height: 2px; background-color: #00BAC6; box-shadow: 0 0 8px #00BAC6; display: none; animation: scanMove 2.2s infinite ease-in-out;"></div>
+            <!-- 전표 위치 가이드 격자 (가로형 전표 비율 92%×84%) -->
+            <div class="camera-guide" style="position: absolute; width: 92%; height: 84%; border: 2px solid #00BAC6; box-shadow: 0 0 0 9999px rgba(0,0,0,0.45); pointer-events: none; border-radius: 4px;">
+              <!-- 모서리 꺾쇠 오버레이 (전표 정렬 보조) -->
+              <span style="position:absolute; top:-2px; left:-2px; width:16px; height:16px; border-top:3px solid #fff; border-left:3px solid #fff; border-radius:3px 0 0 0;"></span>
+              <span style="position:absolute; top:-2px; right:-2px; width:16px; height:16px; border-top:3px solid #fff; border-right:3px solid #fff; border-radius:0 3px 0 0;"></span>
+              <span style="position:absolute; bottom:-2px; left:-2px; width:16px; height:16px; border-bottom:3px solid #fff; border-left:3px solid #fff; border-radius:0 0 0 3px;"></span>
+              <span style="position:absolute; bottom:-2px; right:-2px; width:16px; height:16px; border-bottom:3px solid #fff; border-right:3px solid #fff; border-radius:0 0 3px 0;"></span>
+            </div>
+            <div class="scan-laser" id="laser-effect" style="position: absolute; width: 92%; height: 2px; background-color: #00BAC6; box-shadow: 0 0 8px #00BAC6; display: none; animation: scanMove 2.2s infinite ease-in-out;"></div>
           </div>
           
           <!-- 스냅샷 촬영용 숨김 캔버스 -->

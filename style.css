@@ -1369,9 +1369,9 @@ input:checked + .slider:before {
 .camera-viewfinder {
   position: relative;
   width: 100%;
-  aspect-ratio: 3 / 4;   /* 전표/A4 세로 비율에 최적화 */
-  min-height: 340px;
-  max-height: 70vh;
+  aspect-ratio: 19 / 10;  /* 시중 은행 전표 실물 비율: 190mm × 105mm */
+  min-height: 180px;
+  max-height: 55vh;
   background-color: #111;
   border-radius: 12px;
   overflow: hidden;
