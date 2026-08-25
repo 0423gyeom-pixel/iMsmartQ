@@ -1926,6 +1926,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   function startActiveCameraStream() {
     const video = document.getElementById('camera-stream');
     const preview = document.getElementById('demo-voucher-preview');
+    const hint = document.getElementById('viewfinder-hint');
     if (!video) return;
 
     // 만약 이미 스트림이 활성화되어 있다면 중복 요청 차단
@@ -1934,8 +1935,8 @@ document.addEventListener('DOMContentLoaded', async () => {
     navigator.mediaDevices.getUserMedia({
       video: {
         facingMode: "environment", // 스마트폰 후면 카메라 강제 호출
-        width: { ideal: 1280 },
-        height: { ideal: 720 }
+        width: { ideal: 1920 },
+        height: { ideal: 1080 }
       },
       audio: false
     }).then(stream => {
@@ -1943,10 +1944,12 @@ document.addEventListener('DOMContentLoaded', async () => {
       video.srcObject = stream;
       video.style.display = 'block'; // 비디오 스트림 표출
       if (preview) preview.style.display = 'none'; // 백업용 모의 프리뷰 숨김
+      if (hint) hint.style.display = 'none';        // 안내 텍스트 숨김
     }).catch(err => {
       console.warn("실시간 카메라 렌즈 획득 실패 (PC 혹은 권한차단):", err);
       video.style.display = 'none';
       if (preview) preview.style.display = 'block'; // 실패 시 모의 프리뷰로 폴백
+      if (hint) hint.style.display = 'block';       // 안내 텍스트 유지
     });
   }
 

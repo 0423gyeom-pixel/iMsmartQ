@@ -13,7 +13,7 @@
   <!-- FontAwesome for icons -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <!-- v 파라미터: 배포/수정 시 값을 올려 브라우저 CSS 캐시를 무효화 -->
-  <link rel="stylesheet" href="style.css?v=20260825_voucher_ratio">
+  <link rel="stylesheet" href="style.css?v=20260825_modal_xl">
 </head>
 <body>
   <div class="mobile-web-container">
@@ -881,15 +881,28 @@
             
             <div id="demo-voucher-preview" style="width: 88%; height: 80%; background-size: contain; background-repeat: no-repeat; background-position: center; opacity: 0.9;"></div>
             
-            <!-- 전표 위치 가이드 격자 (가로형 전표 비율 92%×84%) -->
-            <div class="camera-guide" style="position: absolute; width: 92%; height: 84%; border: 2px solid #00BAC6; box-shadow: 0 0 0 9999px rgba(0,0,0,0.45); pointer-events: none; border-radius: 4px;">
-              <!-- 모서리 꺾쇠 오버레이 (전표 정렬 보조) -->
-              <span style="position:absolute; top:-2px; left:-2px; width:16px; height:16px; border-top:3px solid #fff; border-left:3px solid #fff; border-radius:3px 0 0 0;"></span>
-              <span style="position:absolute; top:-2px; right:-2px; width:16px; height:16px; border-top:3px solid #fff; border-right:3px solid #fff; border-radius:0 3px 0 0;"></span>
-              <span style="position:absolute; bottom:-2px; left:-2px; width:16px; height:16px; border-bottom:3px solid #fff; border-left:3px solid #fff; border-radius:0 0 0 3px;"></span>
-              <span style="position:absolute; bottom:-2px; right:-2px; width:16px; height:16px; border-bottom:3px solid #fff; border-right:3px solid #fff; border-radius:0 0 3px 0;"></span>
+            <!-- 전표 위치 가이드 격자 (실물 비율 19:10 기반, 여백 포함 94%×84%) -->
+            <div class="camera-guide" style="
+              position: absolute;
+              width: 94%;
+              height: 84%;
+              border: none;
+              box-shadow: 0 0 0 9999px rgba(0,0,0,0.42);
+              pointer-events: none;
+              border-radius: 3px;
+            ">
+              <!-- ┌ 좌상단 꺾쇠 -->
+              <span style="position:absolute; top:0; left:0; width:28px; height:18px; border-top:3px solid #00BAC6; border-left:3px solid #00BAC6; border-radius:3px 0 0 0;"></span>
+              <!-- ┐ 우상단 꺾쇠 -->
+              <span style="position:absolute; top:0; right:0; width:28px; height:18px; border-top:3px solid #00BAC6; border-right:3px solid #00BAC6; border-radius:0 3px 0 0;"></span>
+              <!-- └ 좌하단 꺾쇠 -->
+              <span style="position:absolute; bottom:0; left:0; width:28px; height:18px; border-bottom:3px solid #00BAC6; border-left:3px solid #00BAC6; border-radius:0 0 0 3px;"></span>
+              <!-- ┘ 우하단 꺾쇠 -->
+              <span style="position:absolute; bottom:0; right:0; width:28px; height:18px; border-bottom:3px solid #00BAC6; border-right:3px solid #00BAC6; border-radius:0 0 3px 0;"></span>
+              <!-- 가이드 중앙 안내 텍스트 (카메라 미연결 시에만 표시) -->
+              <span id="viewfinder-hint" style="position:absolute; top:50%; left:50%; transform:translate(-50%,-50%); color:rgba(255,255,255,0.55); font-size:11px; font-weight:600; white-space:nowrap; letter-spacing:-0.2px; text-shadow:0 1px 4px rgba(0,0,0,0.8);">전표를 이 격자 안에 맞춰 주세요</span>
             </div>
-            <div class="scan-laser" id="laser-effect" style="position: absolute; width: 92%; height: 2px; background-color: #00BAC6; box-shadow: 0 0 8px #00BAC6; display: none; animation: scanMove 2.2s infinite ease-in-out;"></div>
+            <div class="scan-laser" id="laser-effect" style="position: absolute; width: 94%; height: 2px; background-color: #00BAC6; box-shadow: 0 0 8px #00BAC6; display: none; animation: scanMove 2.2s infinite ease-in-out;"></div>
           </div>
           
           <!-- 스냅샷 촬영용 숨김 캔버스 -->
