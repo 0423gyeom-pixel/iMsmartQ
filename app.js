@@ -1740,8 +1740,12 @@ document.addEventListener('DOMContentLoaded', async () => {
 
       const resultItemEl = document.createElement('div');
       resultItemEl.className = 'ai-report-item';
-      resultItemEl.style.borderBottom = '1px solid #f1f2f6';
-      resultItemEl.style.padding = '12px 0';
+      resultItemEl.style.backgroundColor = '#ffffff';
+      resultItemEl.style.border = '1px solid #e2e8f0';
+      resultItemEl.style.borderRadius = '12px';
+      resultItemEl.style.padding = '14px 16px';
+      resultItemEl.style.boxShadow = '0 2px 8px rgba(0, 0, 0, 0.04)';
+      resultItemEl.style.marginBottom = '8px';
 
       let suitabilityStyle = 'background-color:#f1f2f6; color:#7f8c8d;';
       if (!res.isSkipped) {
@@ -1752,11 +1756,11 @@ document.addEventListener('DOMContentLoaded', async () => {
       }
 
       resultItemEl.innerHTML = `
-        <div style="display:flex; justify-content:space-between; align-items:center;">
-          <span style="font-weight:700; font-size:14px; color:#2c3e50;">${item.text}</span>
-          <span style="font-size:11px; font-weight:800; padding:2px 8px; border-radius:12px; ${suitabilityStyle}">${res.suitability} (${res.readiness})</span>
+        <div style="display:flex; justify-content:space-between; align-items:flex-start; gap:10px; margin-bottom:6px;">
+          <span style="font-weight:700; font-size:13.5px; color:#2c3e50; line-height:1.4; word-break:keep-all;">${item.text}</span>
+          <span style="font-size:11px; font-weight:800; padding:3px 8px; border-radius:6px; white-space:nowrap; flex-shrink:0; ${suitabilityStyle}">${res.suitability} (${res.readiness})</span>
         </div>
-        <div style="font-size:12px; color:#7f8c8d; margin-top:6px; line-height:1.4;">${res.guide}</div>
+        <div style="font-size:12px; color:#6c757d; line-height:1.5; word-break:keep-all;">${res.guide}</div>
       `;
 
       aiBatchResultList.appendChild(resultItemEl);

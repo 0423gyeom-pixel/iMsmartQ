@@ -1137,13 +1137,13 @@ input:checked + .slider:before {
 /* AI 일괄 진단 개별 서류 리포트 아이템 스타일 */
 .ai-report-item {
   background: var(--white);
-  border: 1px solid var(--light-gray);
-  border-radius: 10px;
-  padding: 10px 12px;
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+  padding: 14px 16px;
   display: flex;
   flex-direction: column;
-  gap: 6px;
-  box-shadow: var(--shadow-sm);
+  gap: 8px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
 }
 
 .ai-report-header {
