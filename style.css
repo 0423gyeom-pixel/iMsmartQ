@@ -3330,8 +3330,9 @@ input:checked + .slider:before {
 .quick-menu-grid {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
-  grid-template-rows: auto auto; /* 내용물 크기에 따라 자동으로 행 높이 배분 */
-  flex: 0 0 auto; /* 세로 높이 강제 가두기를 제거하여 유연한 연장 허용 */
+  grid-template-rows: repeat(2, minmax(0, 1fr));
+  flex: 0 0 46cqh; /* 1번 사진처럼 퀵 카드들이 큼직하고 이쁘게 채우도록 세로 46% 할당 */
+  min-height: 0;
   gap: clamp(8px, 1.3cqh, 16px);
   margin: 0;
 }
@@ -3339,7 +3340,7 @@ input:checked + .slider:before {
 /* 모바일 전용 notice-section 흐름 제어 */
 .notice-section {
   flex-shrink: 0;
-  margin-top: 12px;
+  margin-top: 4px; /* 간격을 축소해 유의사항 윗선만 살짝 걸치도록 제어 */
   margin-bottom: 12px;
 }
 
