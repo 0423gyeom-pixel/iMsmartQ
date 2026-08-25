@@ -1521,6 +1521,59 @@ document.addEventListener('DOMContentLoaded', async () => {
     });
   }
 
+  let aiActiveStream = null;
+
+  // AI 서류 적합성 진단 실시간 카메라 스트림 구동
+  function startAiCameraStream() {
+    const video = document.getElementById('ai-camera-stream');
+    const preview = document.getElementById('ai-mock-document');
+    const hint = document.getElementById('ai-viewfinder-hint');
+    if (!video) return;
+
+    if (aiActiveStream) return;
+
+    navigator.mediaDevices.getUserMedia({
+      video: {
+        facingMode: "environment", // 스마트폰 후면 카메라 강제 호출
+        width: { ideal: 1920 },
+        height: { ideal: 1080 }
+      },
+      audio: false
+    }).then(stream => {
+      aiActiveStream = stream;
+      video.srcObject = stream;
+      video.style.display = 'block';
+      if (preview) preview.style.display = 'none';
+      if (hint) hint.style.display = 'none';
+    }).catch(err => {
+      console.warn("AI 서류 진단 카메라 획득 실패 (모의 프리뷰 폴백):", err);
+      video.style.display = 'none';
+      if (preview) preview.style.display = 'block';
+      if (hint) hint.style.display = 'block';
+    });
+  }
+
+  // AI 서류 적합성 진단 카메라 스트림 정지
+  function stopAiCameraStream() {
+    const video = document.getElementById('ai-camera-stream');
+    const preview = document.getElementById('ai-mock-document');
+    const hint = document.getElementById('ai-viewfinder-hint');
+    if (aiActiveStream) {
+      aiActiveStream.getTracks().forEach(track => track.stop());
+      aiActiveStream = null;
+    }
+    if (video) {
+      video.srcObject = null;
+      video.style.display = 'none';
+    }
+    if (preview) {
+      preview.style.display = 'block';
+    }
+    if (hint) {
+      hint.style.display = 'block';
+    }
+  }
+
   function openAiBatchScanModal() {
     aiCurrentStep = 0;
     const config = checklistConfig[activeTab];
@@ -1536,6 +1589,9 @@ document.addEventListener('DOMContentLoaded', async () => {
     if (aiScanStepCamera) aiScanStepCamera.classList.remove('hidden');
     if (aiResultContainer) aiResultContainer.classList.add('hidden');
     
+    // 실시간 카메라 구동 개시
+    startAiCameraStream();
+
     loadScanStep();
 
     if (aiScanModal) {
@@ -1546,6 +1602,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
   function loadScanStep() {
     if (aiCurrentStep >= aiTotalSteps) {
+      stopAiCameraStream();
       showBatchResults();
       return;
     }
@@ -1560,6 +1617,13 @@ document.addEventListener('DOMContentLoaded', async () => {
       aiScanDocTargetName.textContent = `[${aiCurrentStep + 1}/${aiTotalSteps}] ${currentItem.text}`;
     }
 
+    if (aiBatchStepText) {
+      aiBatchStepText.textContent = `단계: ${aiCurrentStep + 1} / ${aiTotalSteps}`;
+    }
+    if (aiBatchStepPercent) {
+      aiBatchStepPercent.textContent = `${Math.round(((aiCurrentStep + 1) / aiTotalSteps) * 100)}%`;
+    }
+
     // 모의 서류 템플릿 로드
     const templates = aiMockDocTemplates[activeTab] || [];
     if (aiMockDocument) {
@@ -1570,7 +1634,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     if (aiStartScanBtn) {
       aiStartScanBtn.disabled = false;
       const btnSpan = aiStartScanBtn.querySelector('span');
-      if (btnSpan) btnSpan.textContent = '서류 촬영 및 AI 진단';
+      if (btnSpan) btnSpan.textContent = (aiCurrentStep === aiTotalSteps - 1) ? '서류 촬영 및 AI 최종 진단' : '서류 촬영 및 AI 진단';
       const btnIcon = aiStartScanBtn.querySelector('i');
       if (btnIcon) btnIcon.className = 'fa-solid fa-camera';
     }
@@ -1578,25 +1642,44 @@ document.addEventListener('DOMContentLoaded', async () => {
 
   if (aiStartScanBtn) {
     aiStartScanBtn.addEventListener('click', () => {
+      const video = document.getElementById('ai-camera-stream');
+      const canvas = document.getElementById('ai-camera-canvas');
+
+      // 실시간 카메라 스트림이 돌고 있는 경우 프레임 스냅샷 캡처 및 플래시 효과
+      if (aiActiveStream && video && canvas) {
+        const ctx = canvas.getContext('2d');
+        canvas.width = video.videoWidth || video.clientWidth;
+        canvas.height = video.videoHeight || video.clientHeight;
+        ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+        
+        video.style.opacity = '0.2';
+        setTimeout(() => { video.style.opacity = '1'; }, 120);
+      }
+
       aiStartScanBtn.disabled = true;
       const btnSpan = aiStartScanBtn.querySelector('span');
       if (btnSpan) btnSpan.textContent = 'AI OCR 분석 및 진단 중...';
       const btnIcon = aiStartScanBtn.querySelector('i');
       if (btnIcon) btnIcon.className = 'fa-solid fa-spinner fa-spin';
 
-      if (aiScanLaserLine) aiScanLaserLine.classList.add('animating');
+      if (aiScanLaserLine) aiScanLaserLine.style.display = 'block';
       playNotificationSound('beep');
 
       setTimeout(() => {
-        if (aiScanLaserLine) aiScanLaserLine.classList.remove('animating');
+        if (aiScanLaserLine) aiScanLaserLine.style.display = 'none';
         
         const scenarios = aiVerifyScenarios[activeTab] || [];
         const result = scenarios[aiCurrentStep] || { readiness: '100%', suitability: '적합', guide: '확인 완료', isSuccess: true };
         aiStepResults.push(result);
 
         aiCurrentStep++;
-        loadScanStep();
-      }, 1500);
+        if (aiCurrentStep >= aiTotalSteps) {
+          stopAiCameraStream(); // 모든 서류 촬영 완료 시 카메라 종료
+          showBatchResults();
+        } else {
+          loadScanStep();
+        }
+      }, 1200);
     });
   }
 
@@ -1617,11 +1700,18 @@ document.addEventListener('DOMContentLoaded', async () => {
 
       // 다음 단계로 전환
       aiCurrentStep++;
-      loadScanStep();
+      if (aiCurrentStep >= aiTotalSteps) {
+        stopAiCameraStream();
+        showBatchResults();
+      } else {
+        loadScanStep();
+      }
     });
   }
 
   function showBatchResults() {
+    stopAiCameraStream(); // 결과창 진입 시 카메라 스트림 끄기
+
     if (aiScanStepCamera) aiScanStepCamera.classList.add('hidden');
     if (aiResultContainer) aiResultContainer.classList.remove('hidden');
 
@@ -1649,7 +1739,7 @@ document.addEventListener('DOMContentLoaded', async () => {
       }
 
       const resultItemEl = document.createElement('div');
-    resultItemEl.className = 'ai-report-item';
+      resultItemEl.className = 'ai-report-item';
       resultItemEl.style.borderBottom = '1px solid #f1f2f6';
       resultItemEl.style.padding = '12px 0';
 
@@ -1671,8 +1761,6 @@ document.addEventListener('DOMContentLoaded', async () => {
 
       aiBatchResultList.appendChild(resultItemEl);
     });
-
-
 
     const totalCount = items.length;
     const isAllPassed = fitCount === totalCount;
@@ -1700,7 +1788,6 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
 
     if (aiConfirmBtn) {
-      // 결과 적용 버튼 클릭 시, 이전 리스너 누적 방지를 위해 클론 기법 적용
       const newConfirmBtn = aiConfirmBtn.cloneNode(true);
       aiConfirmBtn.parentNode.replaceChild(newConfirmBtn, aiConfirmBtn);
       
@@ -1715,15 +1802,31 @@ document.addEventListener('DOMContentLoaded', async () => {
         });
         renderChecklist();
         
+        stopAiCameraStream();
         if (aiScanModal) aiScanModal.classList.add('hidden');
         showToast('AI 진단 결과가 체크리스트에 동기화되었습니다.');
       });
     }
   }
 
+  // 재촬영 버튼 바인딩
+  if (aiRetryScanBtn) {
+    aiRetryScanBtn.addEventListener('click', () => {
+      openAiBatchScanModal();
+      playNotificationSound('beep');
+    });
+  }
+
   if (closeAiModalBtn && aiScanModal) {
-    closeAiModalBtn.addEventListener('click', () => {
+    const handleCloseAiModal = () => {
+      stopAiCameraStream();
       aiScanModal.classList.add('hidden');
+    };
+    closeAiModalBtn.addEventListener('click', handleCloseAiModal);
+    aiScanModal.addEventListener('click', (e) => {
+      if (e.target === aiScanModal) {
+        handleCloseAiModal();
+      }
     });
   }
 
