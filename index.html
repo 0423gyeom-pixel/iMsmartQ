@@ -13,7 +13,7 @@
   <!-- FontAwesome for icons -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <!-- v 파라미터: 배포/수정 시 값을 올려 브라우저 CSS 캐시를 무효화 -->
-  <link rel="stylesheet" href="style.css?v=20260825_update">
+  <link rel="stylesheet" href="style.css?v=20260825_camera_live">
 </head>
 <body>
   <div class="mobile-web-container">
@@ -870,17 +870,23 @@
         <!-- 단계 2: 촬영 및 다중 전표 등록 -->
         <div id="scan-step-capture-view" class="scan-step-panel hidden">
           <div style="text-align: center; margin-bottom: 10px;">
-            <h4 id="capture-title-text" style="font-size: 15px; font-weight: 800; margin: 0 0 4px 0;">전표를 촬영해 주세요.</h4>
-            <p id="capture-guidance-text" style="font-size: 11.5px; color: var(--cool-gray); margin: 0;">전표 전체가 뷰파인더 가이드 격자 내에 들어오도록 촬영해주세요.</p>
+            <h4 id="capture-title-text" style="font-size: 15px; font-weight: 800; margin: 0 0 4px 0;">전표를 카메라에 맞춰 주세요.</h4>
+            <p id="capture-guidance-text" style="font-size: 11.5px; color: var(--cool-gray); margin: 0;">전표 전체가 격자 안에 들어오면 <strong style="color:var(--brand-mint-dark);">지금 바로 촬영</strong> 버튼을 눌러 주세요.</p>
           </div>
           
-          <!-- 모의 카메라 화면 프레임 -->
+          <!-- 모의 및 실제 라이브 카메라 통합 뷰파인더 -->
           <div class="camera-viewfinder" style="position: relative; overflow: hidden; background-color: #000; border-radius: 12px; height: 240px; display: flex; justify-content: center; align-items: center; margin-bottom: 12px;">
+            <!-- 실시간 웹캠/모바일 후면 카메라 스트리밍 뷰어 -->
+            <video id="camera-stream" autoplay playsinline style="width: 100%; height: 100%; object-fit: cover; display: none;"></video>
+            
             <div id="demo-voucher-preview" style="width: 80%; height: 75%; background-size: contain; background-repeat: no-repeat; background-position: center; opacity: 0.9;"></div>
             
             <div class="camera-guide" style="position: absolute; width: 85%; height: 80%; border: 2px dashed #00BAC6; box-shadow: 0 0 0 9999px rgba(0,0,0,0.5); pointer-events: none; border-radius: 4px;"></div>
             <div class="scan-laser" id="laser-effect" style="position: absolute; width: 85%; height: 2px; background-color: #00BAC6; box-shadow: 0 0 8px #00BAC6; display: none; animation: scanMove 2.2s infinite ease-in-out;"></div>
           </div>
+          
+          <!-- 스냅샷 촬영용 숨김 캔버스 -->
+          <canvas id="camera-canvas" style="display: none;"></canvas>
 
           <!-- 대량 이체 전용 다중 전표 등록 리스트 바 -->
           <div id="mass-image-slots-container" class="hidden" style="margin-bottom: 14px; background-color: #fafbfc; border: 1px solid var(--light-gray); border-radius: 8px; padding: 10px; box-sizing: border-box;">
@@ -895,10 +901,10 @@
 
           <div style="display: flex; gap: 8px;">
             <button class="btn-scan-action btn-scan-secondary" id="btn-mock-gallery" style="flex: 1; margin: 0; background-color: var(--white); border: 1px solid var(--brand-mint); height: 42px;">
-              <i class="fa-solid fa-image"></i> 갤러리 업로드
+              <i class="fa-solid fa-images"></i> 파일 선택
             </button>
-            <button class="btn-scan-action btn-scan-primary" id="btn-mock-shoot" style="flex: 1.3; margin: 0; height: 42px;">
-              <i class="fa-solid fa-camera"></i> 전표 촬영 추가
+            <button class="btn-scan-action btn-scan-primary" id="btn-mock-shoot" style="flex: 1.5; margin: 0; height: 42px; font-weight: 800; letter-spacing: -0.3px;">
+              <i class="fa-solid fa-circle-dot" style="color:#fff; font-size:16px;"></i>&nbsp;지금 바로 촬영
             </button>
           </div>
           
@@ -1228,6 +1234,6 @@
   <!-- 모바일 실제 카메라 어플 연동용 실시간 파일 업로더 -->
   <input type="file" id="real-camera-input" accept="image/*" capture="environment" style="display: none;">
 
-<script src="app.js?v=20260825_update"></script>
+<script src="app.js?v=20260825_camera_live"></script>
 </body>
 </html>

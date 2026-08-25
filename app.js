@@ -1872,6 +1872,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   let massUploadedImages = []; // { id: "IMG...", name: "전표 X", url: ... }
   let ocrResultData = null;    // AI 분석 결과 원본 객체 백업
   let activePreviewImageIndex = 0; // 대량 이체 결과 확인 시 왼쪽 뷰에 띄울 액티브 이미지 인덱스
+  let activeStream = null;      // 실시간 하드웨어 카메라 비디오 스트림 객체 백업
 
   // [행원 데이터베이스] (실시간 접수 목록 - 데모용 기본 3건 사전적재)
   window.staffVoucherDb = [
@@ -1921,6 +1922,52 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
   ];
 
+  // 실시간 비디오 카메라 스트림 구동 개시
+  function startActiveCameraStream() {
+    const video = document.getElementById('camera-stream');
+    const preview = document.getElementById('demo-voucher-preview');
+    if (!video) return;
+
+    // 만약 이미 스트림이 활성화되어 있다면 중복 요청 차단
+    if (activeStream) return;
+
+    navigator.mediaDevices.getUserMedia({
+      video: {
+        facingMode: "environment", // 스마트폰 후면 카메라 강제 호출
+        width: { ideal: 1280 },
+        height: { ideal: 720 }
+      },
+      audio: false
+    }).then(stream => {
+      activeStream = stream;
+      video.srcObject = stream;
+      video.style.display = 'block'; // 비디오 스트림 표출
+      if (preview) preview.style.display = 'none'; // 백업용 모의 프리뷰 숨김
+    }).catch(err => {
+      console.warn("실시간 카메라 렌즈 획득 실패 (PC 혹은 권한차단):", err);
+      video.style.display = 'none';
+      if (preview) preview.style.display = 'block'; // 실패 시 모의 프리뷰로 폴백
+    });
+  }
+
+  // 실시간 비디오 카메라 스트림 해제/정지
+  function stopActiveCameraStream() {
+    const video = document.getElementById('camera-stream');
+    const preview = document.getElementById('demo-voucher-preview');
+    
+    if (activeStream) {
+      activeStream.getTracks().forEach(track => track.stop());
+      activeStream = null;
+    }
+    if (video) {
+      video.srcObject = null;
+      video.style.display = 'none';
+    }
+    if (preview) {
+      preview.style.display = 'block';
+    }
+  }
+
   // 단계 전환 제어 함수
   function gotoScanStep(stepNum) {
     if (!selectView || !captureView || !resultView || !successView) return;
@@ -1942,6 +1989,11 @@ document.addEventListener('DOMContentLoaded', async () => {
       if (ind) ind.classList.remove('active-step');
     });
 
+    // 2단계(촬영) 이외의 타 단계 진입 시 카메라 스트림 즉시 정지
+    if (stepNum !== 2) {
+      stopActiveCameraStream();
+    }
+
     if (stepNum === 1) {
       if (isEasyActive) {
         if (easySelectView) easySelectView.classList.remove('hidden');
@@ -1960,6 +2012,9 @@ document.addEventListener('DOMContentLoaded', async () => {
       captureView.classList.remove('hidden');
       if (stepInds[1]) stepInds[1].classList.add('active-step');
       
+      // 실시간 하드웨어 카메라 구동 시작!
+      startActiveCameraStream();
+
       // 대량 이체 다중 등록 바 및 타이틀 세팅
       const captureTitle = document.getElementById('capture-title-text');
       const captureGuidance = document.getElementById('capture-guidance-text');
@@ -1975,7 +2030,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         massImageSlotsContainer.classList.add('hidden');
       }
 
-      // 모의 배경 가이드 이미지 매핑
+      // 모의 배경 가이드 이미지 매핑 (실시간 비디오 실패 시의 렌더용 백업)
       if (demoVoucherPreview) {
         demoVoucherPreview.style.background = selectedVoucherType === 'MASS_TRANSFER' 
           ? "linear-gradient(135deg, #ede7f6 0%, #b39ddb 100%)" 
@@ -2234,14 +2289,38 @@ document.addEventListener('DOMContentLoaded', async () => {
     }, 1000);
   }
 
-  // 실제 카메라 연동 트리거
+  // 실제 카메라 연동 및 실시간 웹파인더 스냅샷 촬영 트리거
   if (btnMockShoot) {
     btnMockShoot.addEventListener('click', () => {
-      const realCameraInput = document.getElementById('real-camera-input');
-      if (realCameraInput) {
-        realCameraInput.click(); // 실제 모바일 기기 카메라 어플 기동
+      const video = document.getElementById('camera-stream');
+      const canvas = document.getElementById('camera-canvas');
+      
+      // 1. 실시간 후면 카메라 스트림이 돌고 있는 경우 -> 비디오 화면 그대로 캡처!
+      if (activeStream && video && canvas) {
+        const ctx = canvas.getContext('2d');
+        // 비디오 해상도로 캔버스 크기 맞춤
+        canvas.width = video.videoWidth || video.clientWidth;
+        canvas.height = video.videoHeight || video.clientHeight;
+        
+        // 프레임 그리기
+        ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+        
+        // DataURL 찰칵 이미지 추출
+        const imgDataUrl = canvas.toDataURL('image/jpeg');
+        
+        // 카메라 스트림 정리 및 끄기
+        stopActiveCameraStream();
+        
+        // 캡처 이미지 주입 분석 실행!
+        executeVoucherCapture(imgDataUrl);
       } else {
-        executeVoucherCapture(); // 폴백 시뮬레이션
+        // 2. 카메라 미연동 시 폴백 구동 (파일/카메라앱 다이얼로그)
+        const realCameraInput = document.getElementById('real-camera-input');
+        if (realCameraInput) {
+          realCameraInput.click();
+        } else {
+          executeVoucherCapture();
+        }
       }
     });
   }
