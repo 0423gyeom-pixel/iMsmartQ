@@ -96,38 +96,40 @@
         </div>
       </section>
 
-      <!-- 쉬운 모드 전용 대형 버튼 레이아웃 컨테이너 (기본 숨김, 모바일 번호표 바로 아래 배치) -->
-      <div id="easy-mode-layout-container" class="hidden" style="width: 100%; display: flex; flex-direction: column; margin: 0 0 16px; box-sizing: border-box; gap: 12px;">
+      <!-- 쉬운 모드 전용 대형 버튼 레이아웃 컨테이너 (기본 숨김) -->
+      <div id="easy-mode-layout-container" class="hidden">
         
-        <!-- 1. 송금전표 스캔 대형 버튼 -->
-        <button class="quick-card-btn" id="btn-easy-scan" style="width: 100%; display: flex; flex-direction: row; align-items: center; justify-content: space-between; gap: 16px; padding: clamp(14px, 2.3cqh, 20px) clamp(16px, 3cqw, 24px); background-color: #ffffff; border: 3px solid var(--brand-mint); border-radius: 16px; cursor: pointer; box-shadow: 0 4px 12px rgba(0,0,0,0.03); box-sizing: border-box; transition: all 0.2s;">
-          <img src="easy_voucher.png" alt="송금전표" style="width: clamp(110px, 15cqw, 140px); height: auto; object-fit: contain; flex-shrink: 0;" />
-          <span style="font-size: clamp(22px, 3cqh, 27px); font-weight: 900; color: var(--brand-mint-dark); text-align: right; line-height: 1.15; font-family: 'Pretendard', sans-serif; letter-spacing: -1px;">
-            송금전표<br>스캔
+        <!-- 1. 송금전표 사진찍기 대형 버튼 -->
+        <button class="easy-card-btn easy-scan-btn-large" id="btn-easy-scan">
+          <div class="easy-voucher-img-box">
+            <img src="easy_voucher.png" alt="송금전표" />
+          </div>
+          <span class="easy-scan-text">
+            송금전표<br>사진찍기
           </span>
         </button>
 
-        <!-- 2. 미리작성 / 서류체크 2분할 레이아웃 -->
-        <div style="display: flex; gap: 12px; width: 100%; box-sizing: border-box;">
+        <!-- 2. 미리작성 / 서류 챙기기 2분할 레이아웃 -->
+        <div class="easy-split-row">
           <!-- 미리작성 -->
-          <button class="quick-card-btn" id="btn-easy-pre-writing" style="flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 10px; padding: clamp(14px, 2cqh, 18px) 10px; background-color: #ffffff; border: 3px solid var(--brand-mint); border-radius: 16px; cursor: pointer; box-shadow: 0 4px 12px rgba(0,0,0,0.03); box-sizing: border-box; transition: all 0.2s;">
-            <img src="easy_pencil.png" alt="미리작성" style="width: clamp(48px, 6.8cqh, 56px); height: clamp(48px, 6.8cqh, 56px); object-fit: contain;" />
-            <span style="font-size: clamp(15px, 2cqh, 18px); font-weight: 800; color: #1a1a1a; font-family: 'Pretendard', sans-serif;">미리작성</span>
+          <button class="easy-card-btn easy-split-btn" id="btn-easy-pre-writing">
+            <img src="easy_pencil.png" alt="미리작성" />
+            <span>미리작성</span>
           </button>
           
-          <!-- 서류체크 (기존 체크리스트 매핑) -->
-          <button class="quick-card-btn" id="btn-easy-checklist" style="flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 10px; padding: clamp(14px, 2cqh, 18px) 10px; background-color: #ffffff; border: 3px solid var(--brand-mint); border-radius: 16px; cursor: pointer; box-shadow: 0 4px 12px rgba(0,0,0,0.03); box-sizing: border-box; transition: all 0.2s;">
-            <img src="easy_check.png" alt="서류체크" style="width: clamp(48px, 6.8cqh, 56px); height: clamp(48px, 6.8cqh, 56px); object-fit: contain;" />
-            <span style="font-size: clamp(15px, 2cqh, 18px); font-weight: 800; color: #1a1a1a; font-family: 'Pretendard', sans-serif;">서류체크</span>
+          <!-- 서류 챙기기 (기존 체크리스트 매핑) -->
+          <button class="easy-card-btn easy-split-btn" id="btn-easy-checklist">
+            <img src="easy_check.png" alt="서류 챙기기" />
+            <span>서류 챙기기</span>
           </button>
         </div>
 
-        <!-- 3. 금융성향 테스트 가로 바형 버튼 -->
-        <button class="quick-card-btn" id="btn-easy-financial-test" style="width: 100%; display: flex; flex-direction: row; align-items: center; justify-content: center; gap: 8px; padding: clamp(10px, 1.8cqh, 14px) 16px; background-color: #ffffff; border: 3px solid var(--brand-mint); border-radius: 16px; cursor: pointer; box-shadow: 0 4px 12px rgba(0,0,0,0.03); box-sizing: border-box; transition: all 0.2s;">
-          <div style="width: 22px; height: 22px; border-radius: 50%; background-color: #fff4eb; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
-            <i class="fa-solid fa-magnifying-glass" style="color: #ff9f43; font-size: 11px;"></i>
+        <!-- 3. 금융성향 알아보기 가로 바형 버튼 -->
+        <button class="easy-card-btn easy-bar-btn" id="btn-easy-financial-test">
+          <div class="easy-search-icon-circle">
+            <i class="fa-solid fa-magnifying-glass"></i>
           </div>
-          <span style="font-size: clamp(14px, 1.9cqh, 17px); font-weight: 800; color: #1a1a1a; font-family: 'Pretendard', sans-serif;">금융성향 테스트</span>
+          <span>금융성향 알아보기</span>
         </button>
 
       </div>
@@ -773,6 +775,62 @@
 
       <div class="modal-body" style="padding: 16px; overflow-y: auto; flex: 1;">
         
+        <!-- 쉬운 모드 전용 거래 유형 선택 판넬 (기본 숨김) -->
+        <div id="easy-scan-step-select-view" class="scan-step-panel hidden" style="text-align: center; font-family: 'Pretendard', sans-serif;">
+          <!-- 팝업 제목 -->
+          <h3 style="font-size: clamp(23px, 3.4cqh, 30px); font-weight: 900; color: #111111; margin: 8px 0 20px 0; letter-spacing: -0.5px;">송금 전표 사진찍기 선택</h3>
+          
+          <!-- 2분할 전표 카드 그리드 (CSS 기반 고해상도 구현 및 꽉 차는 레이아웃) -->
+          <div style="display: flex; gap: 14px; margin-bottom: 20px; width: 100%; box-sizing: border-box;">
+            <!-- 찾으실때 전표 (빨간색) -->
+            <button class="easy-voucher-select-btn" data-vtype="WITHDRAW_TRANSFER" style="flex: 1; padding: 0; background-color: #ffffff; border: 3px solid #00baae; border-radius: 20px; overflow: hidden; display: flex; flex-direction: column; cursor: pointer; box-shadow: 0 4px 14px rgba(0,0,0,0.06); box-sizing: border-box;">
+              <!-- 헤더 -->
+              <div style="background-color: #d63031; color: #ffffff; font-size: clamp(16px, 2.3cqw, 20px); font-weight: 900; padding: 14px 10px; width: 100%; text-align: center; box-sizing: border-box; letter-spacing: -0.5px;">
+                찾으실때 전표
+              </div>
+              <!-- 바디 -->
+              <div style="padding: clamp(16px, 2.8cqh, 24px) 10px; display: flex; flex-direction: column; align-items: center; gap: 18px; width: 100%; box-sizing: border-box;">
+                <img src="easy_voucher_withdraw_illust.png" alt="찾으실때 일러스트" style="width: 90%; height: auto; display: block; max-width: 160px; filter: drop-shadow(0 2px 6px rgba(0,0,0,0.05));" />
+                <span style="font-size: clamp(21px, 2.9cqh, 27px); font-weight: 900; color: #111111; line-height: 1.25; font-family: 'Pretendard', sans-serif; letter-spacing: -0.5px;">
+                  찾으실때<br>(빨간색)
+                </span>
+              </div>
+            </button>
+            
+            <!-- 보내실때 전표 (파란색) -->
+            <button class="easy-voucher-select-btn" data-vtype="SINGLE_TRANSFER" style="flex: 1; padding: 0; background-color: #ffffff; border: 3px solid #00baae; border-radius: 20px; overflow: hidden; display: flex; flex-direction: column; cursor: pointer; box-shadow: 0 4px 14px rgba(0,0,0,0.06); box-sizing: border-box;">
+              <!-- 헤더 -->
+              <div style="background-color: #0984e3; color: #ffffff; font-size: clamp(16px, 2.3cqw, 20px); font-weight: 900; padding: 14px 10px; width: 100%; text-align: center; box-sizing: border-box; letter-spacing: -0.5px;">
+                보내실때 전표
+              </div>
+              <!-- 바디 -->
+              <div style="padding: clamp(16px, 2.8cqh, 24px) 10px; display: flex; flex-direction: column; align-items: center; gap: 18px; width: 100%; box-sizing: border-box;">
+                <img src="easy_voucher_deposit_illust.png" alt="보내실때 일러스트" style="width: 90%; height: auto; display: block; max-width: 160px; filter: drop-shadow(0 2px 6px rgba(0,0,0,0.05));" />
+                <span style="font-size: clamp(21px, 2.9cqh, 27px); font-weight: 900; color: #111111; line-height: 1.25; font-family: 'Pretendard', sans-serif; letter-spacing: -0.5px;">
+                  보내실때<br>(파란색)
+                </span>
+              </div>
+            </button>
+          </div>
+
+          <!-- 대량이체 가로 바 버튼 -->
+          <button class="easy-voucher-select-btn" data-vtype="MASS_TRANSFER" style="width: 100%; display: flex; flex-direction: row; align-items: center; justify-content: center; gap: 8px; padding: clamp(12px, 2cqh, 16px) 20px; background-color: #ffffff; border: 2.5px solid var(--brand-mint); border-radius: 14px; margin-bottom: 24px; cursor: pointer; transition: all 0.2s; box-sizing: border-box; box-shadow: var(--shadow-sm);">
+            <svg style="width: 20px; height: 20px; flex-shrink: 0;" viewBox="0 0 24 24" fill="none" stroke="var(--brand-mint)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+              <polyline points="14 2 14 8 20 8"></polyline>
+              <line x1="16" y1="13" x2="8" y2="13"></line>
+              <line x1="16" y1="17" x2="8" y2="17"></line>
+              <polyline points="10 9 9 9 8 9"></polyline>
+            </svg>
+            <span style="font-size: clamp(18px, 2.4cqh, 22px); font-weight: 800; color: var(--brand-mint-dark);">대량이체</span>
+          </button>
+
+          <!-- 취소 버튼 -->
+          <div style="border-top: 1px solid var(--light-gray); padding-top: 14px; width: 100%;">
+            <button type="button" id="easy-scan-cancel-btn" style="background: none; border: none; font-size: clamp(18px, 2.3cqh, 21px); font-weight: 800; color: #666666; cursor: pointer; width: 100%; padding: 4px 0;">취소</button>
+          </div>
+        </div>
+
         <!-- 단계 1: 거래 유형 선택 (단일 vs 대량) -->
         <div id="scan-step-select-view" class="scan-step-panel">
           <div style="text-align: center; margin-bottom: 18px;">
@@ -1166,6 +1224,9 @@
   </div>
 
   </div> <!-- Ends .mobile-web-container (푸터/토스트/모달까지 모두 포함하여 PC 폰 프레임 안에 갇히도록 함) -->
+
+  <!-- 모바일 실제 카메라 어플 연동용 실시간 파일 업로더 -->
+  <input type="file" id="real-camera-input" accept="image/*" capture="environment" style="display: none;">
 
 <script src="app.js?v=20260818e"></script>
 </body>

@@ -1,5 +1,32 @@
 document.addEventListener('DOMContentLoaded', async () => {
   let activeBusiness = 'sushin'; // 영업점 업무 카테고리 정의 (수신/여신 구분용)
+
+  // --- 모달 팝업 오픈 상태 감시 및 body 스크롤 차단(no-scroll) 자동 연동 ---
+  const modalElements = document.querySelectorAll('.modal-overlay, .modal, [id$="-modal"]');
+  const syncScrollLock = () => {
+    let anyModalVisible = false;
+    modalElements.forEach(modal => {
+      if (modal && !modal.classList.contains('hidden') && getComputedStyle(modal).display !== 'none') {
+        anyModalVisible = true;
+      }
+    });
+    if (anyModalVisible) {
+      document.body.classList.add('no-scroll');
+      document.documentElement.classList.add('no-scroll');
+    } else {
+      document.body.classList.remove('no-scroll');
+      document.documentElement.classList.remove('no-scroll');
+    }
+  };
+
+  const modalObserver = new MutationObserver(syncScrollLock);
+  modalElements.forEach(modal => {
+    modalObserver.observe(modal, { attributes: true, attributeFilter: ['class', 'style'] });
+  });
+
+  // 최초 동기화
+  syncScrollLock();
+
   // --- 1. DOM Elements ---
   const statusClock = document.getElementById('status-clock');
   const liveTimestamp = document.getElementById('live-timestamp');
@@ -1622,7 +1649,7 @@ document.addEventListener('DOMContentLoaded', async () => {
       }
 
       const resultItemEl = document.createElement('div');
-      resultItemEl.className = 'ai-report-item';
+    resultItemEl.className = 'ai-report-item';
       resultItemEl.style.borderBottom = '1px solid #f1f2f6';
       resultItemEl.style.padding = '12px 0';
 
@@ -1644,6 +1671,8 @@ document.addEventListener('DOMContentLoaded', async () => {
 
       aiBatchResultList.appendChild(resultItemEl);
     });
+
+
 
     const totalCount = items.length;
     const isAllPassed = fitCount === totalCount;
@@ -1896,18 +1925,34 @@ document.addEventListener('DOMContentLoaded', async () => {
   function gotoScanStep(stepNum) {
     if (!selectView || !captureView || !resultView || !successView) return;
     
+    const easyModeLayoutContainer = document.getElementById('easy-mode-layout-container');
+    const isEasyActive = easyModeLayoutContainer && !easyModeLayoutContainer.classList.contains('hidden');
+    
+    const modalHeader = document.querySelector('#transfer-voucher-modal .modal-header');
+    const scanFlowSteps = document.querySelector('#transfer-voucher-modal .scan-flow-steps');
+    const easySelectView = document.getElementById('easy-scan-step-select-view');
+
     selectView.classList.add('hidden');
     captureView.classList.add('hidden');
     resultView.classList.add('hidden');
     successView.classList.add('hidden');
+    if (easySelectView) easySelectView.classList.add('hidden');
 
     stepInds.forEach(ind => {
       if (ind) ind.classList.remove('active-step');
     });
 
     if (stepNum === 1) {
-      selectView.classList.remove('hidden');
-      if (stepInds[0]) stepInds[0].classList.add('active-step');
+      if (isEasyActive) {
+        if (easySelectView) easySelectView.classList.remove('hidden');
+        if (modalHeader) modalHeader.classList.add('hidden');
+        if (scanFlowSteps) scanFlowSteps.classList.add('hidden');
+      } else {
+        selectView.classList.remove('hidden');
+        if (modalHeader) modalHeader.classList.remove('hidden');
+        if (scanFlowSteps) scanFlowSteps.classList.remove('hidden');
+        if (stepInds[0]) stepInds[0].classList.add('active-step');
+      }
       if (typeof renderMySentVoucherList === 'function') {
         renderMySentVoucherList();
       }
@@ -2155,8 +2200,8 @@ document.addEventListener('DOMContentLoaded', async () => {
     });
   }
 
-  // 모의 추가 촬영
-  function executeVoucherCapture() {
+  // 카메라 촬영 및 파일 분석 (실제 카메라 파일 URL 지원)
+  function executeVoucherCapture(customImgUrl) {
     if (laserEffect) {
       laserEffect.style.display = "block";
     }
@@ -2169,8 +2214,7 @@ document.addEventListener('DOMContentLoaded', async () => {
       if (selectedVoucherType === 'MASS_TRANSFER') {
         // 대량 이체 이미지 1건 증설
         const nextIdx = massUploadedImages.length + 1;
-        const ocrColors = ["linear-gradient(135deg, #ede7f6 0%, #b39ddb 100%)", "linear-gradient(135deg, #fff3e0 0%, #ffcc80 100%)", "linear-gradient(135deg, #e8f5e9 0%, #a5d6a7 100%)"];
-        const bg = ocrColors[(nextIdx - 1) % ocrColors.length];
+        const bg = customImgUrl || "linear-gradient(135deg, #ede7f6 0%, #b39ddb 100%)";
         
         massUploadedImages.push({
           id: `IMG00${nextIdx}`,
@@ -2182,20 +2226,55 @@ document.addEventListener('DOMContentLoaded', async () => {
         renderMassThumbnails();
       } else {
         // 단일 이체 OCR 실행
-        ocrResultData = aiOcrService.analyze('SINGLE_TRANSFER', ["linear-gradient(135deg, #e0f7fa 0%, #80deea 100%)"]);
+        const bg = customImgUrl || "linear-gradient(135deg, #e0f7fa 0%, #80deea 100%)";
+        ocrResultData = aiOcrService.analyze('SINGLE_TRANSFER', [bg]);
         gotoScanStep(3);
         showToast('단일 전표 OCR 분석 성공!');
       }
     }, 1000);
   }
 
+  // 실제 카메라 연동 트리거
   if (btnMockShoot) {
-    btnMockShoot.addEventListener('click', executeVoucherCapture);
+    btnMockShoot.addEventListener('click', () => {
+      const realCameraInput = document.getElementById('real-camera-input');
+      if (realCameraInput) {
+        realCameraInput.click(); // 실제 모바일 기기 카메라 어플 기동
+      } else {
+        executeVoucherCapture(); // 폴백 시뮬레이션
+      }
+    });
   }
+
+  // 실제 카메라 촬영 완료 시 이벤트 감지
+  const realCameraInput = document.getElementById('real-camera-input');
+  if (realCameraInput) {
+    realCameraInput.addEventListener('change', (e) => {
+      const file = e.target.files[0];
+      if (file) {
+        const imgUrl = URL.createObjectURL(file); // 임시 이미지 blob url 생성
+        executeVoucherCapture(imgUrl);
+        realCameraInput.value = ''; // 재촬영 대비 초기화
+      }
+    });
+  }
+
   if (btnMockGallery) {
     btnMockGallery.addEventListener('click', () => {
-      showToast('갤러리에서 이체 전표 파일을 선택 중...');
-      setTimeout(executeVoucherCapture, 500);
+      // 갤러리 업로드 시에도 파일 업로드를 위해 capture 속성이 없는 파일 다이얼로그 호출 가능
+      const realCameraInput = document.getElementById('real-camera-input');
+      if (realCameraInput) {
+        // 갤러리/앨범 탐색을 위해 임시로 capture 속성을 제거했다가 띄움
+        realCameraInput.removeAttribute('capture');
+        realCameraInput.click();
+        // 다이얼로그 클릭 후 카메라용으로 0.5초 뒤 capture 복구
+        setTimeout(() => {
+          realCameraInput.setAttribute('capture', 'environment');
+        }, 500);
+      } else {
+        showToast('갤러리에서 이체 전표 파일을 선택 중...');
+        setTimeout(executeVoucherCapture, 500);
+      }
     });
   }
 
@@ -3230,6 +3309,36 @@ document.addEventListener('DOMContentLoaded', async () => {
     });
   }
 
+  // 쉬운 모드 전표 타입 선택 및 촬영 진입 이벤트 바인딩
+  const easyVoucherSelectBtns = document.querySelectorAll('.easy-voucher-select-btn');
+  easyVoucherSelectBtns.forEach(btn => {
+    btn.addEventListener('click', () => {
+      selectedVoucherType = btn.getAttribute('data-vtype');
+      
+      // 대량 이체일 때 등록 배열 초기화
+      if (selectedVoucherType === 'MASS_TRANSFER') {
+        massUploadedImages = [];
+      }
+      
+      if (typeof gotoScanStep === 'function') {
+        gotoScanStep(2); // 바로 2단계 촬영 뷰로 진입!
+      }
+      playNotificationSound('beep');
+    });
+  });
+
+  // 쉬운 모드 전표 선택 취소 버튼 바인딩
+  const easyScanCancelBtn = document.getElementById('easy-scan-cancel-btn');
+  if (easyScanCancelBtn) {
+    easyScanCancelBtn.addEventListener('click', () => {
+      const transferVoucherModal = document.getElementById('transfer-voucher-modal');
+      if (transferVoucherModal) {
+        transferVoucherModal.classList.add('hidden');
+      }
+      playNotificationSound('beep');
+    });
+  }
+
   // 쉬운 모드 전용 미리작성 버튼 열기 연동
   const easyPreWritingBtn = document.getElementById('btn-easy-pre-writing');
   if (easyPreWritingBtn) {
@@ -3293,7 +3402,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         easyModeToggleBtn.style.border = '2px solid #2c3e50';
         easyModeToggleBtn.innerHTML = '<i class="fa-solid fa-magnifying-glass-minus"></i> 쉬운 모드 끄기';
         
-        showToast('쉬운 모드가 활성화되었습니다. 글씨와 버튼이 시니어 전용으로 커집니다.');
+        showToast('쉬운 모드가 활성화되었습니다. 글씨와 버튼이 크고 명확해집니다.');
       }
       playNotificationSound('beep');
     });
