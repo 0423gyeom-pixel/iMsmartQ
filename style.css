@@ -1369,12 +1369,14 @@ input:checked + .slider:before {
 .camera-viewfinder {
   position: relative;
   width: 100%;
-  aspect-ratio: 4 / 3;
+  aspect-ratio: 3 / 4;   /* 전표/A4 세로 비율에 최적화 */
+  min-height: 340px;
+  max-height: 70vh;
   background-color: #111;
   border-radius: 12px;
   overflow: hidden;
-  margin-top: 12px;
-  margin-bottom: 16px;
+  margin-top: 8px;
+  margin-bottom: 14px;
   display: flex;
   justify-content: center;
   align-items: center;
@@ -2201,11 +2203,13 @@ input:checked + .slider:before {
   max-width: 440px; /* 폰 프레임과 맞춤 */
   background-color: var(--white);
   border-radius: 24px;
-  padding: 24px;
+  padding: 18px 20px;
   box-shadow: var(--shadow-lg);
   display: flex;
   flex-direction: column;
-  gap: 16px;
+  gap: 12px;
+  max-height: 92vh;
+  overflow-y: auto;
 }
 
 .modal-header {
