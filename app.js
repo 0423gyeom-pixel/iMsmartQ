@@ -424,16 +424,71 @@ document.addEventListener('DOMContentLoaded', async () => {
             <input type="text" class="form-input" id="cif-dep-amount" placeholder="예: 1,000,000" required>
           </div>
           <div class="form-group">
-            <label class="form-label">만기시 처리 방식</label>
+            <label class="form-label">만기자동해지 / 만기재예치</label>
             <select class="form-input" id="cif-dep-expiry-type">
-              <option value="만기 자동해지 후 지정계좌 입금">만기 자동해지 후 지정계좌 입금</option>
-              <option value="만기 자동재예치 (원금+이자)">만기 자동재예치 (원금+이자)</option>
-              <option value="만기 직접 해지">만기 직접 해지</option>
+              <option value="만기자동해지">만기자동해지</option>
+              <option value="만기재예치">만기재예치</option>
+              <option value="적용안함">적용안함</option>
             </select>
           </div>
           <div class="form-group">
             <label class="form-label">출금 계좌번호 (연동용)</label>
             <input type="text" inputmode="numeric" class="form-input" id="cif-dep-withdraw-acc" placeholder="연결할 계좌번호 입력 (- 제외)" required>
+            <p style="font-size: 11px; color: #555555; margin: 5px 0 0 2px; line-height: 1.45;">
+              * 보유하신 입출금 계좌에서 가입 금액이 출금되어 예·적금이 신규 개설됩니다.
+            </p>
+          </div>
+
+          <!-- 신규 계좌 개설 법정 필수 확인 (특정금융정보법상 CDD 연계) -->
+          <div style="background-color: #F8FAFC; border: 1.5px solid #E2E8F0; border-radius: 12px; padding: 13px 14px; margin-top: 14px; text-align: left;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; padding-bottom: 6px; border-bottom: 1.5px solid #E2E8F0;">
+              <span style="font-size: 12px; font-weight: 800; color: #1E293B;">
+                <i class="fa-solid fa-shield-halved" style="color: var(--brand-mint); margin-right: 5px;"></i>신규 계좌 법정 필수 확인 (CDD)
+              </span>
+              <span style="font-size: 10px; font-weight: 700; color: var(--brand-mint-dark); background-color: var(--brand-mint-light); padding: 2px 6px; border-radius: 4px;">특금법 제5조의2 필수</span>
+            </div>
+
+            <!-- Q1. 실소유자 여부 -->
+            <div class="form-group" style="margin-bottom: 10px;">
+              <label class="form-label" style="font-size: 11.5px; font-weight: 700; color: #334155;">
+                본인이 신규 개설 계좌의 실제 소유자입니까? <span style="color: #E53E3E;">*</span>
+              </label>
+              <div class="form-radio-group" style="grid-template-columns: repeat(2, 1fr); gap: 6px;">
+                <label class="radio-card" style="padding: 0;">
+                  <input type="radio" name="cif-cdd-realowner" value="예 (본인 직접 개설)" checked>
+                  <span class="radio-content" style="padding: 8px 4px; font-size: 11px; font-weight: 700; text-align: center;">예 (본인 직접 개설)</span>
+                </label>
+                <label class="radio-card" style="padding: 0;">
+                  <input type="radio" name="cif-cdd-realowner" value="아니오 (대리인 개설)">
+                  <span class="radio-content" style="padding: 8px 4px; font-size: 11px; font-weight: 700; text-align: center; color: #DC2626;">아니오 (대리인 개설)</span>
+                </label>
+              </div>
+            </div>
+
+            <!-- Q2. 거래 목적 -->
+            <div class="form-group" style="margin-bottom: 10px;">
+              <label class="form-label" style="font-size: 11.5px; font-weight: 700; color: #334155;">계좌 개설 목적 <span style="color: #E53E3E;">*</span></label>
+              <select class="form-input" id="cif-cdd-purpose" style="font-size: 12px; height: 38px;">
+                <option value="목돈 저축 및 예적금 투자" selected>목돈 저축 및 예적금 투자</option>
+                <option value="급여 수령 및 생활비 관리">급여 수령 및 생활비 관리</option>
+                <option value="사업상 거래 및 결제">사업상 거래 및 결제</option>
+                <option value="대출 거래 및 원리금 상환">대출 거래 및 원리금 상환</option>
+                <option value="기타">기타</option>
+              </select>
+            </div>
+
+            <!-- Q3. 자금의 원천 -->
+            <div class="form-group" style="margin-bottom: 4px;">
+              <label class="form-label" style="font-size: 11.5px; font-weight: 700; color: #334155;">거래자금의 원천(출처) <span style="color: #E53E3E;">*</span></label>
+              <select class="form-input" id="cif-cdd-source" style="font-size: 12px; height: 38px;">
+                <option value="근로소득 (급여/상여금)" selected>근로소득 (급여 / 상여금)</option>
+                <option value="사업소득">사업소득 (매출대금)</option>
+                <option value="부동산 임대소득 또는 매매대금">부동산 임대소득 또는 매매대금</option>
+                <option value="금융소득 (이자/배당 등)">금융소득 (이자 / 배당 등)</option>
+                <option value="상속 / 증여 / 가족지원금">상속 / 증여 / 가족지원금</option>
+                <option value="차입금 / 기타">차입금 / 기타</option>
+              </select>
+            </div>
           </div>
         `;
       } else if (detailVal === '체크/신용카드 신규') {
@@ -576,6 +631,12 @@ document.addEventListener('DOMContentLoaded', async () => {
           <div class="form-group">
             <label class="form-label">변경할 카드 대금 결제 계좌번호</label>
             <input type="text" inputmode="numeric" class="form-input" id="report-card-new-account" placeholder="새로운 대금 결제 계좌번호 입력" required>
+            
+            <!-- 계좌 비밀번호 보안 안내 (창구 직접 핀패드 입력 고지) -->
+            <div style="background-color: #F8FAF9; border: 1px dashed var(--brand-mint); border-radius: 8px; padding: 9px 11px; margin-top: 8px; font-size: 11px; color: #007A68; line-height: 1.45;">
+              <i class="fa-solid fa-lock" style="color: var(--brand-mint); margin-right: 4px;"></i>
+              <strong>계좌 비밀번호 보안 안내:</strong> 계좌 비밀번호는 영업점 직원도 알 수 없으며 모바일에서 사전에 입력받지 않습니다. 번호표 호출 시 창구 보안 핀패드(PIN-Pad)에 고객님이 직접 안전하게 입력합니다.
+            </div>
           </div>
         `;
       }
@@ -631,64 +692,221 @@ document.addEventListener('DOMContentLoaded', async () => {
       }
     } else if (selectedWorkType === 'doc') {
       // 4. 기초 서류 작성
-      if (detailVal === '고객확인제도(CDD/EDD)') {
+      if (detailVal === '고객확인제도(CDD/EDD)' || detailVal.includes('고객확인')) {
         html = `
-          <div class="form-group">
-            <label class="form-label">금융 거래 목적</label>
-            <select class="form-input" id="doc-cdd-purpose">
-              <option value="급여 및 생활비">급여 및 생활비</option>
-              <option value="저축 및 투자">저축 및 투자</option>
-              <option value="사업 자금 거래">사업 자금 거래</option>
-              <option value="대출 원리금 상환">대출 원리금 상환</option>
-            </select>
+          <!-- 안내 배너: CDD 및 EDD 제도 체계 및 기존 고객 갱신 안내 -->
+          <div class="info-alert-box" style="background-color: #F0FBF9; border: 1px solid #C4ECE5; border-radius: 10px; padding: 11px 13px; font-size: 11.5px; color: #0C6255; line-height: 1.5; margin-bottom: 12px; text-align: left;">
+            <div style="font-weight: 800; margin-bottom: 4px; font-size: 12px;">
+              <i class="fa-solid fa-shield-halved" style="color: var(--brand-mint); margin-right: 4px;"></i>고객확인의무(CDD/EDD) 주기적 재이행/갱신 안내
+            </div>
+            • <strong>신규 계좌 개설 고객</strong>: '신규 신청' 서식에 고객확인의무가 필수 단계로 자동 통합되어 있습니다.<br>
+            • <strong>본 서식의 용도</strong>: 이미 계좌가 있는 기존 고객의 법정 정보 갱신(CDD 3년, EDD 1년 주기) 또는 1천만 원 이상 무통장 일회성 거래 고객 전용 등록 서식입니다.
           </div>
-          <div class="form-group">
-            <label class="form-label">자금 원천 구분</label>
-            <select class="form-input" id="doc-cdd-source">
-              <option value="근로소득 (급여)">근로소득 (급여)</option>
-              <option value="사업소득">사업소득</option>
-              <option value="부동산 임대소득/양도">부동산 임대소득 / 양도</option>
-              <option value="상속 / 증여 / 차입">상속 / 증여 / 차입</option>
-            </select>
+
+          <!-- [1단계] 기본 고객확인 (CDD) 섹션 -->
+          <div style="background-color: #ffffff; border: 1px solid #E2E8F0; border-radius: 12px; padding: 13px 14px; margin-bottom: 12px; text-align: left;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; padding-bottom: 6px; border-bottom: 1.5px solid #F1F5F9;">
+              <span style="font-size: 12.5px; font-weight: 800; color: #1E293B;">
+                <i class="fa-solid fa-id-card-clip" style="color: var(--brand-mint); margin-right: 5px;"></i>1단계. 기본 고객확인 (CDD)
+              </span>
+              <span style="font-size: 10px; font-weight: 700; color: #059669; background-color: #ECFDF5; padding: 2px 6px; border-radius: 4px;">3년 주기 재이행</span>
+            </div>
+
+            <!-- Q1. 실제 소유자 여부 -->
+            <div class="form-group" style="margin-bottom: 10px;">
+              <label class="form-label" style="font-size: 11.5px; font-weight: 700; color: #334155;">
+                본인이 해당 금융거래(계좌)의 실제 소유자입니까? <span style="color: #E53E3E;">*</span>
+              </label>
+              <div class="form-radio-group" style="grid-template-columns: repeat(2, 1fr); gap: 6px;">
+                <label class="radio-card" style="padding: 0;">
+                  <input type="radio" name="doc-cdd-realowner" id="cdd-realowner-yes" value="예 (실제 소유자)" checked>
+                  <span class="radio-content" style="padding: 8px 4px; font-size: 11px; font-weight: 700; text-align: center;">예 (본인 직접 거래)</span>
+                </label>
+                <label class="radio-card" style="padding: 0;">
+                  <input type="radio" name="doc-cdd-realowner" id="cdd-realowner-no" value="아니오 (대리인 거래)">
+                  <span class="radio-content" style="padding: 8px 4px; font-size: 11px; font-weight: 700; text-align: center; color: #DC2626;">아니오 (타인 대리/의뢰)</span>
+                </label>
+              </div>
+            </div>
+
+            <!-- Q2. 국적 및 거주 구분 -->
+            <div class="form-group" style="margin-bottom: 10px;">
+              <label class="form-label" style="font-size: 11.5px; font-weight: 700; color: #334155;">
+                국적 및 거주 구분을 선택해 주세요. <span style="color: #E53E3E;">*</span>
+              </label>
+              <div class="form-radio-group" style="grid-template-columns: repeat(2, 1fr); gap: 6px;">
+                <label class="radio-card" style="padding: 0;">
+                  <input type="radio" name="doc-cdd-nationality" id="cdd-nation-kr" value="내국인" checked>
+                  <span class="radio-content" style="padding: 8px 4px; font-size: 11px; font-weight: 700; text-align: center;">대한민국 내국인</span>
+                </label>
+                <label class="radio-card" style="padding: 0;">
+                  <input type="radio" name="doc-cdd-nationality" id="cdd-nation-foreign" value="외국인/비거주자">
+                  <span class="radio-content" style="padding: 8px 4px; font-size: 11px; font-weight: 700; text-align: center; color: #2563EB;">외국인 / 해외 비거주자</span>
+                </label>
+              </div>
+            </div>
+
+            <!-- Q3. 추가 확인(EDD) 케이스 여부 확인 -->
+            <div class="form-group" style="margin-bottom: 4px;">
+              <label class="form-label" style="font-size: 11.5px; font-weight: 700; color: #334155;">
+                오늘 창구 방문 거래 유형이 아래 추가 확인 대상에 해당합니까?
+              </label>
+              <div style="font-size: 10.5px; color: #64748B; background-color: #F8FAFC; border: 1px dashed #CBD5E1; border-radius: 6px; padding: 7px 9px; margin-bottom: 6px; line-height: 1.4;">
+                • 1천만 원 이상 일회성 현금거래 / 1만 달러 이상 외환송금<br>
+                • 법인·개인사업자 거래 / 자금세탁 고위험 상품 거래
+              </div>
+              <div class="form-radio-group" style="grid-template-columns: repeat(2, 1fr); gap: 6px;">
+                <label class="radio-card" style="padding: 0;">
+                  <input type="radio" name="doc-cdd-edd-trigger" id="cdd-edd-trigger-no" value="해당없음" checked>
+                  <span class="radio-content" style="padding: 8px 4px; font-size: 11px; font-weight: 700; text-align: center;">해당 없음 (기본 CDD 완료)</span>
+                </label>
+                <label class="radio-card" style="padding: 0;">
+                  <input type="radio" name="doc-cdd-edd-trigger" id="cdd-edd-trigger-yes" value="해당있음">
+                  <span class="radio-content" style="padding: 8px 4px; font-size: 11px; font-weight: 700; text-align: center; color: var(--brand-mint-dark);">해당 있음 (추가 확인 대상)</span>
+                </label>
+              </div>
+            </div>
           </div>
-          <div class="form-group">
-            <label class="form-label">본인이 이 계좌의 실제 소유자입니까?</label>
-            <div class="form-radio-group" style="grid-template-columns: repeat(2, 1fr); gap: 6px;">
-              <label class="radio-card" style="padding: 0;">
-                <input type="radio" name="doc-cdd-realowner" value="예 (실제 소유자)" checked>
-                <span class="radio-content" style="padding: 8px 4px; font-size: 11.5px; text-align: center;">예 (실제 소유자)</span>
-              </label>
-              <label class="radio-card" style="padding: 0;">
-                <input type="radio" name="doc-cdd-realowner" value="아니오 (타인 대리)">
-                <span class="radio-content" style="padding: 8px 4px; font-size: 11.5px; text-align: center;">아니오 (대리 발급 등)</span>
-              </label>
+
+          <!-- [2단계] 강화된 고객확인 (EDD) 조건부 확장 섹션 -->
+          <div id="cdd-edd-advanced-section" class="hidden" style="background-color: #FFFDF5; border: 1.5px solid #FDE68A; border-radius: 12px; padding: 14px; margin-bottom: 12px; text-align: left; transition: all 0.3s ease;">
+            
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; padding-bottom: 6px; border-bottom: 1px solid #FEF3C7;">
+              <span style="font-size: 12.5px; font-weight: 800; color: #92400E;">
+                <i class="fa-solid fa-file-shield" style="color: #D97706; margin-right: 5px;"></i>2단계. 강화된 고객확인 (EDD) 필수 추가 정보
+              </span>
+              <span style="font-size: 10px; font-weight: 700; color: #D97706; background-color: #FEF3C7; padding: 2px 6px; border-radius: 4px;">1년 주기 재이행</span>
+            </div>
+
+            <div id="cdd-edd-reason-banner" style="font-size: 11px; color: #B45309; background-color: #FFFBEB; border-radius: 6px; padding: 6px 8px; margin-bottom: 10px; line-height: 1.4;">
+              <i class="fa-solid fa-circle-exclamation" style="margin-right: 4px;"></i>
+              <span id="cdd-edd-reason-text">추가 확인 케이스(대리인·외국인·고액거래 등)에 해당하여 필수 추가 정보를 작성합니다.</span>
+            </div>
+
+            <!-- EDD 1. 직업 구분 -->
+            <div class="form-group" style="margin-bottom: 10px;">
+              <label class="form-label" style="font-size: 11.5px; font-weight: 700; color: #78350F;">직업 및 업종 구분 <span style="color: #E53E3E;">*</span></label>
+              <select class="form-input" id="doc-edd-job" style="font-size: 12px; height: 38px; border-color: #FCD34D;">
+                <option value="급여소득자 (회사원/공무원)">급여소득자 (회사원 / 공무원 / 공기업)</option>
+                <option value="개인사업자 / 소상공인">개인사업자 / 소상공인 / 자영업</option>
+                <option value="전문직 (의사/변호사/회계사 등)">전문직 (의사 / 법조인 / 세무회계 등)</option>
+                <option value="프리랜서 / 특수형태근로자">프리랜서 / 특수형태근로종사자</option>
+                <option value="주부 / 학생">주부 / 학생</option>
+                <option value="무직 / 은퇴 / 기타">무직 / 은퇴 / 기타</option>
+              </select>
+            </div>
+
+            <!-- EDD 2. 직장명 / 사업장명 -->
+            <div class="form-group" style="margin-bottom: 10px;">
+              <label class="form-label" style="font-size: 11.5px; font-weight: 700; color: #78350F;">직장명 또는 사업장명 <span style="font-size: 10.5px; color: #92400E; font-weight: 400;">(주부/학생/무직은 소속 또는 '해당없음' 입력)</span></label>
+              <input type="text" class="form-input" id="doc-edd-workplace" placeholder="예: (주)대구상사 또는 OO대학교" style="font-size: 12px; height: 38px; border-color: #FCD34D;">
+            </div>
+
+            <!-- EDD 3. 거래 목적 -->
+            <div class="form-group" style="margin-bottom: 10px;">
+              <label class="form-label" style="font-size: 11.5px; font-weight: 700; color: #78350F;">구체적 금융거래 목적 <span style="color: #E53E3E;">*</span></label>
+              <select class="form-input" id="doc-cdd-purpose" style="font-size: 12px; height: 38px; border-color: #FCD34D;">
+                <option value="급여 수령 및 생활비 관리">급여 수령 및 생활비 관리</option>
+                <option value="목돈 저축 및 예적금/투자">목돈 저축 및 예적금 / 펀드 투자</option>
+                <option value="사업상 물품대금 결제 및 운용">사업상 물품대금 결제 및 운용</option>
+                <option value="대출 실행 및 원리금 상환">대출 실행 및 원리금 상환</option>
+                <option value="부동산 매매 및 임차보증금">부동산 매매 및 임차보증금 지급</option>
+                <option value="기타 (상속/증여 등)">기타 (상속 / 증여 / 학자금 등)</option>
+              </select>
+            </div>
+
+            <!-- EDD 4. 자금 원천 구분 -->
+            <div class="form-group" style="margin-bottom: 4px;">
+              <label class="form-label" style="font-size: 11.5px; font-weight: 700; color: #78350F;">거래자금의 원천 (출처) <span style="color: #E53E3E;">*</span></label>
+              <select class="form-input" id="doc-cdd-source" style="font-size: 12px; height: 38px; border-color: #FCD34D;">
+                <option value="근로소득 (급여/상여금)">근로소득 (급여 / 상여금)</option>
+                <option value="사업소득 (매출대금)">사업소득 (매출대금 / 영업수익)</option>
+                <option value="부동산 임대소득 또는 매매대금">부동산 임대소득 또는 매매대금</option>
+                <option value="금융소득 (이자/배당/투자수익)">금융소득 (이자 / 배당 / 투자수익)</option>
+                <option value="상속 / 증여 / 가족지원금">상속 / 증여 / 가족지원금</option>
+                <option value="차입금 (대출금/개인차용)">차입금 (금융기관 대출 / 개인차용)</option>
+              </select>
             </div>
           </div>
         `;
-      } else if (detailVal === 'FATCA 거주지 확인') {
+      } else if (detailVal === 'FATCA 거주지 확인' || detailVal === 'FATCA/CRS 조세 거주지 확인') {
         html = `
+          <!-- 안내 배너: 메모 내용 반영 (미국/아르헨티나/멕시코/헝가리 국적자 필수) -->
+          <div class="info-alert-box" style="background-color: #F0F7FF; border: 1px solid #C8E1FF; border-radius: 10px; padding: 11px 13px; font-size: 11.5px; color: #1E429F; line-height: 1.5; margin-bottom: 12px; text-align: left;">
+            <i class="fa-solid fa-circle-info" style="color: #2B6CB0; margin-right: 4px;"></i>
+            <strong>조세목적상 국가 확인:</strong> 대한민국 이외에 납세 의무가 있는 경우(미국, 아르헨티나, 멕시코, 헝가리 국적자 등 필수) 본인확인서를 사실대로 작성해야 합니다.
+          </div>
+
+          <!-- Q1. 외국 납세 의무 여부 -->
           <div class="form-group">
-            <label class="form-label">본인은 미국 시민권자 또는 미국 거주자입니까?</label>
-            <div class="form-radio-group" style="grid-template-columns: repeat(2, 1fr); gap: 6px; margin-bottom: 8px;">
+            <label class="form-label" style="font-weight: 700; color: #111;">대한민국 외에 납세 의무(조세목적상 거주지)가 있습니까?</label>
+            <div class="form-radio-group" style="grid-template-columns: repeat(2, 1fr); gap: 8px; margin-bottom: 8px;">
               <label class="radio-card" style="padding: 0;">
-                <input type="radio" name="doc-fatca-us-check" value="아니오" checked>
-                <span class="radio-content" style="padding: 8px 4px; font-size: 11px; text-align: center;">아니오 (해당 없음)</span>
+                <input type="radio" name="doc-fatca-foreign-tax" id="fatca-tax-no" value="아니오" checked>
+                <span class="radio-content" style="padding: 9px 4px; font-size: 11.5px; font-weight: 700; text-align: center;">아니오 (한국만 해당)</span>
               </label>
               <label class="radio-card" style="padding: 0;">
-                <input type="radio" name="doc-fatca-us-check" value="예">
-                <span class="radio-content" style="padding: 8px 4px; font-size: 11px; text-align: center;">예 (미국 납세자)</span>
+                <input type="radio" name="doc-fatca-foreign-tax" id="fatca-tax-yes" value="예">
+                <span class="radio-content" style="padding: 9px 4px; font-size: 11.5px; font-weight: 700; text-align: center; color: var(--brand-mint-dark);">예 (외국 납세 의무 있음)</span>
               </label>
             </div>
           </div>
-          <div class="form-group">
-            <label class="form-label">국적 및 납세 국가</label>
-            <input type="text" class="form-input" id="doc-fatca-nationality" value="대한민국" required>
+
+          <!-- Q2. '예' 선택 시 동적 노출되는 스마트 입력 영역 (기본 숨김) -->
+          <div id="fatca-foreign-detail-section" class="hidden" style="background-color: #F9FBFA; border: 1px solid #E2E8F0; border-radius: 12px; padding: 14px; margin-bottom: 12px; text-align: left;">
+            
+            <!-- 조세목적상 국가 선택 -->
+            <div class="form-group" style="margin-bottom: 12px;">
+              <label class="form-label" style="font-size: 12px; font-weight: 700; color: #2D3748;">
+                조세목적상 국가 <span style="color: #E53E3E;">*</span>
+                <span style="font-size: 11px; font-weight: 500; color: #718096; margin-left: 4px;">(원터치 칩 선택 또는 직접 입력)</span>
+              </label>
+              
+              <!-- 원터치 국가 칩 (미국/아르헨티나/멕시코/헝가리) -->
+              <div class="chip-group" style="display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 8px;">
+                <button type="button" class="fatca-country-chip" data-country="미국" style="background:#fff; border:1px solid var(--brand-mint); color:var(--brand-mint-dark); padding:5px 10px; border-radius:14px; font-size:11px; font-weight:700; cursor:pointer;">🇺🇸 미국</button>
+                <button type="button" class="fatca-country-chip" data-country="아르헨티나" style="background:#fff; border:1px solid #CBD5E0; color:#4A5568; padding:5px 10px; border-radius:14px; font-size:11px; font-weight:700; cursor:pointer;">🇦🇷 아르헨티나</button>
+                <button type="button" class="fatca-country-chip" data-country="멕시코" style="background:#fff; border:1px solid #CBD5E0; color:#4A5568; padding:5px 10px; border-radius:14px; font-size:11px; font-weight:700; cursor:pointer;">🇲🇽 멕시코</button>
+                <button type="button" class="fatca-country-chip" data-country="헝가리" style="background:#fff; border:1px solid #CBD5E0; color:#4A5568; padding:5px 10px; border-radius:14px; font-size:11px; font-weight:700; cursor:pointer;">🇭🇺 헝가리</button>
+              </div>
+              
+              <input type="text" class="form-input" id="doc-fatca-country-input" placeholder="국가명을 직접 입력할 수도 있습니다" value="미국" style="font-size: 12px;">
+            </div>
+
+            <!-- 납세자번호(TIN) 보유 여부 -->
+            <div class="form-group" style="margin-bottom: 12px;">
+              <label class="form-label" style="font-size: 12px; font-weight: 700; color: #2D3748;">
+                납세자번호(TIN / SSN) 보유 여부 <span style="color: #E53E3E;">*</span>
+              </label>
+              <div class="form-radio-group" style="grid-template-columns: repeat(2, 1fr); gap: 6px; margin-bottom: 6px;">
+                <label class="radio-card" style="padding: 0;">
+                  <input type="radio" name="doc-fatca-tin-type" id="fatca-tin-has" value="보유" checked>
+                  <span class="radio-content" style="padding: 7px 4px; font-size: 11px; text-align: center;">보유 중 (직접 입력)</span>
+                </label>
+                <label class="radio-card" style="padding: 0;">
+                  <input type="radio" name="doc-fatca-tin-type" id="fatca-tin-none" value="미보유">
+                  <span class="radio-content" style="padding: 7px 4px; font-size: 11px; text-align: center;">미보유 / 모름 (창구 확인)</span>
+                </label>
+              </div>
+              <div id="doc-fatca-tin-input-box" style="margin-top: 6px;">
+                <input type="text" class="form-input" id="doc-fatca-tin-val" placeholder="납세자번호(TIN / SSN 9자리 등) 입력" style="font-size: 12px;">
+              </div>
+            </div>
+
+            <!-- 창구 연계 안내 팁 배너 -->
+            <div style="background-color: #EDF7F6; border: 1px dashed var(--brand-mint); border-radius: 8px; padding: 9px 11px; font-size: 11px; color: #007A68; line-height: 1.45;">
+              <i class="fa-solid fa-building-columns" style="color: var(--brand-mint); margin-right: 4px;"></i>
+              <strong>창구 간편 연계:</strong> 영문 해외 상세주소 및 법정 서식은 창구 호출 시 행원이 전산 화면과 대조하여 최종 완성해 드립니다.
+            </div>
+
           </div>
-          <div class="form-group checkbox-group" style="margin-bottom: 12px;">
+
+          <!-- 확인 동의 -->
+          <div class="form-group checkbox-group" style="margin-top: 10px; margin-bottom: 12px;">
             <label class="checkbox-container">
               <input type="checkbox" id="doc-fatca-cert-agree" checked>
               <span class="checkmark"></span>
-              <span class="checkbox-label" style="font-size: 11.5px;">해외금융계좌신고(FATCA) 거주지 본인 확인 확약에 동의합니다.</span>
+              <span class="checkbox-label" style="font-size: 11.5px; font-weight: 600;">본인은 상기 기재한 조세목적상 거주지 정보가 사실과 일치함을 확인합니다.</span>
             </label>
           </div>
         `;
@@ -705,6 +923,53 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
     
     dynamicReportFields.innerHTML = html;
+
+    // FATCA/CRS 인터랙션 연동
+    const fatcaTaxRadios = document.querySelectorAll('input[name="doc-fatca-foreign-tax"]');
+    const fatcaDetailSection = document.getElementById('fatca-foreign-detail-section');
+    const fatcaCountryInput = document.getElementById('doc-fatca-country-input');
+    const fatcaCountryChips = document.querySelectorAll('.fatca-country-chip');
+    const fatcaTinRadios = document.querySelectorAll('input[name="doc-fatca-tin-type"]');
+    const fatcaTinInputBox = document.getElementById('doc-fatca-tin-input-box');
+
+    if (fatcaTaxRadios.length > 0 && fatcaDetailSection) {
+      fatcaTaxRadios.forEach(r => {
+        r.addEventListener('change', (e) => {
+          if (e.target.value === '예') {
+            fatcaDetailSection.classList.remove('hidden');
+          } else {
+            fatcaDetailSection.classList.add('hidden');
+          }
+        });
+      });
+    }
+
+    if (fatcaCountryChips.length > 0 && fatcaCountryInput) {
+      fatcaCountryChips.forEach(chip => {
+        chip.addEventListener('click', () => {
+          const country = chip.getAttribute('data-country');
+          fatcaCountryInput.value = country;
+          fatcaCountryChips.forEach(c => {
+            c.style.borderColor = '#CBD5E0';
+            c.style.color = '#4A5568';
+          });
+          chip.style.borderColor = 'var(--brand-mint)';
+          chip.style.color = 'var(--brand-mint-dark)';
+        });
+      });
+    }
+
+    if (fatcaTinRadios.length > 0 && fatcaTinInputBox) {
+      fatcaTinRadios.forEach(r => {
+        r.addEventListener('change', (e) => {
+          if (e.target.value === '보유') {
+            fatcaTinInputBox.style.display = 'block';
+          } else {
+            fatcaTinInputBox.style.display = 'none';
+          }
+        });
+      });
+    }
     
     // 추가 서식 내 인터랙션 보정: 카드 재발급 우편/영업점 수령에 따른 주소창 가시성 연동
     const addressGroup = document.getElementById('card-delivery-address-group');
@@ -724,6 +989,43 @@ document.addEventListener('DOMContentLoaded', async () => {
         });
       });
     }
+
+    // CDD ➔ EDD 조건부 확장 인터랙션 바인딩
+    const cddRealOwnerRadios = document.querySelectorAll('input[name="doc-cdd-realowner"]');
+    const cddNationRadios = document.querySelectorAll('input[name="doc-cdd-nationality"]');
+    const cddTriggerRadios = document.querySelectorAll('input[name="doc-cdd-edd-trigger"]');
+    const eddSection = document.getElementById('cdd-edd-advanced-section');
+    const eddReasonText = document.getElementById('cdd-edd-reason-text');
+
+    function syncCddEddVisibility() {
+      if (!eddSection) return;
+      const realOwner = document.querySelector('input[name="doc-cdd-realowner"]:checked')?.value || '';
+      const nation = document.querySelector('input[name="doc-cdd-nationality"]:checked')?.value || '';
+      const trigger = document.querySelector('input[name="doc-cdd-edd-trigger"]:checked')?.value || '';
+
+      const isProxy = realOwner.includes('대리');
+      const isForeign = nation.includes('외국인');
+      const isHighRisk = trigger.includes('해당있음');
+
+      if (isProxy || isForeign || isHighRisk) {
+        eddSection.classList.remove('hidden');
+        if (eddReasonText) {
+          if (isProxy) {
+            eddReasonText.innerHTML = '<i class="fa-solid fa-triangle-exclamation" style="color: #DC2626; margin-right: 4px;"></i><strong>타인 대리 거래(실소유자 불일치)</strong>로 확인되어 강화된 고객확인(EDD) 필수 정보를 작성합니다.';
+          } else if (isForeign) {
+            eddReasonText.innerHTML = '<i class="fa-solid fa-passport" style="color: #2563EB; margin-right: 4px;"></i><strong>외국인 또는 해외 비거주자</strong> 고객으로 확인되어 법령에 따라 강화된 고객확인(EDD)을 진행합니다.';
+          } else if (isHighRisk) {
+            eddReasonText.innerHTML = '<i class="fa-solid fa-shield-halved" style="color: #D97706; margin-right: 4px;"></i><strong>1천만원 이상 현금/외환 거래 등 자금세탁 방지 고위험 대상</strong>으로 확인되어 추가 정보를 작성합니다.';
+          }
+        }
+      } else {
+        eddSection.classList.add('hidden');
+      }
+    }
+
+    [...cddRealOwnerRadios, ...cddNationRadios, ...cddTriggerRadios].forEach(r => {
+      r.addEventListener('change', syncCddEddVisibility);
+    });
   }
 
   // 작성할 업무 대분류(5단 라디오 카드) 선택에 따른 토글
@@ -2145,6 +2447,10 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
 
     if (stepNum === 1) {
+      isManualMassMode = false;
+      if (stepInds[1]) stepInds[1].textContent = "② 전표 촬영";
+      if (stepInds[2]) stepInds[2].textContent = "③ OCR 결과 확인";
+
       if (isEasyActive) {
         if (easySelectView) easySelectView.classList.remove('hidden');
         if (modalHeader) modalHeader.classList.add('hidden');
@@ -2208,6 +2514,18 @@ document.addEventListener('DOMContentLoaded', async () => {
       resultView.classList.remove('hidden');
       if (stepInds[2]) stepInds[2].classList.add('active-step');
       
+      // 모달 헤더와 인디케이터가 숨겨져 있다면(예: 쉬운모드에서 바로 진입했을 때) 보여주기
+      if (modalHeader) modalHeader.classList.remove('hidden');
+      if (scanFlowSteps) scanFlowSteps.classList.remove('hidden');
+
+      if (isManualMassMode) {
+        if (stepInds[1]) stepInds[1].textContent = "② 직접 입력";
+        if (stepInds[2]) stepInds[2].textContent = "③ 내용 확인";
+      } else {
+        if (stepInds[1]) stepInds[1].textContent = "② 전표 촬영";
+        if (stepInds[2]) stepInds[2].textContent = "③ OCR 결과 확인";
+      }
+
       // 왼쪽 프리뷰 세팅
       activePreviewImageIndex = 0;
       updatePreviewImageBox();
@@ -2324,6 +2642,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
   // 거래 유형 카드 선택 리스너 바인딩
   const vTypeCards = document.querySelectorAll('.v-type-card');
+  const goToManualMassBtn = document.getElementById('go-to-manual-mass-btn');
   vTypeCards.forEach(card => {
     card.addEventListener('click', () => {
       vTypeCards.forEach(c => {
@@ -2335,12 +2654,59 @@ document.addEventListener('DOMContentLoaded', async () => {
       card.style.borderColor = "var(--brand-mint)";
       card.style.backgroundColor = "var(--brand-mint-light)";
       selectedVoucherType = card.getAttribute('data-vtype');
+
+      // 대량이체 선택 시 '전표 촬영 없이 직접 입력하기' 버튼 노출 연동
+      if (goToManualMassBtn) {
+        if (selectedVoucherType === 'MASS_TRANSFER') {
+          goToManualMassBtn.classList.remove('hidden');
+        } else {
+          goToManualMassBtn.classList.add('hidden');
+        }
+      }
     });
   });
+
+  let isManualMassMode = false;
+
+  // 대량이체 직접 수기 작성 모드 시작 함수
+  function startManualMassTransfer() {
+    isManualMassMode = true;
+    selectedVoucherType = 'MASS_TRANSFER';
+    massUploadedImages = [];
+    ocrResultData = {
+      totalCount: 1,
+      totalAmount: 0,
+      transactions: [
+        {
+          sourceImageId: "MANUAL_1",
+          bank: "iM뱅크 (대구은행)",
+          accountNumber: "",
+          accountHolder: "",
+          amount: 0,
+          ocrConfidence: 1.0,
+          isManual: true
+        }
+      ]
+    };
+    activePreviewImageIndex = 0;
+    gotoScanStep(3);
+    playNotificationSound('beep');
+    showToast('대량이체 직접 입력 모드로 진입했습니다.');
+  }
+
+  if (goToManualMassBtn) {
+    goToManualMassBtn.addEventListener('click', startManualMassTransfer);
+  }
+
+  const btnEasyManualMass = document.getElementById('btn-easy-manual-mass');
+  if (btnEasyManualMass) {
+    btnEasyManualMass.addEventListener('click', startManualMassTransfer);
+  }
 
   // 단계 이동 이벤트 트리거
   if (goToCaptureBtn) {
     goToCaptureBtn.addEventListener('click', () => {
+      isManualMassMode = false;
       // 대량 이체일 때 등록 배열 초기화
       if (selectedVoucherType === 'MASS_TRANSFER') {
         massUploadedImages = [];
@@ -2537,9 +2903,45 @@ document.addEventListener('DOMContentLoaded', async () => {
     });
   }
 
+  // 결과 창에서 송금 내역 수기 1건 직접 추가 연동
+  const ocrAddManualRowBtn = document.getElementById('ocr-add-manual-row-btn');
+  if (ocrAddManualRowBtn) {
+    ocrAddManualRowBtn.addEventListener('click', () => {
+      if (!ocrResultData || !ocrResultData.transactions) {
+        ocrResultData = { totalCount: 0, totalAmount: 0, transactions: [] };
+      }
+      const newNum = ocrResultData.transactions.length + 1;
+      const newImgId = `IMG_MANUAL_${newNum}`;
+      massUploadedImages.push({
+        id: newImgId,
+        name: `직접입력 ${newNum}`,
+        url: "linear-gradient(135deg, #e8f5e9 0%, #c8e6c9 100%)"
+      });
+      ocrResultData.transactions.push({
+        sourceImageId: newImgId,
+        bank: "iM뱅크",
+        accountNumber: "",
+        accountHolder: "",
+        amount: 0,
+        ocrConfidence: 1.0,
+        isManual: true
+      });
+      ocrResultData.totalCount = ocrResultData.transactions.length;
+      activePreviewImageIndex = massUploadedImages.length - 1;
+      buildOcrEditForm();
+      updatePreviewImageBox();
+      playNotificationSound('beep');
+      showToast(`송금 내역이 추가되었습니다 (총 ${ocrResultData.totalCount}건).`);
+    });
+  }
+
   if (ocrRetryBtn) {
     ocrRetryBtn.addEventListener('click', () => {
-      gotoScanStep(2);
+      if (isManualMassMode) {
+        gotoScanStep(1);
+      } else {
+        gotoScanStep(2);
+      }
       playNotificationSound('beep');
     });
   }
@@ -2570,10 +2972,60 @@ document.addEventListener('DOMContentLoaded', async () => {
         integrityErrorBanner.classList.add('hidden');
       }
 
-      // 최종 금융거래 경고 모달/안내 후 전송 진행
-      const isConfirmed = confirm("AI가 인식한 전표 정보를 확인하셨습니까?\n최종 금융거래 처리는 창구 행원의 확인 후 진행됩니다.");
-      if (!isConfirmed) return;
+      // 최종 금융거래 전송 확인 커스텀 모달 호출
+      openVoucherConfirmModal();
+    });
+  }
 
+  // 전표 전송 확인 커스텀 모바일 모달 제어 함수
+  function openVoucherConfirmModal() {
+    const modal = document.getElementById('voucher-confirm-modal');
+    const msgEl = document.getElementById('voucher-confirm-msg');
+    const titleEl = document.getElementById('voucher-confirm-title');
+    if (!modal) {
+      gotoScanStep(4);
+      return;
+    }
+
+    if (isManualMassMode) {
+      const cnt = (ocrResultData && ocrResultData.transactions) ? ocrResultData.transactions.length : 1;
+      const amt = (ocrResultData && ocrResultData.totalAmount) ? ocrResultData.totalAmount.toLocaleString() : '0';
+      if (titleEl) titleEl.textContent = '송금 내역 전송 확인';
+      if (msgEl) {
+        msgEl.innerHTML = `직접 입력하신 대량이체 내역<br><strong style="color: var(--brand-mint-dark); font-size: 15px;">총 ${cnt}건 (${amt}원)</strong>을<br>창구로 전송하시겠습니까?`;
+      }
+    } else {
+      if (titleEl) titleEl.textContent = '전표 정보 전송 확인';
+      if (msgEl) {
+        msgEl.innerHTML = `인식 및 확인하신 전표 정보를<br>창구로 전송하시겠습니까?`;
+      }
+    }
+
+    modal.classList.remove('hidden');
+    playNotificationSound('beep');
+  }
+
+  function closeVoucherConfirmModal() {
+    const modal = document.getElementById('voucher-confirm-modal');
+    if (modal) modal.classList.add('hidden');
+  }
+
+  const cancelVoucherConfirmBtn = document.getElementById('cancel-voucher-confirm-btn');
+  const closeVoucherConfirmBtn = document.getElementById('close-voucher-confirm-btn');
+  const okVoucherConfirmBtn = document.getElementById('ok-voucher-confirm-btn');
+  const voucherConfirmModal = document.getElementById('voucher-confirm-modal');
+
+  if (cancelVoucherConfirmBtn) cancelVoucherConfirmBtn.addEventListener('click', closeVoucherConfirmModal);
+  if (closeVoucherConfirmBtn) closeVoucherConfirmBtn.addEventListener('click', closeVoucherConfirmModal);
+  if (voucherConfirmModal) {
+    voucherConfirmModal.addEventListener('click', (e) => {
+      if (e.target === voucherConfirmModal) closeVoucherConfirmModal();
+    });
+  }
+
+  if (okVoucherConfirmBtn) {
+    okVoucherConfirmBtn.addEventListener('click', () => {
+      closeVoucherConfirmModal();
       gotoScanStep(4);
     });
   }
@@ -2603,16 +3055,31 @@ document.addEventListener('DOMContentLoaded', async () => {
       ocrSourceImageBox.style.background = img.url;
       document.getElementById('display-preview-source-id').textContent = `[${img.name}]`;
       
-      ocrSourceImageBox.innerHTML = `
-        <div style="padding:10px; color:#333; height:100%; display:flex; flex-direction:column; justify-content:space-between; box-sizing:border-box;">
-          <div style="font-size:10px; font-weight:700; border-bottom:1px solid rgba(0,0,0,0.1); padding-bottom:3px;">${img.name} (대량 의뢰서)</div>
-          <div style="font-size:9.5px; font-weight:600; line-height:1.3;">
-            ※ 대량이체 일괄전표 AI OCR 매핑<br>
-            자동 텍스트 라인 세분화 추출 완료.
+      if (img.id && img.id.startsWith("IMG_MANUAL")) {
+        ocrSourceImageBox.innerHTML = `
+          <div style="padding:12px; color:#14532d; height:100%; display:flex; flex-direction:column; justify-content:space-between; box-sizing:border-box;">
+            <div style="font-size:10.5px; font-weight:800; border-bottom:1px solid rgba(0,0,0,0.1); padding-bottom:4px; color:var(--brand-mint-dark);">
+              ✍️ ${img.name} (수기 직접입력)
+            </div>
+            <div style="font-size:10px; font-weight:600; line-height:1.45; color:#166534;">
+              전표 촬영 없이 모바일에서 직접 작성된 송금 건입니다.<br>
+              계좌번호와 금액을 검토 후 창구로 전송해 주세요.
+            </div>
+            <div style="font-size:8.5px; color:#15803d; font-weight:700; text-align:right;">iM SmartQ 직접입력</div>
           </div>
-          <div style="font-size:8px; color:#666; text-align:right;">iM SmartQ AI OCR</div>
-        </div>
-      `;
+        `;
+      } else {
+        ocrSourceImageBox.innerHTML = `
+          <div style="padding:10px; color:#333; height:100%; display:flex; flex-direction:column; justify-content:space-between; box-sizing:border-box;">
+            <div style="font-size:10px; font-weight:700; border-bottom:1px solid rgba(0,0,0,0.1); padding-bottom:3px;">${img.name} (대량 의뢰서)</div>
+            <div style="font-size:9.5px; font-weight:600; line-height:1.3;">
+              ※ 대량이체 일괄전표 AI OCR 매핑<br>
+              자동 텍스트 라인 세분화 추출 완료.
+            </div>
+            <div style="font-size:8px; color:#666; text-align:right;">iM SmartQ AI OCR</div>
+          </div>
+        `;
+      }
     } else {
       const source = ocrResultData;
       ocrSourceImageBox.style.background = source.images[0] || "linear-gradient(135deg, #e0f7fa 0%, #80deea 100%)";
@@ -2715,9 +3182,53 @@ document.addEventListener('DOMContentLoaded', async () => {
     ocrFormStandard.classList.add('hidden');
     ocrFormMulti.classList.add('hidden');
     
+    const manualContainer = document.getElementById('manual-mass-container');
+    if (manualContainer) manualContainer.classList.add('hidden');
+
+    const splitLayout = document.querySelector('.ocr-split-layout');
+    const splitLeft = document.querySelector('.ocr-split-left');
+    const splitRight = document.querySelector('.ocr-split-right');
+    const titleLabel = document.getElementById('ocr-form-title-label');
+    const ocrRetryBtn = document.getElementById('ocr-retry-btn');
+    
     // 배너 초기화
     integrityErrorBanner.classList.add('hidden');
     duplicateWarningBanner.classList.add('hidden');
+
+    if (isManualMassMode) {
+      // 1. 직접 입력 모드: 촬영 원본 프리뷰 박스 완전 숨김 & 우측 폼 100% 전체 너비 확장!
+      if (splitLeft) splitLeft.style.display = 'none';
+      if (splitLayout) splitLayout.classList.add('is-manual-mode');
+      if (splitRight) {
+        splitRight.style.width = '100%';
+        splitRight.style.maxWidth = '100%';
+      }
+      if (titleLabel) {
+        titleLabel.innerHTML = '<i class="fa-solid fa-pen-to-square"></i> 송금 내역 직접 입력 (수기 작성)';
+      }
+      if (ocrRetryBtn) {
+        ocrRetryBtn.innerHTML = '<i class="fa-solid fa-arrow-left"></i> 이전으로';
+      }
+      if (manualContainer) {
+        manualContainer.classList.remove('hidden');
+        renderManualMassCards();
+      }
+      return;
+    }
+
+    // 2. 촬영 모드: 촬영 원본 프리뷰 박스 표시 및 원복
+    if (splitLeft) splitLeft.style.display = 'block';
+    if (splitLayout) splitLayout.classList.remove('is-manual-mode');
+    if (splitRight) {
+      splitRight.style.width = '';
+      splitRight.style.maxWidth = '';
+    }
+    if (titleLabel) {
+      titleLabel.innerHTML = '<i class="fa-solid fa-square-poll-horizontal"></i> AI 추출 구조화 정보 및 신뢰도 검증';
+    }
+    if (ocrRetryBtn) {
+      ocrRetryBtn.innerHTML = '다시 촬영';
+    }
 
     if (selectedVoucherType === 'MASS_TRANSFER') {
       ocrFormMulti.classList.remove('hidden');
@@ -2745,12 +3256,17 @@ document.addEventListener('DOMContentLoaded', async () => {
           tr.innerHTML = `
             <td style="padding:6px; font-weight:700;">${idx + 1}</td>
             <td style="padding:6px; font-weight:700; color:var(--brand-mint-dark);">${sourceName}</td>
-            <td style="padding:4px;"><input type="text" value="${rec.bank}" class="multi-row-input" data-idx="${idx}" data-field="bank"></td>
-            <td style="padding:4px;"><input type="text" value="${rec.accountNumber}" class="multi-row-input" data-idx="${idx}" data-field="accountNumber"></td>
-            <td style="padding:4px;"><input type="text" value="${rec.accountHolder}" class="multi-row-input" data-idx="${idx}" data-field="accountHolder"></td>
+            <td style="padding:4px;"><input type="text" value="${rec.bank}" class="multi-row-input" data-idx="${idx}" data-field="bank" placeholder="은행"></td>
+            <td style="padding:4px;"><input type="text" value="${rec.accountNumber}" class="multi-row-input" data-idx="${idx}" data-field="accountNumber" placeholder="계좌번호"></td>
+            <td style="padding:4px;"><input type="text" value="${rec.accountHolder}" class="multi-row-input" data-idx="${idx}" data-field="accountHolder" placeholder="예금주"></td>
             <td style="padding:4px; text-align:right;">
-              <input type="number" value="${rec.amount}" class="multi-row-input" data-idx="${idx}" data-field="amount" style="text-align:right; width:80%;">
+              <input type="number" step="10000" min="0" value="${rec.amount}" class="multi-row-input" data-idx="${idx}" data-field="amount" style="text-align:right; width:80%; font-weight:700;" placeholder="금액">
               <div style="margin-top:2px;">${confBadge}</div>
+            </td>
+            <td style="padding:4px; text-align:center;">
+              <button type="button" class="btn-del-mass-row" data-idx="${idx}" style="background:none; border:none; color:#e74c3c; cursor:pointer; font-size:12px; padding:2px;" title="이 내역 삭제">
+                <i class="fa-solid fa-trash-can"></i>
+              </button>
             </td>
           `;
 
@@ -2765,6 +3281,26 @@ document.addEventListener('DOMContentLoaded', async () => {
           });
 
           tbody.appendChild(tr);
+        });
+
+        // 행별 삭제 버튼 바인딩
+        const delBtns = tbody.querySelectorAll('.btn-del-mass-row');
+        delBtns.forEach(btn => {
+          btn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            const idx = parseInt(btn.getAttribute('data-idx'));
+            if (ocrResultData.transactions.length <= 1) {
+              showToast('최소 1건 이상의 송금 내역이 필요합니다.');
+              return;
+            }
+            ocrResultData.transactions.splice(idx, 1);
+            ocrResultData.totalCount = ocrResultData.transactions.length;
+            let sum = 0;
+            ocrResultData.transactions.forEach(t => sum += (parseInt(t.amount) || 0));
+            ocrResultData.totalAmount = sum;
+            buildOcrEditForm();
+            showToast('해당 송금 내역이 삭제되었습니다.');
+          });
         });
 
         // 대량 인풋 변경 실시간 연동
@@ -2827,13 +3363,14 @@ document.addEventListener('DOMContentLoaded', async () => {
         
         const isAmount = key === 'amount';
         const inputType = isAmount ? 'number' : 'text';
+        const stepAttr = isAmount ? 'step="10000" min="0"' : '';
         
         formGroup.innerHTML = `
           <label class="form-label" style="display:flex; justify-content:space-between; align-items:center;">
             <span>${label}</span>
             ${badge}
           </label>
-          <input type="${inputType}" class="form-input ocr-std-input" data-key="${key}" value="${val}" required style="font-weight: 800;">
+          <input type="${inputType}" ${stepAttr} class="form-input ocr-std-input" data-key="${key}" value="${val}" required style="font-weight: 800;">
         `;
 
         const inputEl = formGroup.querySelector('.ocr-std-input');
@@ -2873,6 +3410,292 @@ document.addEventListener('DOMContentLoaded', async () => {
       });
     }
   }
+
+  // 국내 은행 콤보박스 그룹 데이터 (시중은행, 지역은행, 인터넷전문은행, 특수/상호금융)
+  const KOREA_BANK_DATA = [
+    {
+      groupName: "당행 (iM Bank)",
+      banks: ["iM뱅크 (대구은행)"]
+    },
+    {
+      groupName: "시중은행",
+      banks: ["KB국민은행", "신한은행", "우리은행", "하나은행", "NH농협은행", "IBK기업은행", "SC제일은행", "한국씨티은행", "Sh수협은행"]
+    },
+    {
+      groupName: "지역은행 (지방은행)",
+      banks: ["BNK부산은행", "BNK경남은행", "광주은행", "전북은행", "제주은행"]
+    },
+    {
+      groupName: "인터넷전문은행",
+      banks: ["카카오뱅크", "토스뱅크", "케이뱅크"]
+    },
+    {
+      groupName: "특수 / 상호금융",
+      banks: ["우체국", "새마을금고", "신협", "산림조합"]
+    }
+  ];
+
+  function buildBankDropdownListHtml(currentBank) {
+    const cur = currentBank || "iM뱅크 (대구은행)";
+    let html = '';
+    KOREA_BANK_DATA.forEach(grp => {
+      html += `<div class="bank-drop-header">${grp.groupName}</div>`;
+      grp.banks.forEach(b => {
+        const isSel = (b === cur) || (cur.includes('iM') && b.includes('iM'));
+        html += `
+          <div class="bank-drop-item ${isSel ? 'selected' : ''}" data-bank="${b}">
+            <span>${b}</span>
+          </div>
+        `;
+      });
+    });
+    return html;
+  }
+
+  // 대량이체 직접 입력 모드 전용 모바일 카드 렌더링 함수 (가로 스크롤 없는 스마트 뷰)
+  function renderManualMassCards() {
+    const container = document.getElementById('manual-tx-cards-list');
+    const countLabel = document.getElementById('manual-total-count-label');
+    const amountLabel = document.getElementById('manual-total-amount-label');
+    if (!container || !ocrResultData || !ocrResultData.transactions) return;
+
+    container.innerHTML = '';
+    const tx = ocrResultData.transactions;
+
+    if (countLabel) countLabel.textContent = `총 ${tx.length}건`;
+    if (amountLabel) amountLabel.textContent = `총 금액 ${(ocrResultData.totalAmount || 0).toLocaleString()}원`;
+
+    tx.forEach((rec, idx) => {
+      const card = document.createElement('div');
+      card.className = 'manual-tx-card';
+      card.style.cssText = 'background: #ffffff; border: 1.5px solid #e2e8f0; border-radius: 12px; padding: 12px 14px; box-shadow: 0 1px 4px rgba(0,0,0,0.04); position: relative;';
+
+      card.innerHTML = `
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; border-bottom: 1px dashed #e2e8f0; padding-bottom: 6px;">
+          <span style="font-size: 13px; font-weight: 800; color: var(--brand-mint-dark);">
+            <i class="fa-solid fa-money-bill-transfer" style="margin-right: 4px;"></i> 송금 ${idx + 1}
+          </span>
+          <button type="button" class="btn-del-manual-card" data-idx="${idx}" style="background: #fff0f0; border: 1px solid #ffccd3; color: #d0021b; font-size: 11px; font-weight: 700; border-radius: 6px; padding: 3px 8px; cursor: pointer; display: flex; align-items: center; gap: 4px;">
+            <i class="fa-solid fa-trash-can"></i> 삭제
+          </button>
+        </div>
+
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 8px;">
+          <div class="bank-combobox-wrapper" style="position: relative;">
+            <label style="font-size: 11px; font-weight: 700; color: #4a5568; display: block; margin-bottom: 3px;">입금은행</label>
+            <button type="button" class="form-input manual-bank-trigger-btn" data-idx="${idx}" style="font-size: 12px; height: 38px; padding: 6px 10px; border-radius: 8px; width: 100%; box-sizing: border-box; background-color: #ffffff; font-weight: 800; color: #1a202c; border: 1.5px solid #cbd5e1; cursor: pointer; text-align: left; display: flex; justify-content: space-between; align-items: center;">
+              <span class="selected-bank-name" style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${rec.bank || 'iM뱅크 (대구은행)'}</span>
+              <i class="fa-solid fa-chevron-down" style="color: #718096; font-size: 10.5px; flex-shrink: 0; margin-left: 4px;"></i>
+            </button>
+            <!-- 하단으로 열리는 스크롤 콤보박스 드롭다운 -->
+            <div class="bank-dropdown-menu hidden" data-idx="${idx}">
+              ${buildBankDropdownListHtml(rec.bank)}
+            </div>
+          </div>
+          <div>
+            <label style="font-size: 11px; font-weight: 700; color: #4a5568; display: block; margin-bottom: 3px;">받는 분 (예금주)</label>
+            <input type="text" class="form-input manual-card-input" data-idx="${idx}" data-field="accountHolder" value="${rec.accountHolder || ''}" placeholder="예금주명" style="font-size: 12px; height: 38px; padding: 6px 10px; border-radius: 8px; width: 100%; box-sizing: border-box;">
+          </div>
+        </div>
+
+        <div style="margin-bottom: 8px;">
+          <label style="font-size: 11px; font-weight: 700; color: #4a5568; display: block; margin-bottom: 3px;">입금 계좌번호</label>
+          <input type="text" inputmode="numeric" class="form-input manual-card-input" data-idx="${idx}" data-field="accountNumber" value="${rec.accountNumber || ''}" placeholder="계좌번호 입력 (- 제외)" style="font-size: 12px; height: 38px; padding: 6px 10px; border-radius: 8px; width: 100%; box-sizing: border-box;">
+        </div>
+
+        <div>
+          <label style="font-size: 11px; font-weight: 700; color: #4a5568; display: block; margin-bottom: 3px;">송금 금액 (원)</label>
+          <input type="number" step="10000" min="0" inputmode="numeric" class="form-input manual-card-input" data-idx="${idx}" data-field="amount" value="${rec.amount || ''}" placeholder="금액 입력" style="font-size: 13.5px; font-weight: 800; color: var(--brand-mint-dark); height: 38px; padding: 6px 10px; border-radius: 8px; width: 100%; box-sizing: border-box;">
+          <div style="display: flex; gap: 4px; margin-top: 5px; align-items: center;">
+            <button type="button" class="btn-quick-amount" data-idx="${idx}" data-add="10000" style="padding: 3px 8px; font-size: 10.5px; font-weight: 700; background: #f8fafc; border: 1px solid #cbd5e1; border-radius: 6px; color: #334155; cursor: pointer;">+1만</button>
+            <button type="button" class="btn-quick-amount" data-idx="${idx}" data-add="50000" style="padding: 3px 8px; font-size: 10.5px; font-weight: 700; background: #f8fafc; border: 1px solid #cbd5e1; border-radius: 6px; color: #334155; cursor: pointer;">+5만</button>
+            <button type="button" class="btn-quick-amount" data-idx="${idx}" data-add="100000" style="padding: 3px 8px; font-size: 10.5px; font-weight: 700; background: #f8fafc; border: 1px solid #cbd5e1; border-radius: 6px; color: #334155; cursor: pointer;">+10만</button>
+            <button type="button" class="btn-quick-amount" data-idx="${idx}" data-add="1000000" style="padding: 3px 8px; font-size: 10.5px; font-weight: 700; background: #f8fafc; border: 1px solid #cbd5e1; border-radius: 6px; color: #334155; cursor: pointer;">+100만</button>
+            <button type="button" class="btn-quick-amount-clear" data-idx="${idx}" style="padding: 3px 8px; font-size: 10.5px; font-weight: 700; background: #fff1f2; border: 1px solid #fecdd3; border-radius: 6px; color: #e11d48; cursor: pointer; margin-left: auto;">정정</button>
+          </div>
+        </div>
+      `;
+
+      container.appendChild(card);
+    });
+
+    // 1. 은행 트리거 버튼 클릭 시 하단 콤보박스 토글
+    const triggerBtns = container.querySelectorAll('.manual-bank-trigger-btn');
+    triggerBtns.forEach(btn => {
+      btn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        const wrapper = btn.closest('.bank-combobox-wrapper');
+        const menu = wrapper ? wrapper.querySelector('.bank-dropdown-menu') : null;
+        if (!menu) return;
+
+        const isCurrentlyOpen = !menu.classList.contains('hidden');
+
+        // 다른 모든 열려있는 은행 드롭다운 닫기
+        document.querySelectorAll('.bank-dropdown-menu').forEach(m => m.classList.add('hidden'));
+        document.querySelectorAll('.manual-tx-card').forEach(c => c.style.zIndex = '');
+
+        if (!isCurrentlyOpen) {
+          menu.classList.remove('hidden');
+          const card = btn.closest('.manual-tx-card');
+          if (card) card.style.zIndex = '50';
+          playNotificationSound('beep');
+        }
+      });
+    });
+
+    // 2. 드롭다운 내부 은행 아이템 클릭 시 선택
+    const dropItems = container.querySelectorAll('.bank-drop-item');
+    dropItems.forEach(item => {
+      item.addEventListener('click', (e) => {
+        e.stopPropagation();
+        const bankName = item.getAttribute('data-bank');
+        const menu = item.closest('.bank-dropdown-menu');
+        const idx = menu ? parseInt(menu.getAttribute('data-idx')) : null;
+
+        if (idx !== null && ocrResultData && ocrResultData.transactions && ocrResultData.transactions[idx]) {
+          ocrResultData.transactions[idx].bank = bankName;
+
+          const wrapper = menu.closest('.bank-combobox-wrapper');
+          if (wrapper) {
+            const span = wrapper.querySelector('.selected-bank-name');
+            if (span) span.textContent = bankName;
+
+            menu.querySelectorAll('.bank-drop-item').forEach(el => el.classList.remove('selected'));
+            item.classList.add('selected');
+          }
+        }
+
+        if (menu) menu.classList.add('hidden');
+        const card = item.closest('.manual-tx-card');
+        if (card) card.style.zIndex = '';
+
+        playNotificationSound('beep');
+        showToast(`${bankName} 선택 완료`);
+      });
+    });
+
+    // 행별 삭제 바인딩
+    const delBtns = container.querySelectorAll('.btn-del-manual-card');
+    delBtns.forEach(btn => {
+      btn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        const idx = parseInt(btn.getAttribute('data-idx'));
+        if (ocrResultData.transactions.length <= 1) {
+          showToast('최소 1건 이상의 송금 내역이 필요합니다.');
+          return;
+        }
+        ocrResultData.transactions.splice(idx, 1);
+        ocrResultData.totalCount = ocrResultData.transactions.length;
+        let sum = 0;
+        ocrResultData.transactions.forEach(t => sum += (parseInt(t.amount) || 0));
+        ocrResultData.totalAmount = sum;
+        renderManualMassCards();
+        showToast('해당 송금 건이 삭제되었습니다.');
+      });
+    });
+
+    // 퀵 금액(+1만, +5만, +10만, +100만, 정정) 버튼 바인딩
+    const quickAmountBtns = container.querySelectorAll('.btn-quick-amount');
+    quickAmountBtns.forEach(btn => {
+      btn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        const idx = parseInt(btn.getAttribute('data-idx'));
+        const addVal = parseInt(btn.getAttribute('data-add')) || 0;
+        const currentVal = parseInt(ocrResultData.transactions[idx].amount) || 0;
+        const newVal = currentVal + addVal;
+        ocrResultData.transactions[idx].amount = newVal;
+
+        const card = btn.closest('.manual-tx-card');
+        if (card) {
+          const amountInput = card.querySelector('input[data-field="amount"]');
+          if (amountInput) amountInput.value = newVal;
+        }
+
+        let sum = 0;
+        ocrResultData.transactions.forEach(t => sum += (parseInt(t.amount) || 0));
+        ocrResultData.totalAmount = sum;
+        if (amountLabel) amountLabel.textContent = `총 금액 ${sum.toLocaleString()}원`;
+        playNotificationSound('beep');
+      });
+    });
+
+    const clearAmountBtns = container.querySelectorAll('.btn-quick-amount-clear');
+    clearAmountBtns.forEach(btn => {
+      btn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        const idx = parseInt(btn.getAttribute('data-idx'));
+        ocrResultData.transactions[idx].amount = 0;
+
+        const card = btn.closest('.manual-tx-card');
+        if (card) {
+          const amountInput = card.querySelector('input[data-field="amount"]');
+          if (amountInput) amountInput.value = '';
+        }
+
+        let sum = 0;
+        ocrResultData.transactions.forEach(t => sum += (parseInt(t.amount) || 0));
+        ocrResultData.totalAmount = sum;
+        if (amountLabel) amountLabel.textContent = `총 금액 ${sum.toLocaleString()}원`;
+        playNotificationSound('beep');
+      });
+    });
+
+    // 실시간 인풋 바인딩
+    const inputs = container.querySelectorAll('.manual-card-input');
+    inputs.forEach(input => {
+      const handleValueChange = (e) => {
+        const idx = parseInt(e.target.getAttribute('data-idx'));
+        const field = e.target.getAttribute('data-field');
+        const val = e.target.value;
+
+        if (field === 'amount') {
+          ocrResultData.transactions[idx][field] = parseInt(val) || 0;
+        } else {
+          ocrResultData.transactions[idx][field] = val;
+        }
+
+        let sum = 0;
+        ocrResultData.transactions.forEach(t => sum += (parseInt(t.amount) || 0));
+        ocrResultData.totalAmount = sum;
+        if (amountLabel) amountLabel.textContent = `총 금액 ${sum.toLocaleString()}원`;
+      };
+
+      input.addEventListener('input', handleValueChange);
+      input.addEventListener('change', handleValueChange);
+    });
+  }
+
+  // 카드 추가 버튼 바인딩
+  const btnAddManualCard = document.getElementById('btn-add-manual-card');
+  if (btnAddManualCard) {
+    btnAddManualCard.addEventListener('click', () => {
+      if (!ocrResultData || !ocrResultData.transactions) {
+        ocrResultData = { totalCount: 0, totalAmount: 0, transactions: [] };
+      }
+      const newNum = ocrResultData.transactions.length + 1;
+      ocrResultData.transactions.push({
+        sourceImageId: `MANUAL_${newNum}`,
+        bank: "iM뱅크 (대구은행)",
+        accountNumber: "",
+        accountHolder: "",
+        amount: 0,
+        ocrConfidence: 1.0,
+        isManual: true
+      });
+      ocrResultData.totalCount = ocrResultData.transactions.length;
+      renderManualMassCards();
+      playNotificationSound('beep');
+      showToast(`송금 내역 ${newNum}번이 추가되었습니다.`);
+    });
+  }
+
+  // 외부 클릭 시 모든 은행 드롭다운 닫기
+  document.addEventListener('click', (e) => {
+    if (!e.target.closest('.bank-combobox-wrapper')) {
+      document.querySelectorAll('.bank-dropdown-menu').forEach(m => m.classList.add('hidden'));
+      document.querySelectorAll('.manual-tx-card').forEach(c => c.style.zIndex = '');
+    }
+  });
 
   // ==========================================================================
   // --- 11-B. 행원 정보 단말 (Staff View) 실시간 제어 로직 (삭제 처리) ---
@@ -3638,8 +4461,8 @@ document.addEventListener('DOMContentLoaded', async () => {
         if (easyModeLayoutContainer) easyModeLayoutContainer.classList.remove('hidden');
         if (quickMenuGrid) quickMenuGrid.classList.add('hidden'); // 기존 2x2 그리드 숨기기
         
-        // 로고 한글 똑똑한 대기열 변환
-        if (headerLogoSmartQ) headerLogoSmartQ.textContent = '똑똑한 대기열';
+        // 로고 SmartQ (똑똑한 대기열) 변환
+        if (headerLogoSmartQ) headerLogoSmartQ.textContent = 'SmartQ (똑똑한 대기열)';
 
         // 버튼 톤앤무드 활성화 강조 (차콜 톤으로 켜짐 표시)
         easyModeToggleBtn.style.backgroundColor = '#2c3e50';

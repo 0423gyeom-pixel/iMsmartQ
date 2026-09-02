@@ -12,8 +12,7 @@
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.css" />
   <!-- FontAwesome for icons -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-  <!-- v 파라미터: 배포/수정 시 값을 올려 브라우저 CSS 캐시를 무효화 -->
-  <link rel="stylesheet" href="style.css?v=20260825_easy_icon_box">
+  <link rel="stylesheet" href="style.css?v=20260902_cdd_integrated">
 </head>
 <body>
   <div class="mobile-web-container">
@@ -25,17 +24,12 @@
           <img src="im_logo.png" alt="iM" style="height: clamp(14px, 2.1cqh, 19px); width: auto; object-fit: contain; flex-shrink: 0; display: block; filter: saturate(1.05);" />
           
           <!-- iM Bank 로고타입 구성 (동일 폰트/굵기 및 자간 간격 축소) -->
-          <span class="logo-im-bank" style="font-family: 'Inter', sans-serif; font-weight: 800; color: #2c3e50; font-size: clamp(15px, 2.2cqh, 20px); letter-spacing: -0.6px;">iM Bank</span>
-          <span class="logo-smartq" style="font-family: 'Pretendard', sans-serif; font-weight: 800; color: var(--brand-mint-dark); font-size: clamp(13.5px, 1.95cqh, 17px); letter-spacing: -0.5px; margin-left: 5px; padding-left: 6px; border-left: 1.5px solid #dcdde1; display: inline-flex; align-items: center; white-space: nowrap;">SmartQ</span>
+          <span class="logo-im-bank" style="font-family: 'Inter', sans-serif; font-weight: 800; color: #2c3e50; font-size: clamp(14.5px, 2.1cqh, 19px); letter-spacing: -0.6px;">iM Bank</span>
+          <span class="logo-smartq" style="font-family: 'Pretendard', sans-serif; font-weight: 800; color: var(--brand-mint-dark); font-size: clamp(12px, 1.75cqh, 15.5px); letter-spacing: -0.5px; margin-left: 5px; padding-left: 6px; border-left: 1.5px solid #dcdde1; display: inline-flex; align-items: center; white-space: nowrap;">SmartQ (똑똑한 대기열)</span>
         </h1>
         
-        <!-- 우측 상단 영역: 쉬운 모드 버튼 + 시간 안내문구 -->
+        <!-- 우측 상단 영역: 시간 안내문구 -->
         <div class="header-right-group" style="display: flex; align-items: center; gap: 10px; flex-shrink: 0;">
-          <!-- 쉬운 모드 토글 버튼 (강조색 톤앤무드 유지 및 굵은 글씨) -->
-          <button id="easy-mode-toggle-btn" style="background-color: var(--brand-mint-light); color: var(--brand-mint-dark); border: 2px solid var(--brand-mint); font-size: clamp(11px, 1.5cqh, 14px); font-weight: 800; padding: 4px 10px; border-radius: 6px; display: flex; align-items: center; gap: 4px; cursor: pointer; transition: all 0.2s; white-space: nowrap;">
-            <i class="fa-solid fa-magnifying-glass-plus"></i> 쉬운 모드 켜기
-          </button>
-          
           <div class="header-bottom" style="margin: 0; display: flex; align-items: center; gap: 6px; flex-shrink: 0;">
             <div class="live-indicator" style="margin: 0;"></div>
             <span class="timestamp" id="live-timestamp" style="font-size: clamp(10px, 1.42cqh, 13.5px); color: var(--cool-gray); font-weight: 500; white-space: nowrap;">오후 3:37 기준</span>
@@ -96,8 +90,8 @@
         </div>
       </section>
 
-      <!-- 쉬운 모드 전용 대형 버튼 레이아웃 컨테이너 (기본 숨김) -->
-      <div id="easy-mode-layout-container" class="hidden">
+      <!-- 쉬운 모드 전용 대형 버튼 레이아웃 컨테이너 (기본 메인 화면) -->
+      <div id="easy-mode-layout-container">
         
         <!-- 1. 송금전표 사진찍기 대형 버튼 -->
         <button class="easy-card-btn easy-scan-btn-large" id="btn-easy-scan">
@@ -153,8 +147,8 @@
 
       </div>
 
-      <!-- 2x2 퀵 메뉴 그리드 -->
-      <section class="quick-menu-grid animate-fade-in">
+      <!-- 2x2 퀵 메뉴 그리드 (기본 숨김) -->
+      <section class="quick-menu-grid animate-fade-in hidden" style="display: none;">
         <button class="quick-card-btn" id="btn-quick-pre-writing">
           <div class="quick-card-icon-wrapper paper-pencil">
             <svg class="quick-svg-icon" viewBox="0 0 24 24" fill="none" stroke="#00C7A9" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -164,7 +158,7 @@
           </div>
           <span class="quick-card-text">
             <span class="quick-card-title">미리작성</span>
-            <span class="quick-card-desc">방문 전 서류를 미리 작성해 창구 처리 시간을 절반으로 줄여요.</span>
+            <span class="quick-card-desc">창구 처리 시간 빠른 단축</span>
           </span>
         </button>
         <button class="quick-card-btn" id="btn-quick-checklist">
@@ -176,7 +170,7 @@
           </div>
           <span class="quick-card-text">
             <span class="quick-card-title">체크리스트</span>
-            <span class="quick-card-desc">업무별 필요 서류를 확인하고 AI 일괄 진단으로 적합성을 점검해요.</span>
+            <span class="quick-card-desc">필요 서류 AI 일괄 진단</span>
           </span>
         </button>
         <button class="quick-card-btn" id="btn-quick-scan">
@@ -191,7 +185,7 @@
           </div>
           <span class="quick-card-text">
             <span class="quick-card-title">송금전표</span>
-            <span class="quick-card-desc">전표를 촬영해서 미리 정보를 보내두면 업무 처리 시간이 크게 단축돼요.</span>
+            <span class="quick-card-desc">전표 촬영으로 빠른 접수</span>
           </span>
         </button>
         <button class="quick-card-btn" id="btn-quick-financial-test">
@@ -204,8 +198,8 @@
             </svg>
           </div>
           <span class="quick-card-text">
-            <span class="quick-card-title">금융성향 테스트</span>
-            <span class="quick-card-desc">5문항 간단 진단으로 나에게 꼭 맞는 카드·예적금 상품을 추천받아요.</span>
+            <span class="quick-card-title">금융성향</span>
+            <span class="quick-card-desc">5문항 맞춤 상품 추천</span>
           </span>
         </button>
       </section>
@@ -587,7 +581,7 @@
           <!-- 1. 서류 직접 작성 내용 -->
           <div class="pre-tab-content" id="pre-tab-content-form">
             <form id="pre-writing-form" onsubmit="event.preventDefault();">
-              <p class="form-desc">창구 방문 전에 미리 작성하시면 업무 처리 시간이 절반으로 줄어들어요.</p>
+              <p class="form-desc">창구 방문 전에 미리 작성하시면 업무 처리 시간을 크게 줄일 수 있어요.</p>
               
               <!-- 업무 대분류 선택 (5단 라디오 카드) -->
               <div class="form-group" style="margin-bottom: 45px;">
@@ -669,8 +663,8 @@
                 <div class="form-group report-detail-group hidden" id="detail-doc">
                   <label class="form-label">세부 항목</label>
                   <div class="chip-group">
-                    <label class="chip-item"><input type="radio" name="detail-doc-val" value="고객확인제도(CDD/EDD)" checked><span>고객확인제도(CDD/EDD)</span></label>
-                    <label class="chip-item"><input type="radio" name="detail-doc-val" value="FATCA 거주지 확인"><span>FATCA 거주지 확인</span></label>
+                    <label class="chip-item"><input type="radio" name="detail-doc-val" value="고객확인 재이행/갱신 (CDD/EDD)" checked><span>고객확인 재이행/갱신 (CDD/EDD)</span></label>
+                    <label class="chip-item"><input type="radio" name="detail-doc-val" value="FATCA/CRS 조세 거주지 확인"><span>FATCA/CRS 조세 거주지 확인</span></label>
                   </div>
                 </div>
 
@@ -689,10 +683,6 @@
                 <div class="form-group">
                   <label for="report-user-name" class="form-label">고객 성명</label>
                   <input type="text" id="report-user-name" class="form-input" placeholder="성명을 입력해 주세요" required>
-                </div>
-                <div class="form-group">
-                  <label for="report-user-phone" class="form-label">연락처</label>
-                  <input type="tel" id="report-user-phone" class="form-input" placeholder="전화번호를 입력해 주세요 (예: 010-1234-5678)" required>
                 </div>
               </div>
 
@@ -865,17 +855,17 @@
             </button>
           </div>
 
-          <!-- 대량이체 가로 바 버튼 -->
-          <button class="easy-voucher-select-btn" data-vtype="MASS_TRANSFER" style="width: 100%; display: flex; flex-direction: row; align-items: center; justify-content: center; gap: 8px; padding: clamp(12px, 2cqh, 16px) 20px; background-color: #ffffff; border: 2.5px solid var(--brand-mint); border-radius: 14px; margin-bottom: 24px; cursor: pointer; transition: all 0.2s; box-sizing: border-box; box-shadow: var(--shadow-sm);">
-            <svg style="width: 20px; height: 20px; flex-shrink: 0;" viewBox="0 0 24 24" fill="none" stroke="var(--brand-mint)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-              <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
-              <polyline points="14 2 14 8 20 8"></polyline>
-              <line x1="16" y1="13" x2="8" y2="13"></line>
-              <line x1="16" y1="17" x2="8" y2="17"></line>
-              <polyline points="10 9 9 9 8 9"></polyline>
-            </svg>
-            <span style="font-size: clamp(18px, 2.4cqh, 22px); font-weight: 800; color: var(--brand-mint-dark);">대량이체</span>
-          </button>
+          <!-- 대량이체: 촬영 vs 직접입력 2분할 버튼 -->
+          <div style="display: flex; gap: 8px; margin-bottom: 24px; width: 100%;">
+            <button class="easy-voucher-select-btn" data-vtype="MASS_TRANSFER" style="flex: 1.2; display: flex; flex-direction: row; align-items: center; justify-content: center; gap: 8px; padding: clamp(12px, 2cqh, 16px) 12px; background-color: #ffffff; border: 2.5px solid var(--brand-mint); border-radius: 14px; cursor: pointer; transition: all 0.2s; box-sizing: border-box; box-shadow: var(--shadow-sm);">
+              <i class="fa-solid fa-camera" style="font-size: 16px; color: var(--brand-mint);"></i>
+              <span style="font-size: clamp(16px, 2.2cqh, 20px); font-weight: 800; color: var(--brand-mint-dark);">대량이체 촬영</span>
+            </button>
+            <button type="button" id="btn-easy-manual-mass" style="flex: 1; display: flex; flex-direction: row; align-items: center; justify-content: center; gap: 6px; padding: clamp(12px, 2cqh, 16px) 10px; background-color: #f8fafc; border: 2px solid #94a3b8; border-radius: 14px; cursor: pointer; transition: all 0.2s; box-sizing: border-box;">
+              <i class="fa-solid fa-pen-to-square" style="font-size: 15px; color: #475569;"></i>
+              <span style="font-size: clamp(15px, 2cqh, 18px); font-weight: 800; color: #334155;">직접 입력</span>
+            </button>
+          </div>
 
           <!-- 취소 버튼 -->
           <div style="border-top: 1px solid var(--light-gray); padding-top: 14px; width: 100%;">
@@ -907,10 +897,16 @@
             </div>
           </div>
 
-           <button type="button" class="submit-form-btn" id="go-to-capture-btn" style="margin-top: 0; width: 100%; height: 44px; font-size: 13.5px;">
-            <span>선택한 유형으로 촬영 시작</span>
-            <i class="fa-solid fa-chevron-right"></i>
-          </button>
+          <div style="display: flex; flex-direction: column; gap: 8px;">
+            <button type="button" class="submit-form-btn" id="go-to-capture-btn" style="margin-top: 0; width: 100%; height: 44px; font-size: 13.5px;">
+              <span>선택한 유형으로 촬영 시작</span>
+              <i class="fa-solid fa-chevron-right"></i>
+            </button>
+            <button type="button" id="go-to-manual-mass-btn" class="hidden" style="width: 100%; height: 42px; background-color: #f8fafc; border: 1.5px solid var(--brand-mint); border-radius: 8px; color: var(--brand-mint-dark); font-size: 13px; font-weight: 800; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 6px; transition: all 0.2s;">
+              <i class="fa-solid fa-pen-to-square"></i>
+              <span>전표 촬영 없이 직접 입력하기</span>
+            </button>
+          </div>
 
           <!-- 최근 전송한 전표 내역 목록 추가 -->
           <div id="sent-vouchers-container" style="margin-top: 20px; border-top: 1px solid var(--light-gray); padding-top: 16px; text-align: left;">
@@ -1034,7 +1030,7 @@
                 </div>
               </div>
 
-              <div style="font-size: 11px; font-weight: 700; color: var(--dark-gray); margin-bottom: 6px;"><i class="fa-solid fa-square-poll-horizontal"></i> AI 추출 구조화 정보 및 신뢰도 검증</div>
+              <div id="ocr-form-title-label" style="font-size: 11px; font-weight: 700; color: var(--dark-gray); margin-bottom: 6px;"><i class="fa-solid fa-square-poll-horizontal"></i> AI 추출 구조화 정보 및 신뢰도 검증</div>
               
               <!-- 1. 단일 이체 폼 -->
               <div id="ocr-form-standard" class="hidden">
@@ -1052,12 +1048,13 @@
                   <table class="ocr-table" style="width: 100%; border-collapse: collapse; font-size: 10.5px; text-align: left; min-width: 320px;">
                     <thead>
                       <tr style="background-color: var(--background-gray); border-bottom: 1px solid var(--light-gray);">
-                        <th style="padding: 6px; width: 8%;">No</th>
+                        <th style="padding: 6px; width: 7%;">No</th>
                         <th style="padding: 6px; width: 14%;">출처</th>
-                        <th style="padding: 6px; width: 20%;">은행</th>
-                        <th style="padding: 6px; width: 24%;">계좌번호</th>
-                        <th style="padding: 6px; width: 16%;">예금주</th>
-                        <th style="padding: 6px; width: 18%;">금액</th>
+                        <th style="padding: 6px; width: 18%;">은행</th>
+                        <th style="padding: 6px; width: 23%;">계좌번호</th>
+                        <th style="padding: 6px; width: 15%;">예금주</th>
+                        <th style="padding: 6px; width: 16%;">금액</th>
+                        <th style="padding: 6px; width: 7%; text-align:center;">삭제</th>
                       </tr>
                     </thead>
                     <tbody id="ocr-multi-table-body">
@@ -1065,9 +1062,32 @@
                     </tbody>
                   </table>
                 </div>
-                <!-- 추가 촬영 연동 버튼 -->
-                <button type="button" class="btn-scan-action btn-scan-secondary" id="ocr-add-more-shoot-btn" style="width:100%; height:32px; font-size:11px; margin-top:2px; margin-bottom:10px;">
-                  <i class="fa-solid fa-plus"></i> 누락된 전표 추가 촬영하기
+                <!-- 추가 촬영 및 내역 직접 추가 2분할 버튼 -->
+                <div style="display: flex; gap: 8px; margin-top: 2px; margin-bottom: 10px;">
+                  <button type="button" class="btn-scan-action btn-scan-secondary" id="ocr-add-more-shoot-btn" style="flex: 1; height: 34px; font-size: 11px; margin: 0;">
+                    <i class="fa-solid fa-camera"></i> 전표 추가 촬영
+                  </button>
+                  <button type="button" class="btn-scan-action btn-scan-secondary" id="ocr-add-manual-row-btn" style="flex: 1; height: 34px; font-size: 11px; margin: 0; background-color: var(--brand-mint-light); border: 1.5px solid var(--brand-mint); color: var(--brand-mint-dark); font-weight: 700;">
+                    <i class="fa-solid fa-plus"></i> 내역 직접 추가
+                  </button>
+                </div>
+              </div>
+
+              <!-- 3. 대량 이체 직접 입력 전용 모바일 카드 폼 (가로 스크롤 완전 배제) -->
+              <div id="manual-mass-container" class="hidden">
+                <div class="multi-summary-bar" style="background-color: var(--brand-mint-light); border: 1.5px solid var(--brand-mint); border-radius: 8px; padding: 9px 12px; font-size: 12px; font-weight: 800; display: flex; justify-content: space-between; margin-bottom: 10px; color: var(--brand-mint-dark);">
+                  <span id="manual-total-count-label">총 1건</span>
+                  <span id="manual-total-amount-label">총 금액 0원</span>
+                </div>
+
+                <!-- 카드 리스트 컨테이너 -->
+                <div id="manual-tx-cards-list" style="display: flex; flex-direction: column; gap: 10px;">
+                  <!-- JS 동적 모바일 카드 렌더링 -->
+                </div>
+
+                <!-- 카드 추가 버튼 -->
+                <button type="button" id="btn-add-manual-card" style="width: 100%; height: 42px; background-color: var(--white); border: 1.5px dashed var(--brand-mint); border-radius: 10px; color: var(--brand-mint-dark); font-size: 12.5px; font-weight: 800; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 6px; margin-top: 8px; margin-bottom: 6px; transition: all 0.2s;">
+                  <i class="fa-solid fa-plus-circle" style="font-size: 14px;"></i> 송금 내역 추가하기
                 </button>
               </div>
 
@@ -1136,6 +1156,37 @@
       </div>
     </div>
   </div>
+
+  <!-- 전표 전송 최종 확인 커스텀 모바일 모달 -->
+  <div id="voucher-confirm-modal" class="modal-overlay hidden" style="z-index: 10250;">
+    <div class="modal-content animate-slide-up" style="max-width: 360px; border-radius: 16px; overflow: hidden;">
+      <div class="modal-header" style="background-color: var(--brand-mint-light); border-bottom: 1px solid rgba(0, 186, 174, 0.15); padding: 14px 16px;">
+        <div class="modal-header-title">
+          <i class="fa-solid fa-paper-plane" style="color: var(--brand-mint); font-size: 15px;"></i>
+          <h3 id="voucher-confirm-title" style="font-size: 14px; font-weight: 700; color: var(--brand-mint-dark);">전표 정보 전송 확인</h3>
+        </div>
+        <button class="close-btn" id="close-voucher-confirm-btn">&times;</button>
+      </div>
+      <div class="modal-body" style="padding: 20px 16px 16px 16px; text-align: center;">
+        <div style="width: 48px; height: 48px; border-radius: 50%; background-color: var(--brand-mint-light); color: var(--brand-mint); display: flex; align-items: center; justify-content: center; font-size: 22px; margin: 0 auto 12px auto;">
+          <i class="fa-solid fa-file-invoice-dollar"></i>
+        </div>
+        <p id="voucher-confirm-msg" style="font-weight: 700; color: var(--dark-text); font-size: 14px; line-height: 1.5; margin: 0 0 10px 0;">
+          작성하신 전표 정보를 창구로 전송하시겠습니까?
+        </p>
+        <p style="margin: 0; color: #718096; font-size: 11.5px; line-height: 1.4; background-color: #f8fafc; border-radius: 8px; padding: 8px 10px; border: 1px solid #edf2f7; text-align: left;">
+          <i class="fa-solid fa-circle-info" style="color: var(--brand-mint); margin-right: 4px;"></i>
+          실제 출금 및 이체 처리는 창구 번호표 호출 시 행원의 최종 실명/서명 확인 후 안전하게 체결됩니다.
+        </p>
+      </div>
+      <div class="modal-footer" style="display: grid; grid-template-columns: 1fr 1.3fr; gap: 8px; padding: 12px 16px; background-color: #fafbfc; border-top: 1px solid #edf2f7;">
+        <button type="button" class="btn-cancel" id="cancel-voucher-confirm-btn" style="margin: 0; height: 42px; font-size: 13px; font-weight: 700; border-radius: 8px;">취소</button>
+        <button type="button" class="btn-confirm" id="ok-voucher-confirm-btn" style="margin: 0; height: 42px; font-size: 13px; font-weight: 700; background-color: var(--brand-mint); color: #ffffff; border: none; border-radius: 8px; cursor: pointer;">확인하고 전송</button>
+      </div>
+    </div>
+  </div>
+
+
 
 
 
@@ -1310,6 +1361,6 @@
   <!-- 모바일 실제 카메라 어플 연동용 실시간 파일 업로더 -->
   <input type="file" id="real-camera-input" accept="image/*" capture="environment" style="display: none;">
 
-<script src="app.js?v=20260825_smart_queue"></script>
+<script src="app.js?v=20260902_cdd_integrated"></script> 
 </body>
 </html>
