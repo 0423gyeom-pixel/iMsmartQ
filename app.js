@@ -208,20 +208,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   // Load products initially
   await loadProducts();
 
-  // --- 2. Initialize Virtual Clock & Initial Timestamp ---
-  function updateClock() {
-    const now = new Date();
-    let hours = now.getHours();
-    let minutes = now.getMinutes();
-    
-    // Format clock (HH:MM)
-    const formattedHours = hours < 10 ? '0' + hours : hours;
-    const formattedMinutes = minutes < 10 ? '0' + minutes : minutes;
-    if (statusClock) {
-      statusClock.textContent = `${formattedHours}:${formattedMinutes}`;
-    }
-  }
-  
+  // --- 2. Initialize Virtual Clock & Initial Timestamp (실시간 1초 주기 동기화) ---
   function getKoreanTimestampString() {
     const now = new Date();
     let hours = now.getHours();
@@ -236,13 +223,27 @@ document.addEventListener('DOMContentLoaded', async () => {
     const paddedMinutes = minutes < 10 ? '0' + minutes : minutes;
     return `${ampm} ${hours}:${paddedMinutes} 기준`;
   }
+
+  function updateClock() {
+    const now = new Date();
+    let hours = now.getHours();
+    let minutes = now.getMinutes();
+    
+    // Format status clock (HH:MM)
+    const formattedHours = hours < 10 ? '0' + hours : hours;
+    const formattedMinutes = minutes < 10 ? '0' + minutes : minutes;
+    if (statusClock) {
+      statusClock.textContent = `${formattedHours}:${formattedMinutes}`;
+    }
+
+    // 우측 상단 실시간 기준 시간 자동 업데이트
+    if (liveTimestamp) {
+      liveTimestamp.textContent = getKoreanTimestampString();
+    }
+  }
   
   updateClock();
-  setInterval(updateClock, 60000); // Update clock every minute
-  
-  if (liveTimestamp) {
-    liveTimestamp.textContent = getKoreanTimestampString();
-  }
+  setInterval(updateClock, 1000); // 1초마다 실시간으로 시간 자동 갱신
 
   // --- 3. Sound Notification Web Audio API ---
   let audioCtx = null;
@@ -279,6 +280,29 @@ document.addEventListener('DOMContentLoaded', async () => {
         
         osc.start(audioCtx.currentTime);
         osc.stop(audioCtx.currentTime + 0.3);
+      } else if (type === 'call') {
+        // 4음계 맑고 웅장한 은행 딩동 차임벨 (C5 -> E5 -> G5 -> C6)
+        const notes = [523.25, 659.25, 783.99, 1046.50];
+        notes.forEach((freq, idx) => {
+          const noteOsc = audioCtx.createOscillator();
+          const noteGain = audioCtx.createGain();
+          noteOsc.connect(noteGain);
+          noteGain.connect(audioCtx.destination);
+          
+          noteOsc.type = 'sine';
+          noteOsc.frequency.setValueAtTime(freq, audioCtx.currentTime + idx * 0.18);
+          noteGain.gain.setValueAtTime(0, audioCtx.currentTime + idx * 0.18);
+          noteGain.gain.linearRampToValueAtTime(0.22, audioCtx.currentTime + idx * 0.18 + 0.04);
+          noteGain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + idx * 0.18 + 0.55);
+          
+          noteOsc.start(audioCtx.currentTime + idx * 0.18);
+          noteOsc.stop(audioCtx.currentTime + idx * 0.18 + 0.6);
+        });
+
+        if (navigator.vibrate) {
+          navigator.vibrate([300, 150, 300, 150, 500]);
+        }
+        return;
       }
       
       if (navigator.vibrate) {
@@ -310,6 +334,8 @@ document.addEventListener('DOMContentLoaded', async () => {
     // Trigger CSS spin animations
     if (refreshIcon) refreshIcon.classList.add('spinning');
     if (refreshIcon2) refreshIcon2.classList.add('spinning');
+    const refreshIconDesktop = document.getElementById('refresh-icon-desktop');
+    if (refreshIconDesktop) refreshIconDesktop.classList.add('spinning');
     const safariRefreshIcon = document.getElementById('refresh-bottom-btn');
     if (safariRefreshIcon) safariRefreshIcon.classList.add('spinning');
     
@@ -335,6 +361,7 @@ document.addEventListener('DOMContentLoaded', async () => {
       // Remove animations
       if (refreshIcon) refreshIcon.classList.remove('spinning');
       if (refreshIcon2) refreshIcon2.classList.remove('spinning');
+      if (refreshIconDesktop) refreshIconDesktop.classList.remove('spinning');
       if (safariRefreshIcon) safariRefreshIcon.classList.remove('spinning');
       isRefreshing = false;
       
@@ -346,6 +373,8 @@ document.addEventListener('DOMContentLoaded', async () => {
   
   if (refreshTopBtn) refreshTopBtn.addEventListener('click', triggerRefresh);
   if (refreshBottomBtn2) refreshBottomBtn2.addEventListener('click', triggerRefresh);
+  const refreshDesktopBtn = document.getElementById('refresh-desktop-btn');
+  if (refreshDesktopBtn) refreshDesktopBtn.addEventListener('click', triggerRefresh);
   const refreshSafariBtn = document.getElementById('refresh-bottom-btn');
   if (refreshSafariBtn) refreshSafariBtn.addEventListener('click', triggerRefresh);
 
@@ -690,229 +719,8 @@ document.addEventListener('DOMContentLoaded', async () => {
           </div>
         `;
       }
-    } else if (selectedWorkType === 'doc') {
-      // 4. 기초 서류 작성
-      if (detailVal === '고객확인제도(CDD/EDD)' || detailVal.includes('고객확인')) {
-        html = `
-          <!-- 안내 배너: CDD 및 EDD 제도 체계 및 기존 고객 갱신 안내 -->
-          <div class="info-alert-box" style="background-color: #F0FBF9; border: 1px solid #C4ECE5; border-radius: 10px; padding: 11px 13px; font-size: 11.5px; color: #0C6255; line-height: 1.5; margin-bottom: 12px; text-align: left;">
-            <div style="font-weight: 800; margin-bottom: 4px; font-size: 12px;">
-              <i class="fa-solid fa-shield-halved" style="color: var(--brand-mint); margin-right: 4px;"></i>고객확인의무(CDD/EDD) 주기적 재이행/갱신 안내
-            </div>
-            • <strong>신규 계좌 개설 고객</strong>: '신규 신청' 서식에 고객확인의무가 필수 단계로 자동 통합되어 있습니다.<br>
-            • <strong>본 서식의 용도</strong>: 이미 계좌가 있는 기존 고객의 법정 정보 갱신(CDD 3년, EDD 1년 주기) 또는 1천만 원 이상 무통장 일회성 거래 고객 전용 등록 서식입니다.
-          </div>
-
-          <!-- [1단계] 기본 고객확인 (CDD) 섹션 -->
-          <div style="background-color: #ffffff; border: 1px solid #E2E8F0; border-radius: 12px; padding: 13px 14px; margin-bottom: 12px; text-align: left;">
-            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; padding-bottom: 6px; border-bottom: 1.5px solid #F1F5F9;">
-              <span style="font-size: 12.5px; font-weight: 800; color: #1E293B;">
-                <i class="fa-solid fa-id-card-clip" style="color: var(--brand-mint); margin-right: 5px;"></i>1단계. 기본 고객확인 (CDD)
-              </span>
-              <span style="font-size: 10px; font-weight: 700; color: #059669; background-color: #ECFDF5; padding: 2px 6px; border-radius: 4px;">3년 주기 재이행</span>
-            </div>
-
-            <!-- Q1. 실제 소유자 여부 -->
-            <div class="form-group" style="margin-bottom: 10px;">
-              <label class="form-label" style="font-size: 11.5px; font-weight: 700; color: #334155;">
-                본인이 해당 금융거래(계좌)의 실제 소유자입니까? <span style="color: #E53E3E;">*</span>
-              </label>
-              <div class="form-radio-group" style="grid-template-columns: repeat(2, 1fr); gap: 6px;">
-                <label class="radio-card" style="padding: 0;">
-                  <input type="radio" name="doc-cdd-realowner" id="cdd-realowner-yes" value="예 (실제 소유자)" checked>
-                  <span class="radio-content" style="padding: 8px 4px; font-size: 11px; font-weight: 700; text-align: center;">예 (본인 직접 거래)</span>
-                </label>
-                <label class="radio-card" style="padding: 0;">
-                  <input type="radio" name="doc-cdd-realowner" id="cdd-realowner-no" value="아니오 (대리인 거래)">
-                  <span class="radio-content" style="padding: 8px 4px; font-size: 11px; font-weight: 700; text-align: center; color: #DC2626;">아니오 (타인 대리/의뢰)</span>
-                </label>
-              </div>
-            </div>
-
-            <!-- Q2. 국적 및 거주 구분 -->
-            <div class="form-group" style="margin-bottom: 10px;">
-              <label class="form-label" style="font-size: 11.5px; font-weight: 700; color: #334155;">
-                국적 및 거주 구분을 선택해 주세요. <span style="color: #E53E3E;">*</span>
-              </label>
-              <div class="form-radio-group" style="grid-template-columns: repeat(2, 1fr); gap: 6px;">
-                <label class="radio-card" style="padding: 0;">
-                  <input type="radio" name="doc-cdd-nationality" id="cdd-nation-kr" value="내국인" checked>
-                  <span class="radio-content" style="padding: 8px 4px; font-size: 11px; font-weight: 700; text-align: center;">대한민국 내국인</span>
-                </label>
-                <label class="radio-card" style="padding: 0;">
-                  <input type="radio" name="doc-cdd-nationality" id="cdd-nation-foreign" value="외국인/비거주자">
-                  <span class="radio-content" style="padding: 8px 4px; font-size: 11px; font-weight: 700; text-align: center; color: #2563EB;">외국인 / 해외 비거주자</span>
-                </label>
-              </div>
-            </div>
-
-            <!-- Q3. 추가 확인(EDD) 케이스 여부 확인 -->
-            <div class="form-group" style="margin-bottom: 4px;">
-              <label class="form-label" style="font-size: 11.5px; font-weight: 700; color: #334155;">
-                오늘 창구 방문 거래 유형이 아래 추가 확인 대상에 해당합니까?
-              </label>
-              <div style="font-size: 10.5px; color: #64748B; background-color: #F8FAFC; border: 1px dashed #CBD5E1; border-radius: 6px; padding: 7px 9px; margin-bottom: 6px; line-height: 1.4;">
-                • 1천만 원 이상 일회성 현금거래 / 1만 달러 이상 외환송금<br>
-                • 법인·개인사업자 거래 / 자금세탁 고위험 상품 거래
-              </div>
-              <div class="form-radio-group" style="grid-template-columns: repeat(2, 1fr); gap: 6px;">
-                <label class="radio-card" style="padding: 0;">
-                  <input type="radio" name="doc-cdd-edd-trigger" id="cdd-edd-trigger-no" value="해당없음" checked>
-                  <span class="radio-content" style="padding: 8px 4px; font-size: 11px; font-weight: 700; text-align: center;">해당 없음 (기본 CDD 완료)</span>
-                </label>
-                <label class="radio-card" style="padding: 0;">
-                  <input type="radio" name="doc-cdd-edd-trigger" id="cdd-edd-trigger-yes" value="해당있음">
-                  <span class="radio-content" style="padding: 8px 4px; font-size: 11px; font-weight: 700; text-align: center; color: var(--brand-mint-dark);">해당 있음 (추가 확인 대상)</span>
-                </label>
-              </div>
-            </div>
-          </div>
-
-          <!-- [2단계] 강화된 고객확인 (EDD) 조건부 확장 섹션 -->
-          <div id="cdd-edd-advanced-section" class="hidden" style="background-color: #FFFDF5; border: 1.5px solid #FDE68A; border-radius: 12px; padding: 14px; margin-bottom: 12px; text-align: left; transition: all 0.3s ease;">
-            
-            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; padding-bottom: 6px; border-bottom: 1px solid #FEF3C7;">
-              <span style="font-size: 12.5px; font-weight: 800; color: #92400E;">
-                <i class="fa-solid fa-file-shield" style="color: #D97706; margin-right: 5px;"></i>2단계. 강화된 고객확인 (EDD) 필수 추가 정보
-              </span>
-              <span style="font-size: 10px; font-weight: 700; color: #D97706; background-color: #FEF3C7; padding: 2px 6px; border-radius: 4px;">1년 주기 재이행</span>
-            </div>
-
-            <div id="cdd-edd-reason-banner" style="font-size: 11px; color: #B45309; background-color: #FFFBEB; border-radius: 6px; padding: 6px 8px; margin-bottom: 10px; line-height: 1.4;">
-              <i class="fa-solid fa-circle-exclamation" style="margin-right: 4px;"></i>
-              <span id="cdd-edd-reason-text">추가 확인 케이스(대리인·외국인·고액거래 등)에 해당하여 필수 추가 정보를 작성합니다.</span>
-            </div>
-
-            <!-- EDD 1. 직업 구분 -->
-            <div class="form-group" style="margin-bottom: 10px;">
-              <label class="form-label" style="font-size: 11.5px; font-weight: 700; color: #78350F;">직업 및 업종 구분 <span style="color: #E53E3E;">*</span></label>
-              <select class="form-input" id="doc-edd-job" style="font-size: 12px; height: 38px; border-color: #FCD34D;">
-                <option value="급여소득자 (회사원/공무원)">급여소득자 (회사원 / 공무원 / 공기업)</option>
-                <option value="개인사업자 / 소상공인">개인사업자 / 소상공인 / 자영업</option>
-                <option value="전문직 (의사/변호사/회계사 등)">전문직 (의사 / 법조인 / 세무회계 등)</option>
-                <option value="프리랜서 / 특수형태근로자">프리랜서 / 특수형태근로종사자</option>
-                <option value="주부 / 학생">주부 / 학생</option>
-                <option value="무직 / 은퇴 / 기타">무직 / 은퇴 / 기타</option>
-              </select>
-            </div>
-
-            <!-- EDD 2. 직장명 / 사업장명 -->
-            <div class="form-group" style="margin-bottom: 10px;">
-              <label class="form-label" style="font-size: 11.5px; font-weight: 700; color: #78350F;">직장명 또는 사업장명 <span style="font-size: 10.5px; color: #92400E; font-weight: 400;">(주부/학생/무직은 소속 또는 '해당없음' 입력)</span></label>
-              <input type="text" class="form-input" id="doc-edd-workplace" placeholder="예: (주)대구상사 또는 OO대학교" style="font-size: 12px; height: 38px; border-color: #FCD34D;">
-            </div>
-
-            <!-- EDD 3. 거래 목적 -->
-            <div class="form-group" style="margin-bottom: 10px;">
-              <label class="form-label" style="font-size: 11.5px; font-weight: 700; color: #78350F;">구체적 금융거래 목적 <span style="color: #E53E3E;">*</span></label>
-              <select class="form-input" id="doc-cdd-purpose" style="font-size: 12px; height: 38px; border-color: #FCD34D;">
-                <option value="급여 수령 및 생활비 관리">급여 수령 및 생활비 관리</option>
-                <option value="목돈 저축 및 예적금/투자">목돈 저축 및 예적금 / 펀드 투자</option>
-                <option value="사업상 물품대금 결제 및 운용">사업상 물품대금 결제 및 운용</option>
-                <option value="대출 실행 및 원리금 상환">대출 실행 및 원리금 상환</option>
-                <option value="부동산 매매 및 임차보증금">부동산 매매 및 임차보증금 지급</option>
-                <option value="기타 (상속/증여 등)">기타 (상속 / 증여 / 학자금 등)</option>
-              </select>
-            </div>
-
-            <!-- EDD 4. 자금 원천 구분 -->
-            <div class="form-group" style="margin-bottom: 4px;">
-              <label class="form-label" style="font-size: 11.5px; font-weight: 700; color: #78350F;">거래자금의 원천 (출처) <span style="color: #E53E3E;">*</span></label>
-              <select class="form-input" id="doc-cdd-source" style="font-size: 12px; height: 38px; border-color: #FCD34D;">
-                <option value="근로소득 (급여/상여금)">근로소득 (급여 / 상여금)</option>
-                <option value="사업소득 (매출대금)">사업소득 (매출대금 / 영업수익)</option>
-                <option value="부동산 임대소득 또는 매매대금">부동산 임대소득 또는 매매대금</option>
-                <option value="금융소득 (이자/배당/투자수익)">금융소득 (이자 / 배당 / 투자수익)</option>
-                <option value="상속 / 증여 / 가족지원금">상속 / 증여 / 가족지원금</option>
-                <option value="차입금 (대출금/개인차용)">차입금 (금융기관 대출 / 개인차용)</option>
-              </select>
-            </div>
-          </div>
-        `;
-      } else if (detailVal === 'FATCA 거주지 확인' || detailVal === 'FATCA/CRS 조세 거주지 확인') {
-        html = `
-          <!-- 안내 배너: 메모 내용 반영 (미국/아르헨티나/멕시코/헝가리 국적자 필수) -->
-          <div class="info-alert-box" style="background-color: #F0F7FF; border: 1px solid #C8E1FF; border-radius: 10px; padding: 11px 13px; font-size: 11.5px; color: #1E429F; line-height: 1.5; margin-bottom: 12px; text-align: left;">
-            <i class="fa-solid fa-circle-info" style="color: #2B6CB0; margin-right: 4px;"></i>
-            <strong>조세목적상 국가 확인:</strong> 대한민국 이외에 납세 의무가 있는 경우(미국, 아르헨티나, 멕시코, 헝가리 국적자 등 필수) 본인확인서를 사실대로 작성해야 합니다.
-          </div>
-
-          <!-- Q1. 외국 납세 의무 여부 -->
-          <div class="form-group">
-            <label class="form-label" style="font-weight: 700; color: #111;">대한민국 외에 납세 의무(조세목적상 거주지)가 있습니까?</label>
-            <div class="form-radio-group" style="grid-template-columns: repeat(2, 1fr); gap: 8px; margin-bottom: 8px;">
-              <label class="radio-card" style="padding: 0;">
-                <input type="radio" name="doc-fatca-foreign-tax" id="fatca-tax-no" value="아니오" checked>
-                <span class="radio-content" style="padding: 9px 4px; font-size: 11.5px; font-weight: 700; text-align: center;">아니오 (한국만 해당)</span>
-              </label>
-              <label class="radio-card" style="padding: 0;">
-                <input type="radio" name="doc-fatca-foreign-tax" id="fatca-tax-yes" value="예">
-                <span class="radio-content" style="padding: 9px 4px; font-size: 11.5px; font-weight: 700; text-align: center; color: var(--brand-mint-dark);">예 (외국 납세 의무 있음)</span>
-              </label>
-            </div>
-          </div>
-
-          <!-- Q2. '예' 선택 시 동적 노출되는 스마트 입력 영역 (기본 숨김) -->
-          <div id="fatca-foreign-detail-section" class="hidden" style="background-color: #F9FBFA; border: 1px solid #E2E8F0; border-radius: 12px; padding: 14px; margin-bottom: 12px; text-align: left;">
-            
-            <!-- 조세목적상 국가 선택 -->
-            <div class="form-group" style="margin-bottom: 12px;">
-              <label class="form-label" style="font-size: 12px; font-weight: 700; color: #2D3748;">
-                조세목적상 국가 <span style="color: #E53E3E;">*</span>
-                <span style="font-size: 11px; font-weight: 500; color: #718096; margin-left: 4px;">(원터치 칩 선택 또는 직접 입력)</span>
-              </label>
-              
-              <!-- 원터치 국가 칩 (미국/아르헨티나/멕시코/헝가리) -->
-              <div class="chip-group" style="display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 8px;">
-                <button type="button" class="fatca-country-chip" data-country="미국" style="background:#fff; border:1px solid var(--brand-mint); color:var(--brand-mint-dark); padding:5px 10px; border-radius:14px; font-size:11px; font-weight:700; cursor:pointer;">🇺🇸 미국</button>
-                <button type="button" class="fatca-country-chip" data-country="아르헨티나" style="background:#fff; border:1px solid #CBD5E0; color:#4A5568; padding:5px 10px; border-radius:14px; font-size:11px; font-weight:700; cursor:pointer;">🇦🇷 아르헨티나</button>
-                <button type="button" class="fatca-country-chip" data-country="멕시코" style="background:#fff; border:1px solid #CBD5E0; color:#4A5568; padding:5px 10px; border-radius:14px; font-size:11px; font-weight:700; cursor:pointer;">🇲🇽 멕시코</button>
-                <button type="button" class="fatca-country-chip" data-country="헝가리" style="background:#fff; border:1px solid #CBD5E0; color:#4A5568; padding:5px 10px; border-radius:14px; font-size:11px; font-weight:700; cursor:pointer;">🇭🇺 헝가리</button>
-              </div>
-              
-              <input type="text" class="form-input" id="doc-fatca-country-input" placeholder="국가명을 직접 입력할 수도 있습니다" value="미국" style="font-size: 12px;">
-            </div>
-
-            <!-- 납세자번호(TIN) 보유 여부 -->
-            <div class="form-group" style="margin-bottom: 12px;">
-              <label class="form-label" style="font-size: 12px; font-weight: 700; color: #2D3748;">
-                납세자번호(TIN / SSN) 보유 여부 <span style="color: #E53E3E;">*</span>
-              </label>
-              <div class="form-radio-group" style="grid-template-columns: repeat(2, 1fr); gap: 6px; margin-bottom: 6px;">
-                <label class="radio-card" style="padding: 0;">
-                  <input type="radio" name="doc-fatca-tin-type" id="fatca-tin-has" value="보유" checked>
-                  <span class="radio-content" style="padding: 7px 4px; font-size: 11px; text-align: center;">보유 중 (직접 입력)</span>
-                </label>
-                <label class="radio-card" style="padding: 0;">
-                  <input type="radio" name="doc-fatca-tin-type" id="fatca-tin-none" value="미보유">
-                  <span class="radio-content" style="padding: 7px 4px; font-size: 11px; text-align: center;">미보유 / 모름 (창구 확인)</span>
-                </label>
-              </div>
-              <div id="doc-fatca-tin-input-box" style="margin-top: 6px;">
-                <input type="text" class="form-input" id="doc-fatca-tin-val" placeholder="납세자번호(TIN / SSN 9자리 등) 입력" style="font-size: 12px;">
-              </div>
-            </div>
-
-            <!-- 창구 연계 안내 팁 배너 -->
-            <div style="background-color: #EDF7F6; border: 1px dashed var(--brand-mint); border-radius: 8px; padding: 9px 11px; font-size: 11px; color: #007A68; line-height: 1.45;">
-              <i class="fa-solid fa-building-columns" style="color: var(--brand-mint); margin-right: 4px;"></i>
-              <strong>창구 간편 연계:</strong> 영문 해외 상세주소 및 법정 서식은 창구 호출 시 행원이 전산 화면과 대조하여 최종 완성해 드립니다.
-            </div>
-
-          </div>
-
-          <!-- 확인 동의 -->
-          <div class="form-group checkbox-group" style="margin-top: 10px; margin-bottom: 12px;">
-            <label class="checkbox-container">
-              <input type="checkbox" id="doc-fatca-cert-agree" checked>
-              <span class="checkmark"></span>
-              <span class="checkbox-label" style="font-size: 11.5px; font-weight: 600;">본인은 상기 기재한 조세목적상 거주지 정보가 사실과 일치함을 확인합니다.</span>
-            </label>
-          </div>
-        `;
-      }
     } else if (selectedWorkType === 'security') {
-      // 5. 창구 보안 업무 (사전 작성 불가 비대상 경고창 노출)
+      // 4. 창구 보안 업무 (사전 작성 불가 비대상 경고창 노출)
       html = `
         <div class="info-alert-box" style="background-color: #FFF2F4; border: 1px solid #FFCCD3; border-radius: 8px; padding: 12px; font-size: 12.0px; color: #D0021B; line-height: 1.6; margin-bottom: 8px; box-sizing: border-box; text-align: left;">
           <h4 style="margin: 0 0 6px 0; font-weight: 700; font-size: 12.5px;"><i class="fa-solid fa-triangle-exclamation"></i> 사전 작성 및 전송 제한 안내</h4>
@@ -923,53 +731,6 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
     
     dynamicReportFields.innerHTML = html;
-
-    // FATCA/CRS 인터랙션 연동
-    const fatcaTaxRadios = document.querySelectorAll('input[name="doc-fatca-foreign-tax"]');
-    const fatcaDetailSection = document.getElementById('fatca-foreign-detail-section');
-    const fatcaCountryInput = document.getElementById('doc-fatca-country-input');
-    const fatcaCountryChips = document.querySelectorAll('.fatca-country-chip');
-    const fatcaTinRadios = document.querySelectorAll('input[name="doc-fatca-tin-type"]');
-    const fatcaTinInputBox = document.getElementById('doc-fatca-tin-input-box');
-
-    if (fatcaTaxRadios.length > 0 && fatcaDetailSection) {
-      fatcaTaxRadios.forEach(r => {
-        r.addEventListener('change', (e) => {
-          if (e.target.value === '예') {
-            fatcaDetailSection.classList.remove('hidden');
-          } else {
-            fatcaDetailSection.classList.add('hidden');
-          }
-        });
-      });
-    }
-
-    if (fatcaCountryChips.length > 0 && fatcaCountryInput) {
-      fatcaCountryChips.forEach(chip => {
-        chip.addEventListener('click', () => {
-          const country = chip.getAttribute('data-country');
-          fatcaCountryInput.value = country;
-          fatcaCountryChips.forEach(c => {
-            c.style.borderColor = '#CBD5E0';
-            c.style.color = '#4A5568';
-          });
-          chip.style.borderColor = 'var(--brand-mint)';
-          chip.style.color = 'var(--brand-mint-dark)';
-        });
-      });
-    }
-
-    if (fatcaTinRadios.length > 0 && fatcaTinInputBox) {
-      fatcaTinRadios.forEach(r => {
-        r.addEventListener('change', (e) => {
-          if (e.target.value === '보유') {
-            fatcaTinInputBox.style.display = 'block';
-          } else {
-            fatcaTinInputBox.style.display = 'none';
-          }
-        });
-      });
-    }
     
     // 추가 서식 내 인터랙션 보정: 카드 재발급 우편/영업점 수령에 따른 주소창 가시성 연동
     const addressGroup = document.getElementById('card-delivery-address-group');
@@ -1083,7 +844,6 @@ document.addEventListener('DOMContentLoaded', async () => {
           cif: '신규 신청',
           report: '제신고 & 변경',
           autodebit: '자동이체 등록',
-          doc: '기초 서류 작성',
           security: '창구 보안 업무'
         };
         const targetNameText = targetNames[selectedWorkType] || '신규 신청';
@@ -1121,10 +881,19 @@ document.addEventListener('DOMContentLoaded', async () => {
   }
 
   // --- 7. KakaoTalk Modal Control ---
-  kakaotalkBtn.addEventListener('click', () => {
-    kakaoModal.classList.remove('hidden');
-    playNotificationSound('beep');
-  });
+  if (kakaotalkBtn) {
+    kakaotalkBtn.addEventListener('click', () => {
+      kakaoModal.classList.remove('hidden');
+      playNotificationSound('beep');
+    });
+  }
+  const kakaotalkDesktopBtn = document.getElementById('kakaotalk-desktop-btn');
+  if (kakaotalkDesktopBtn) {
+    kakaotalkDesktopBtn.addEventListener('click', () => {
+      kakaoModal.classList.remove('hidden');
+      playNotificationSound('beep');
+    });
+  }
 
   function closeModal() {
     kakaoModal.classList.add('hidden');
@@ -3053,46 +2822,57 @@ document.addEventListener('DOMContentLoaded', async () => {
     if (selectedVoucherType === 'MASS_TRANSFER') {
       const img = massUploadedImages[activePreviewImageIndex] || { name: "전표", url: "linear-gradient(135deg, #ede7f6 0%, #b39ddb 100%)" };
       ocrSourceImageBox.style.background = img.url;
+      ocrSourceImageBox.style.backgroundSize = "cover";
+      ocrSourceImageBox.style.backgroundPosition = "center";
       document.getElementById('display-preview-source-id').textContent = `[${img.name}]`;
       
       if (img.id && img.id.startsWith("IMG_MANUAL")) {
         ocrSourceImageBox.innerHTML = `
-          <div style="padding:12px; color:#14532d; height:100%; display:flex; flex-direction:column; justify-content:space-between; box-sizing:border-box;">
-            <div style="font-size:10.5px; font-weight:800; border-bottom:1px solid rgba(0,0,0,0.1); padding-bottom:4px; color:var(--brand-mint-dark);">
-              ✍️ ${img.name} (수기 직접입력)
+          <div style="padding:14px 18px; color:#14532d; width:100%; height:100%; display:flex; flex-direction:column; justify-content:space-between; box-sizing:border-box; background: rgba(240, 253, 244, 0.94); border-radius: 10px;">
+            <div style="font-size:12px; font-weight:800; border-bottom:1.5px solid rgba(0,0,0,0.08); padding-bottom:6px; color:var(--brand-mint-dark); display:flex; justify-content:space-between; align-items:center;">
+              <span>✍️ ${img.name} (수기 직접입력)</span>
+              <span style="font-size:9.5px; background:rgba(0,199,169,0.15); color:var(--brand-mint-dark); padding:2px 6px; border-radius:4px; font-weight:700;">모바일 작성</span>
             </div>
-            <div style="font-size:10px; font-weight:600; line-height:1.45; color:#166534;">
+            <div style="font-size:11px; font-weight:600; line-height:1.45; color:#166534; margin:6px 0;">
               전표 촬영 없이 모바일에서 직접 작성된 송금 건입니다.<br>
               계좌번호와 금액을 검토 후 창구로 전송해 주세요.
             </div>
-            <div style="font-size:8.5px; color:#15803d; font-weight:700; text-align:right;">iM SmartQ 직접입력</div>
+            <div style="font-size:9.5px; color:#15803d; font-weight:700; text-align:right;">iM SmartQ 직접입력</div>
           </div>
         `;
       } else {
         ocrSourceImageBox.innerHTML = `
-          <div style="padding:10px; color:#333; height:100%; display:flex; flex-direction:column; justify-content:space-between; box-sizing:border-box;">
-            <div style="font-size:10px; font-weight:700; border-bottom:1px solid rgba(0,0,0,0.1); padding-bottom:3px;">${img.name} (대량 의뢰서)</div>
-            <div style="font-size:9.5px; font-weight:600; line-height:1.3;">
-              ※ 대량이체 일괄전표 AI OCR 매핑<br>
-              자동 텍스트 라인 세분화 추출 완료.
+          <div style="padding:14px 18px; color:#1e293b; width:100%; height:100%; display:flex; flex-direction:column; justify-content:space-between; box-sizing:border-box; background: rgba(255, 255, 255, 0.92); border-radius: 10px; backdrop-filter: blur(4px);">
+            <div style="font-size:12px; font-weight:800; border-bottom:1.5px solid rgba(0,199,169,0.2); padding-bottom:6px; color:var(--brand-mint-dark); display:flex; justify-content:space-between; align-items:center;">
+              <span>📄 ${img.name} (대량 이체 의뢰서)</span>
+              <span style="font-size:9.5px; background:rgba(0,199,169,0.15); color:var(--brand-mint-dark); padding:2px 6px; border-radius:4px; font-weight:700;">AI 스캔 완료</span>
             </div>
-            <div style="font-size:8px; color:#666; text-align:right;">iM SmartQ AI OCR</div>
+            <div style="font-size:11px; font-weight:600; line-height:1.45; color:#334155; margin:6px 0;">
+              ※ 대량이체 일괄전표 AI OCR 매핑 분석 완료<br>
+              계좌번호, 수취인, 이체금액 라인 자동 추출 성공
+            </div>
+            <div style="font-size:9.5px; color:#64748b; font-weight:700; text-align:right;">iM SmartQ AI OCR Vision Engine</div>
           </div>
         `;
       }
     } else {
       const source = ocrResultData;
       ocrSourceImageBox.style.background = source.images[0] || "linear-gradient(135deg, #e0f7fa 0%, #80deea 100%)";
+      ocrSourceImageBox.style.backgroundSize = "cover";
+      ocrSourceImageBox.style.backgroundPosition = "center";
       document.getElementById('display-preview-source-id').textContent = `[단일 전표]`;
       
       ocrSourceImageBox.innerHTML = `
-        <div style="padding:10px; color:#333; height:100%; display:flex; flex-direction:column; justify-content:space-between; box-sizing:border-box; position:relative; z-index:1;">
-          <div style="font-size:10px; font-weight:700; border-bottom:1px solid rgba(0,0,0,0.1); padding-bottom:3px;">단일 이체 전표 원본</div>
-          <div style="font-size:9.5px; font-weight:600; line-height:1.3;">
-            ※ 단일거래 OCR 판독<br>
+        <div style="padding:14px 18px; color:#1e293b; width:100%; height:100%; display:flex; flex-direction:column; justify-content:space-between; box-sizing:border-box; background: rgba(255, 255, 255, 0.92); border-radius: 10px; backdrop-filter: blur(4px); position:relative; z-index:1;">
+          <div style="font-size:12px; font-weight:800; border-bottom:1.5px solid rgba(0,199,169,0.2); padding-bottom:6px; color:var(--brand-mint-dark); display:flex; justify-content:space-between; align-items:center;">
+            <span>📄 단일 이체 전표 원본</span>
+            <span style="font-size:9.5px; background:rgba(0,199,169,0.15); color:var(--brand-mint-dark); padding:2px 6px; border-radius:4px; font-weight:700;">AI 분석 완료</span>
+          </div>
+          <div style="font-size:11px; font-weight:600; line-height:1.45; color:#334155; margin:6px 0;">
+            ※ 단일거래 OCR 판독 완료<br>
             출금/수취/예금주/금액 추출 성공.
           </div>
-          <div style="font-size:8px; color:#666; text-align:right;">iM SmartQ AI OCR</div>
+          <div style="font-size:9.5px; color:#64748b; font-weight:700; text-align:right;">iM SmartQ AI OCR</div>
         </div>
         <!-- 하이라이트 박스 DOM 유지 -->
         <div id="ocr-hl-withdrawalAccount" class="ocr-hl-box" style="position: absolute; border: 2px solid #e74c3c; background: rgba(231, 76, 60, 0.18); top: 18%; left: 32%; width: 55%; height: 12%; border-radius:3px; display: none; pointer-events: none; z-index: 20; animation: blink-effect 0.8s infinite alternate;"></div>
@@ -4106,6 +3886,14 @@ document.addEventListener('DOMContentLoaded', async () => {
       playNotificationSound('beep');
     });
 
+    const smsDesktopBtn = document.getElementById('sms-desktop-btn');
+    if (smsDesktopBtn) {
+      smsDesktopBtn.addEventListener('click', () => {
+        smsModal.classList.remove('hidden');
+        playNotificationSound('beep');
+      });
+    }
+
     const closeSmsModal = () => {
       smsModal.classList.add('hidden');
     };
@@ -4755,6 +4543,139 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
       });
     }
+  }
+
+  // ==========================================================================
+  // 🎙️ 발표자 전용 대기열 제어 리모컨 & 내 차례 즉시 호출 시스템
+  // ==========================================================================
+  const queueCalledModal = document.getElementById('queue-called-modal');
+  const btnCalledModalClose = document.getElementById('btn-called-modal-close');
+  const ticketCard = document.querySelector('.ticket-card');
+
+  // 대기 인원 변경 및 실시간 호출 상태 관리 함수
+  function updateWaitQueueState(targetCount) {
+    if (!waitingCountEl || !waitingTimeEl) return;
+    
+    let count = Math.max(0, targetCount);
+    let time = count === 0 ? 0 : Math.max(1, count * 3);
+    
+    waitingCountEl.textContent = count === 0 ? "0명 (호출 중!)" : `${count}명`;
+    waitingTimeEl.textContent = count === 0 ? "즉시 방문" : `약 ${time}분`;
+    
+    // 순번 미루기 뱃지 상태 동기화
+    updateDelayBadge();
+
+    if (count === 1) {
+      // ⚠️ 1명 남았을 때: 순번 임박 예고 알림!
+      playNotificationSound('double');
+      showToast('⚠️ [순번 임박] 곧 고객님의 차례입니다! 3번 창구 근처에서 대기해 주세요.', true);
+      if (ticketCard) {
+        ticketCard.classList.remove('called-state-active');
+        ticketCard.style.borderColor = '#f59e0b';
+      }
+    } else if (count === 0) {
+      // 🚨 0명 도달: 내 차례 즉시 호출 클라이맥스 연출!
+      triggerImmediateCallEvent();
+    } else {
+      // 일반 대기 상태 복원
+      if (ticketCard) {
+        ticketCard.classList.remove('called-state-active');
+        ticketCard.style.borderColor = '';
+      }
+      if (queueCalledModal) {
+        queueCalledModal.classList.add('hidden');
+      }
+      playNotificationSound('beep');
+      showToast(`대기 인원이 ${count}명(약 ${time}분)으로 업데이트되었습니다.`);
+    }
+  }
+
+  // 🚨 내 차례 즉시 호출 이벤트 트리거 (긴박한 알림 모달 + 딩동 차임벨 + 네온 점멸)
+  function triggerImmediateCallEvent() {
+    if (ticketCard) {
+      ticketCard.classList.add('called-state-active');
+    }
+    
+    // 실제 은행 딩동 차임벨 4중주 + 모바일 강력 진동 연타
+    playNotificationSound('call');
+    
+    // 풀스크린 호출 모달 팝업
+    if (queueCalledModal) {
+      queueCalledModal.classList.remove('hidden');
+    }
+
+    showToast('📢 [창구 호출] 1004번 고객님, 3번 창구로 지금 방문해 주세요!', true);
+  }
+
+  // 호출 모달 닫기 (창구 이동 확인)
+  if (btnCalledModalClose && queueCalledModal) {
+    btnCalledModalClose.addEventListener('click', () => {
+      queueCalledModal.classList.add('hidden');
+      playNotificationSound('beep');
+      showToast('3번 창구(수신/신규)로 이동 중입니다.');
+    });
+  }
+
+  // 1. 발표자 리모컨: 대기 1명 감소 버튼
+  const btnPresenterReduce = document.getElementById('btn-presenter-reduce');
+  if (btnPresenterReduce) {
+    btnPresenterReduce.addEventListener('click', () => {
+      let currentWaitCount = parseInt(waitingCountEl.textContent, 10);
+      if (isNaN(currentWaitCount)) currentWaitCount = 0;
+      updateWaitQueueState(currentWaitCount - 1);
+    });
+  }
+
+  // 2. 발표자 리모컨: 즉시 내 차례 호출! (0명)
+  const btnPresenterCallNow = document.getElementById('btn-presenter-call-now');
+  if (btnPresenterCallNow) {
+    btnPresenterCallNow.addEventListener('click', () => {
+      updateWaitQueueState(0);
+    });
+  }
+
+  // 3. 발표자 리모컨: 대기 5명 리셋
+  const btnPresenterReset = document.getElementById('btn-presenter-reset');
+  if (btnPresenterReset) {
+    btnPresenterReset.addEventListener('click', () => {
+      updateWaitQueueState(5);
+    });
+  }
+
+  // 4. 발표자 키보드 단축키 지원 (노트북 화면 송출 중 키보드로 비밀 조작)
+  document.addEventListener('keydown', (e) => {
+    // 텍스트 입력창 포커스 중에는 단축키 무시
+    if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') return;
+
+    if (e.key === '[' || e.key === '-') {
+      let currentWaitCount = parseInt(waitingCountEl.textContent, 10);
+      if (isNaN(currentWaitCount)) currentWaitCount = 0;
+      updateWaitQueueState(currentWaitCount - 1);
+    } else if (e.key === ']' || e.key === '0') {
+      updateWaitQueueState(0);
+    } else if (e.key === '\\' || e.key === 'r' || e.key === 'R') {
+      updateWaitQueueState(5);
+    }
+  });
+
+  // 5. 모바일 비밀 제스처 (지점명 '본점영업부' 2초 내 3회 탭 시 비밀리에 1명씩 감소)
+  const branchNameEl = document.querySelector('.branch-name');
+  let secretTapCount = 0;
+  let secretTapTimer = null;
+  if (branchNameEl) {
+    branchNameEl.style.cursor = "pointer";
+    branchNameEl.addEventListener('click', () => {
+      secretTapCount++;
+      clearTimeout(secretTapTimer);
+      if (secretTapCount >= 3) {
+        secretTapCount = 0;
+        let currentWaitCount = parseInt(waitingCountEl.textContent, 10);
+        if (isNaN(currentWaitCount)) currentWaitCount = 0;
+        updateWaitQueueState(currentWaitCount - 1);
+      } else {
+        secretTapTimer = setTimeout(() => { secretTapCount = 0; }, 2000);
+      }
+    });
   }
 
 });
