@@ -2951,7 +2951,7 @@ input:checked + .slider:before {
 }
 
 html {
-  height: 100%;
+  min-height: 100%;
 }
 
 /* ==========================================================================
@@ -2959,12 +2959,9 @@ html {
    ========================================================================== */
 
 body {
-  min-height: 100vh;
-  min-height: 100dvh;
+  min-height: 100%;
   background-color: #EBF0F3;
   color: var(--dark-text);
-  overflow-x: hidden;
-  overflow-y: auto;
   -webkit-overflow-scrolling: touch;
 }
 
@@ -2973,8 +2970,7 @@ body {
   position: relative;
   width: 100%;
   max-width: 480px;
-  min-height: 100vh;
-  min-height: 100dvh;
+  min-height: 100%;
   margin: 0 auto;
   background-color: var(--white);
   box-shadow: 0 4px 24px rgba(0, 0, 0, 0.06);
@@ -3629,9 +3625,14 @@ body {
 
 /* 2. 스마트폰 모바일 화면 (480px 이하): 기기별 100% 꽉 찬 반응형 뷰 */
 @media (max-width: 480px) {
+  html {
+    min-height: 100%;
+  }
+
   body {
     background-color: #ffffff;
     padding: 0;
+    min-height: 100%;
   }
 
   .mobile-web-container {
@@ -3641,8 +3642,8 @@ body {
     border-radius: 0;
     box-shadow: none;
     border: none;
-    min-height: 100vh;
-    min-height: 100dvh;
+    min-height: 100%;
+    padding-bottom: calc(90px + env(safe-area-inset-bottom, 20px)) !important;
   }
 
   .app-content {
