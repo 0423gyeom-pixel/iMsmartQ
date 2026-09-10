@@ -2526,70 +2526,40 @@ document.addEventListener('DOMContentLoaded', async () => {
             const frame = liveOffscreenCtx.getImageData(0, 0, 160, 120);
             const d = frame.data;
 
-            // 1단계: 전체 프레임 평균 조도(밝기) 및 대비 분포 계산
+            // 1단계: 전체 프레임 조도 및 최대 밝기(용지 후보) 분석
             let totalLum = 0;
+            let maxLum = 0;
             let sampleCount = 0;
-            for (let y = 0; y < 120; y += 4) {
-              for (let x = 0; x < 160; x += 4) {
+
+            for (let y = 0; y < 120; y += 3) {
+              for (let x = 0; x < 160; x += 3) {
                 const idx = (y * 160 + x) * 4;
-                totalLum += (d[idx] * 299 + d[idx + 1] * 587 + d[idx + 2] * 114) / 1000;
+                const lum = (d[idx] * 299 + d[idx + 1] * 587 + d[idx + 2] * 114) / 1000;
+                totalLum += lum;
+                if (lum > maxLum) maxLum = lum;
                 sampleCount++;
               }
             }
-            const avgLum = totalLum / (sampleCount || 1);
 
-            // 2단계: 엣지 및 용지 투영 밀도(X축 / Y축 투영 히스토그램) 스캔
+            const avgLum = totalLum / (sampleCount || 1);
+            // 적응형 전표 밝기 임계값 (원목/어두운 책상, 실내 조명에 맞춰 전표 용지만 정밀 분리)
+            const paperThreshold = Math.max(95, Math.min(avgLum * 1.22, maxLum * 0.72));
+
+            // 2단계: 누적 투영 히스토그램(Projection Histogram) 스캔
             const colVotes = new Int32Array(160);
             const rowVotes = new Int32Array(120);
             let totalPaperPixels = 0;
 
-            for (let y = 2; y < 118; y += 2) {
-              for (let x = 2; x < 158; x += 2) {
+            for (let y = 1; y < 119; y += 2) {
+              for (let x = 1; x < 159; x += 2) {
                 const idx = (y * 160 + x) * 4;
-                const r = d[idx], g = d[idx + 1], b = d[idx + 2];
-                const lum = (r * 299 + g * 587 + b * 114) / 1000;
+                const lum = (d[idx] * 299 + d[idx + 1] * 587 + d[idx + 2] * 114) / 1000;
 
-                const idxL = (y * 160 + (x - 2)) * 4;
-                const idxR = (y * 160 + (x + 2)) * 4;
-                const idxU = ((y - 2) * 160 + x) * 4;
-                const idxD = ((y + 2) * 160 + x) * 4;
-
-                const lumL = (d[idxL] * 299 + d[idxL + 1] * 587 + d[idxL + 2] * 114) / 1000;
-                const lumR = (d[idxR] * 299 + d[idxR + 1] * 587 + d[idxR + 2] * 114) / 1000;
-                const lumU = (d[idxU] * 299 + d[idxU + 1] * 587 + d[idxU + 2] * 114) / 1000;
-                const lumD = (d[idxD] * 299 + d[idxD + 1] * 587 + d[idxD + 2] * 114) / 1000;
-
-                const edge = Math.abs(lumR - lumL) + Math.abs(lumD - lumU);
-
-                // 전표 픽셀 판정: 글자/인쇄선 엣지(edge >= 12) 또는 배경 대비 밝은 용지 표면
-                const isPaper = (edge >= 12 && lum >= 45) || (lum >= Math.max(85, avgLum + 10));
-
-                if (isPaper) {
+                if (lum >= paperThreshold) {
                   colVotes[x]++;
                   rowVotes[y]++;
                   totalPaperPixels++;
                 }
-              }
-            }
-
-            // 3단계: 유효 전표 바운딩 박스(Bounding Box) 탐색
-            const colThresh = Math.max(3, 120 * 0.035);
-            const rowThresh = Math.max(3, 160 * 0.035);
-
-            let minX = 0, maxX = 159, minY = 0, maxY = 119;
-            let foundMinX = false, foundMinY = false;
-
-            for (let x = 0; x < 160; x++) {
-              if (colVotes[x] >= colThresh) {
-                if (!foundMinX) { minX = x; foundMinX = true; }
-                maxX = x;
-              }
-            }
-
-            for (let y = 0; y < 120; y++) {
-              if (rowVotes[y] >= rowThresh) {
-                if (!foundMinY) { minY = y; foundMinY = true; }
-                maxY = y;
               }
             }
 
@@ -2598,49 +2568,105 @@ document.addEventListener('DOMContentLoaded', async () => {
             let icon = 'fa-arrows-to-dot';
             let color = '#00BAC6';
 
-            if (totalPaperPixels < 120 || !foundMinX || !foundMinY || (maxX - minX) < 20 || (maxY - minY) < 12) {
+            // 전표 용지 픽셀이 너무 적으면 탐색 상태
+            if (totalPaperPixels < 150) {
               targetState = 'SEARCHING';
               message = '전표 앞면을 격자 안에 맞춰 주세요';
               icon = 'fa-arrows-to-dot';
               color = '#00BAC6';
             } else {
+              // 3단계: 5% ~ 95% 분위수(Percentile) 기반 노이즈 배제 바운딩 박스 추출
+              let cumX = 0;
+              let minX = 0, maxX = 159;
+              const p5X = totalPaperPixels * 0.05;
+              const p95X = totalPaperPixels * 0.95;
+
+              for (let x = 0; x < 160; x++) {
+                cumX += colVotes[x];
+                if (cumX >= p5X && minX === 0) minX = x;
+                if (cumX >= p95X) { maxX = x; break; }
+              }
+
+              let cumY = 0;
+              let minY = 0, maxY = 119;
+              const p5Y = totalPaperPixels * 0.05;
+              const p95Y = totalPaperPixels * 0.95;
+
+              for (let y = 0; y < 120; y++) {
+                cumY += rowVotes[y];
+                if (cumY >= p5Y && minY === 0) minY = y;
+                if (cumY >= p95Y) { maxY = y; break; }
+              }
+
               const pixelW = maxX - minX + 1;
               const pixelH = maxY - minY + 1;
               const centerPxX = (minX + maxX) / 2;
               const centerPxY = (minY + maxY) / 2;
 
-              // 뷰파인더 160×120 내 격자 영역(실제 전표 94%×68%): 폭 ~150 (5~155), 높이 ~82 (19~101), 중심 (80, 60)
-              if (pixelW < 84 || pixelH < 44) {
-                targetState = 'WARNING';
-                message = '전표가 너무 멀어요. 더 가까이 대주세요 ⬇️';
-                icon = 'fa-magnifying-glass-plus';
-                color = '#FFA000';
-              } else if (pixelW > 154 || pixelH > 96 || (minX <= 1 && maxX >= 158)) {
+              // 뷰파인더 160×120 내 격자 4개 모서리(94%×68%): 좌(5~24), 우(136~155), 상(15~30), 하(90~105)
+              const cutLeft = minX <= 2;
+              const cutRight = maxX >= 157;
+              const cutTop = minY <= 2;
+              const cutBottom = maxY >= 117;
+
+              // 1. 화면 밖으로 전표가 잘려 나갔을 때
+              if ((cutLeft && cutRight) || (cutTop && cutBottom) || (pixelW > 154 && pixelH > 96)) {
                 targetState = 'WARNING';
                 message = '전표가 너무 가까워요. 조금 뒤로 물러서 주세요 ⬆️';
                 icon = 'fa-magnifying-glass-minus';
                 color = '#FF7043';
-              } else if (centerPxX < 64) {
+              } else if (cutLeft) {
                 targetState = 'WARNING';
-                message = '전표를 오른쪽으로 조금 이동해 주세요 ➡️';
+                message = '전표 왼쪽이 잘렸어요. 오른쪽으로 이동해 주세요 ➡️';
                 icon = 'fa-arrow-right';
                 color = '#FFB300';
-              } else if (centerPxX > 96) {
+              } else if (cutRight) {
                 targetState = 'WARNING';
-                message = '전표를 왼쪽으로 조금 이동해 주세요 ⬅️';
+                message = '전표 오른쪽이 잘렸어요. 왼쪽으로 이동해 주세요 ⬅️';
                 icon = 'fa-arrow-left';
                 color = '#FFB300';
-              } else if (centerPxY < 44) {
+              } else if (cutTop) {
                 targetState = 'WARNING';
-                message = '전표를 아래로 조금 내려 주세요 ⬇️';
+                message = '전표 위쪽이 잘렸어요. 아래로 내려 주세요 ⬇️';
                 icon = 'fa-arrow-down';
                 color = '#FFB300';
-              } else if (centerPxY > 76) {
+              } else if (cutBottom) {
                 targetState = 'WARNING';
-                message = '전표를 위로 조금 올려 주세요 ⬆️';
+                message = '전표 아래쪽이 잘렸어요. 위로 올려 주세요 ⬆️';
                 icon = 'fa-arrow-up';
                 color = '#FFB300';
-              } else {
+              }
+              // 2. 전표가 너무 작거나 멀리 있을 때
+              else if (pixelW < 90 || pixelH < 46) {
+                targetState = 'WARNING';
+                message = '전표가 너무 멀어요. 격자 크기에 맞춰 더 가까이 대주세요 ⬇️';
+                icon = 'fa-magnifying-glass-plus';
+                color = '#FFA000';
+              }
+              // 3. 4개 모서리가 격자 꺾쇠 위치에 도달하지 못했을 때 (부분 촬영/치우침 감지)
+              else if (minX > 25) {
+                targetState = 'WARNING';
+                message = '전표를 왼쪽으로 이동해 좌측 모서리에 맞춰주세요 ⬅️';
+                icon = 'fa-arrow-left';
+                color = '#FFB300';
+              } else if (maxX < 135) {
+                targetState = 'WARNING';
+                message = '전표를 오른쪽으로 이동해 우측 모서리에 맞춰주세요 ➡️';
+                icon = 'fa-arrow-right';
+                color = '#FFB300';
+              } else if (minY > 30) {
+                targetState = 'WARNING';
+                message = '전표를 위로 올려 상단 모서리에 맞춰주세요 ⬆️';
+                icon = 'fa-arrow-up';
+                color = '#FFB300';
+              } else if (maxY < 90) {
+                targetState = 'WARNING';
+                message = '전표를 아래로 내려 하단 모서리에 맞춰주세요 ⬇️';
+                icon = 'fa-arrow-down';
+                color = '#FFB300';
+              }
+              // 4. 네 모서리가 격자 4개 코너에 완벽히 정합되었을 때
+              else {
                 targetState = 'OPTIMAL';
                 message = '최적의 위치입니다! 지금 바로 촬영을 눌러주세요 ✨';
                 icon = 'fa-circle-check';
