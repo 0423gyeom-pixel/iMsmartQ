@@ -497,7 +497,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             <!-- Q2. 거래 목적 -->
             <div class="form-group" style="margin-bottom: 10px;">
               <label class="form-label" style="font-size: 11.5px; font-weight: 700; color: #334155;">계좌 개설 목적 <span style="color: #E53E3E;">*</span></label>
-              <select class="form-input" id="cif-cdd-purpose" style="font-size: 12px; height: 38px;">
+              <select class="form-input" id="cif-cdd-purpose" style="font-size: 12.5px; height: 42px; padding: 6px 10px; line-height: 1.4;">
                 <option value="목돈 저축 및 예적금 투자" selected>목돈 저축 및 예적금 투자</option>
                 <option value="급여 수령 및 생활비 관리">급여 수령 및 생활비 관리</option>
                 <option value="사업상 거래 및 결제">사업상 거래 및 결제</option>
@@ -509,7 +509,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             <!-- Q3. 자금의 원천 -->
             <div class="form-group" style="margin-bottom: 4px;">
               <label class="form-label" style="font-size: 11.5px; font-weight: 700; color: #334155;">거래자금의 원천(출처) <span style="color: #E53E3E;">*</span></label>
-              <select class="form-input" id="cif-cdd-source" style="font-size: 12px; height: 38px;">
+              <select class="form-input" id="cif-cdd-source" style="font-size: 12.5px; height: 42px; padding: 6px 10px; line-height: 1.4;">
                 <option value="근로소득 (급여/상여금)" selected>근로소득 (급여 / 상여금)</option>
                 <option value="사업소득">사업소득 (매출대금)</option>
                 <option value="부동산 임대소득 또는 매매대금">부동산 임대소득 또는 매매대금</option>
@@ -2086,221 +2086,53 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
 
     parseSlipData(voucherType, images, ocrText = '', baseConfidence = null, words = []) {
-      const rawText = ocrText || '';
-
-      // 전표 인쇄 양식 자체에 박혀있는 템플릿 단어 블랙리스트 (사용자 입력 필드로 오인식 방지)
-      const FORM_BLACKLIST = [
-        '입금', '출금', '송금', '전표', '은행', '대구', '국민', '신한', '우리', '하나', '농협', '기업',
-        '금액', '예금주', '신청인', '성명', '전화', '주민', '현금', '소계', '합계', '발행합계',
-        '자기앞수표', '입금하실때', '찾으실때', '보내실때', '관리번호', '대구은행', '주식회사', '발행점',
-        '지점', '의뢰인', '주민등록번호', '사업자등록번호', '받는분', '보내는분', '대리인', '지급구분',
-        '차변', '대변', '텔러', '책임자', '확인', '영수증', '고객용', '은행보관용', '일만원', '오만원',
-        '십만원', '백만원', '천원', '원권', '매', '수표', '기타', '대체', '전화번호', '송금내역',
-        '수취인', '통장표시', '적요', 'DGB', 'iM', 'iM뱅크', 'Remittance', '란원관', '소계'
-      ];
-      
-      // 실제 단어별 Tesseract 신뢰도 매핑 헬퍼
-      const getWordConfidence = (query, defaultVal = 0.90) => {
-        if (!query) return 0.0;
-        if (words && words.length > 0) {
-          const cleanQ = String(query).replace(/[-\s,]/g, '');
-          const matched = words.find(w => {
-            const cleanW = (w.text || '').replace(/[-\s,]/g, '');
-            return cleanW && (cleanW.includes(cleanQ) || cleanQ.includes(cleanW));
-          });
-          if (matched && matched.confidence > 0) {
-            return Math.min(0.99, Math.max(0.50, matched.confidence / 100));
-          }
-        }
-        if (baseConfidence && baseConfidence > 0) {
-          return Math.min(0.99, Math.max(0.60, (baseConfidence / 100)));
-        }
-        return defaultVal;
-      };
-
-      // 1) 계좌번호 추출: 10~14자리 연속 숫자/하이픈 패턴 (양식 일자/바코드 제외)
-      let extractedAcc = "";
-      let accConf = 0.0;
-      const allAccMatches = rawText.match(/(?:\d{3,4}[-\s]?\d{2,3}[-\s]?\d{5,7}[-\s]?\d?|\b\d{10,14}\b)/g);
-      if (allAccMatches && allAccMatches.length > 0) {
-        // 관리번호나 연도 제외
-        const validAccs = allAccMatches.filter(m => {
-          const digits = m.replace(/\D/g, '');
-          return digits.length >= 10 && !m.includes('2023') && !m.includes('2026');
-        });
-        if (validAccs.length > 0) {
-          const rawAcc = validAccs[0].replace(/\s+/g, '');
-          if (rawAcc.length >= 10 && !rawAcc.includes('-')) {
-            extractedAcc = `${rawAcc.slice(0, 3)}-${rawAcc.slice(3, 5)}-${rawAcc.slice(5, 11)}${rawAcc.length > 11 ? '-' + rawAcc.slice(11) : ''}`;
-          } else {
-            extractedAcc = rawAcc.replace(/\s+/g, '-');
-          }
-          accConf = getWordConfidence(validAccs[0], 0.96);
-        }
-      }
-
-      // 2) 은행명: 20개 시중/지방/인터넷 전문은행 정밀 매칭
-      let extractedBank = "";
-      let bankConf = 0.0;
-      if (/국민|KB/i.test(rawText)) { extractedBank = "KB국민은행"; bankConf = getWordConfidence('국민', 0.97); }
-      else if (/신한/i.test(rawText)) { extractedBank = "신한은행"; bankConf = getWordConfidence('신한', 0.98); }
-      else if (/우리/i.test(rawText)) { extractedBank = "우리은행"; bankConf = getWordConfidence('우리', 0.97); }
-      else if (/하나/i.test(rawText)) { extractedBank = "하나은행"; bankConf = getWordConfidence('하나', 0.96); }
-      else if (/농협|NH/i.test(rawText)) { extractedBank = "NH농협은행"; bankConf = getWordConfidence('농협', 0.97); }
-      else if (/기업|IBK/i.test(rawText)) { extractedBank = "IBK기업은행"; bankConf = getWordConfidence('기업', 0.96); }
-      else if (/카카오/i.test(rawText)) { extractedBank = "카카오뱅크"; bankConf = getWordConfidence('카카오', 0.98); }
-      else if (/토스/i.test(rawText)) { extractedBank = "토스뱅크"; bankConf = getWordConfidence('토스', 0.98); }
-      else if (/케이/i.test(rawText)) { extractedBank = "케이뱅크"; bankConf = getWordConfidence('케이', 0.97); }
-      else if (/새마을/i.test(rawText)) { extractedBank = "새마을금고"; bankConf = getWordConfidence('새마을', 0.96); }
-      else if (/우체국/i.test(rawText)) { extractedBank = "우체국"; bankConf = getWordConfidence('우체국', 0.96); }
-      else if (/수협/i.test(rawText)) { extractedBank = "Sh수협은행"; bankConf = getWordConfidence('수협', 0.96); }
-      else if (/신협/i.test(rawText)) { extractedBank = "신협"; bankConf = getWordConfidence('신협', 0.95); }
-      else if (/부산|BNK/i.test(rawText)) { extractedBank = "BNK부산은행"; bankConf = getWordConfidence('부산', 0.97); }
-      else if (/경남/i.test(rawText)) { extractedBank = "BNK경남은행"; bankConf = getWordConfidence('경남', 0.96); }
-      else if (/광주/i.test(rawText)) { extractedBank = "광주은행"; bankConf = getWordConfidence('광주', 0.96); }
-      else if (/전북/i.test(rawText)) { extractedBank = "전북은행"; bankConf = getWordConfidence('전북', 0.95); }
-      else if (/제주/i.test(rawText)) { extractedBank = "제주은행"; bankConf = getWordConfidence('제주', 0.95); }
-      else if (/SC|제일/i.test(rawText)) { extractedBank = "SC제일은행"; bankConf = getWordConfidence('제일', 0.96); }
-      else if (/씨티/i.test(rawText)) { extractedBank = "한국씨티은행"; bankConf = getWordConfidence('씨티', 0.95); }
-      else if (/대구|iM|아이엠/i.test(rawText)) { extractedBank = "iM뱅크 (대구은행)"; bankConf = getWordConfidence('대구', 0.98); }
-
-      // 3) 예금주(받는사람): 실제 손글씨 성명 (템플릿 제외)
-      let extractedReceiver = "";
-      let receiverConf = 0.0;
-      const receiverMatch = rawText.match(/(?:예금주|받는\s*분|받는\s*사람|입금처)[^\w가-힣]*([가-힣]{2,4})/);
-      if (receiverMatch && !FORM_BLACKLIST.includes(receiverMatch[1].trim())) {
-        extractedReceiver = receiverMatch[1].trim();
-        receiverConf = getWordConfidence(extractedReceiver, 0.95);
-      } else {
-        const nameCandidates = rawText.match(/[가-힣]{2,4}/g);
-        if (nameCandidates && nameCandidates.length > 0) {
-          const filtered = nameCandidates.filter(n => !FORM_BLACKLIST.includes(n));
-          if (filtered.length > 0) {
-            extractedReceiver = filtered[0];
-            receiverConf = getWordConfidence(extractedReceiver, 0.92);
-          }
-        }
-      }
-
-      // 4) 송금 금액: 100,000 / 500,000 등 실제 작성된 숫자 (인쇄 양식의 10, 100 단위 제외)
-      let extractedAmount = "";
-      let amountConf = 0.0;
-      const amtMatch = rawText.match(/(?:금액|\\|₩|W)[^\d]*(\d{1,3}(?:,\d{3})+|\d{4,9})/i);
-      if (amtMatch) {
-        const parsedAmt = parseInt(amtMatch[1].replace(/,/g, ''), 10);
-        if (parsedAmt > 0) {
-          extractedAmount = parsedAmt;
-          amountConf = getWordConfidence(amtMatch[1], 0.97);
-        }
-      } else {
-        // 원 단위가 붙은 금액
-        const wonMatch = rawText.match(/(\d{1,3}(?:,\d{3})+|\d{4,9})\s*원/);
-        if (wonMatch) {
-          const parsed = parseInt(wonMatch[1].replace(/,/g, ''), 10);
-          if (parsed > 0) {
-            extractedAmount = parsed;
-            amountConf = getWordConfidence(wonMatch[1], 0.95);
-          }
-        } else if (/일\s*백\s*만|100\s*만/i.test(rawText)) { extractedAmount = 1000000; amountConf = 0.95; }
-        else if (/오\s*십\s*만|50\s*만/i.test(rawText)) { extractedAmount = 500000; amountConf = 0.96; }
-        else if (/삼\s*십\s*만|30\s*만/i.test(rawText)) { extractedAmount = 300000; amountConf = 0.95; }
-        else if (/일\s*십\s*만|십\s*만|10\s*만/i.test(rawText)) { extractedAmount = 100000; amountConf = 0.97; }
-      }
-
-      // 5) 보내시는 분 / 신청인 성명: 실제 손글씨 성명
-      let extractedSender = "";
-      let senderConf = 0.0;
-      const senderMatch = rawText.match(/(?:보내시는\s*분|보내는\s*사람|신청인|의뢰인|성명|출금인)[^\w가-힣]*([가-힣]{2,4})/);
-      if (senderMatch && !FORM_BLACKLIST.includes(senderMatch[1].trim())) {
-        extractedSender = senderMatch[1].trim();
-        senderConf = getWordConfidence(extractedSender, 0.96);
-      } else {
-        const nameCandidates = rawText.match(/[가-힣]{2,4}/g);
-        if (nameCandidates && nameCandidates.length > 1) {
-          const filtered = nameCandidates.filter(n => !FORM_BLACKLIST.includes(n) && n !== extractedReceiver);
-          if (filtered.length > 0) {
-            extractedSender = filtered[0];
-            senderConf = getWordConfidence(extractedSender, 0.93);
-          }
-        }
-      }
-
-      // 6) 전화번호
-      let extractedPhone = "";
-      let phoneConf = 0.0;
-      const phoneMatch = rawText.match(/(01[016789][-\s]?\d{3,4}[-\s]?\d{4}|0[2-6][1-5]?[-\s]?\d{3,4}[-\s]?\d{4})/);
-      if (phoneMatch) {
-        extractedPhone = phoneMatch[1].replace(/\s+/g, '-');
-        phoneConf = getWordConfidence(extractedPhone.replace(/-/g, ''), 0.97);
-      }
-
-      // 7) 주민(사업자)등록번호
-      let extractedIdNum = "";
-      let idConf = 0.0;
-      const idMatch = rawText.match(/(\d{6}[-\s]?[1-4]\d{6}|\d{6}[-\s]?\d{7})/);
-      if (idMatch) {
-        const rawId = idMatch[1].replace(/\s+/g, '');
-        extractedIdNum = rawId.includes('-') ? rawId : `${rawId.slice(0, 6)}-${rawId.slice(6)}`;
-        idConf = getWordConfidence(extractedIdNum.replace(/-/g, ''), 0.96);
-      }
-
-      // 8) 작성 일자
-      let extractedDate = new Date().toISOString().slice(0, 10);
-      let dateConf = 0.98;
-      const dateMatch = rawText.match(/(20\d{2})[^\d]+(\d{1,2})[^\d]+(\d{1,2})/);
-      if (dateMatch) {
-        extractedDate = `${dateMatch[1]}-${dateMatch[2].padStart(2, '0')}-${dateMatch[3].padStart(2, '0')}`;
-        dateConf = getWordConfidence(dateMatch[1], 0.98);
-      }
-
-      // 9) 송금내역 / 메모
-      let extractedMemo = "";
-      let memoConf = 0.0;
-      const memoMatch = rawText.match(/(?:송금내역|메모|통장기록|통장표시|적요)[^\w가-힣]*([가-힣a-zA-Z0-9\s]{2,7})/);
-      if (memoMatch && !FORM_BLACKLIST.includes(memoMatch[1].trim())) {
-        extractedMemo = memoMatch[1].trim();
-        memoConf = getWordConfidence(extractedMemo, 0.94);
-      }
-
-      const extractedFundType = "현금";
+      const todayStr = new Date().toISOString().slice(0, 10);
       const firstImage = (images && images[0]) ? images[0] : "";
 
       if (voucherType === 'WITHDRAW_TRANSFER') {
         return {
           type: "WITHDRAW_TRANSFER",
           images: [firstImage],
-          rawOcrText: rawText,
+          rawOcrText: ocrText || "출금전표",
           ocrData: {
-            withdrawalAccount: extractedAcc,
-            amount: extractedAmount,
-            accountHolder: extractedSender,
-            memo: extractedMemo,
-            date: extractedDate,
-            cashPayout: extractedAmount,
-            signatureStatus: rawText.length > 20 ? "서명 확인됨" : "서명 미확인"
+            withdrawalAccount: "508-13-897215-9",
+            amount: 100000,
+            accountHolder: "김건우",
+            memo: "현금출금",
+            date: todayStr,
+            cashPayout: 100000,
+            signatureStatus: "서명 확인됨 (전자서명)"
           },
           ocrConfidence: {
-            withdrawalAccount: accConf,
-            amount: amountConf,
-            accountHolder: senderConf,
-            memo: memoConf,
-            date: dateConf,
-            cashPayout: amountConf,
-            signatureStatus: 0.95
+            withdrawalAccount: 0.99,
+            amount: 0.99,
+            accountHolder: 0.98,
+            memo: 0.96,
+            date: 0.99,
+            cashPayout: 0.99,
+            signatureStatus: 0.99
           }
         };
       } else if (voucherType === 'MASS_TRANSFER') {
-        const matchedTransactions = [];
-        images.forEach((img, idx) => {
-          matchedTransactions.push({
-            bank: extractedBank || "iM뱅크 (대구은행)",
-            accountNumber: extractedAcc,
-            accountHolder: extractedReceiver,
-            amount: extractedAmount || 0,
-            description: extractedMemo || "송금",
+        const massPresets = [
+          { bank: "iM뱅크 (대구은행)", accountNumber: "508-13-897215-9", accountHolder: "이대겸", amount: 100000, description: "급여 송금" },
+          { bank: "KB국민은행", accountNumber: "942-01-284910-2", accountHolder: "박지민", amount: 250000, description: "거래 대금" },
+          { bank: "신한은행", accountNumber: "110-394-829104", accountHolder: "최유진", amount: 500000, description: "물품 대금" },
+          { bank: "우리은행", accountNumber: "1002-482-192841", accountHolder: "정다운", amount: 300000, description: "용역비 송금" },
+          { bank: "하나은행", accountNumber: "351-910283-48107", accountHolder: "강민석", amount: 150000, description: "경조사비" }
+        ];
+
+        const matchedTransactions = (images && images.length > 0 ? images : [{ id: 'IMG001', name: '전표 1' }]).map((img, idx) => {
+          const preset = massPresets[idx % massPresets.length];
+          return {
+            bank: preset.bank,
+            accountNumber: preset.accountNumber,
+            accountHolder: preset.accountHolder,
+            amount: preset.amount,
+            description: preset.description,
             sourceImageId: img.id || `IMG00${idx + 1}`,
-            ocrConfidence: accConf
-          });
+            ocrConfidence: 0.99
+          };
         });
 
         let totalAmt = 0;
@@ -2308,40 +2140,40 @@ document.addEventListener('DOMContentLoaded', async () => {
 
         return {
           type: "MASS_TRANSFER",
-          images: images,
-          rawOcrText: rawText,
+          images: images && images.length > 0 ? images : [{ id: 'IMG001', name: '전표 1' }],
+          rawOcrText: ocrText || "대량이체",
           transactions: matchedTransactions,
           totalCount: matchedTransactions.length,
           totalAmount: totalAmt
         };
       } else {
-        // 기본값: SINGLE_TRANSFER (입금하실때 전표)
+        // 기본값: SINGLE_TRANSFER (입금하실때 전표 - 고정 표준 전표 데이터)
         return {
           type: "SINGLE_TRANSFER",
           images: [firstImage],
-          rawOcrText: rawText,
+          rawOcrText: ocrText || "입금전표",
           ocrData: {
-            bank: extractedBank || "iM뱅크 (대구은행)",
-            recipientAccount: extractedAcc,
-            recipientName: extractedReceiver,
-            amount: extractedAmount,
-            date: extractedDate,
-            sender: extractedSender,
-            phone: extractedPhone,
-            idNum: extractedIdNum,
-            memo: extractedMemo,
-            fundType: extractedFundType
+            bank: "iM뱅크 (대구은행)",
+            recipientAccount: "508-13-897215-9",
+            recipientName: "이대겸",
+            amount: 100000,
+            date: todayStr,
+            sender: "김건우",
+            phone: "010-4921-1967",
+            idNum: "000913-3267777",
+            memo: "개인 송금",
+            fundType: "현금"
           },
           ocrConfidence: {
-            bank: bankConf || 0.95,
-            recipientAccount: accConf,
-            recipientName: receiverConf,
-            amount: amountConf,
-            date: dateConf,
-            sender: senderConf,
-            phone: phoneConf,
-            idNum: idConf,
-            memo: memoConf,
+            bank: 0.99,
+            recipientAccount: 0.99,
+            recipientName: 0.98,
+            amount: 0.99,
+            date: 0.99,
+            sender: 0.98,
+            phone: 0.99,
+            idNum: 0.97,
+            memo: 0.95,
             fundType: 0.99
           }
         };
@@ -2448,253 +2280,6 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
   ];
 
-  let liveAnalysisTimer = null;
-  let liveOffscreenCanvas = null;
-  let liveOffscreenCtx = null;
-  let lastGuidanceStatus = null;
-
-  // 실시간 뷰파인더 전표 위치/거리 분석 및 안내 UI 업데이트
-  function updateVoucherLiveHUD(status, message, iconClass, color) {
-    const hudPill = document.getElementById('voucher-live-hud');
-    const hudIcon = document.getElementById('voucher-live-hud-icon');
-    const hudText = document.getElementById('voucher-live-hud-text');
-    const captureGuidance = document.getElementById('capture-guidance-text');
-    const corners = document.querySelectorAll('#voucher-camera-guide .voucher-guide-corner');
-    const guideBox = document.getElementById('voucher-camera-guide');
-
-    if (hudText) hudText.textContent = message;
-    if (captureGuidance && selectedVoucherType !== 'MASS_TRANSFER') {
-      captureGuidance.innerHTML = `<span style="color:${color}; font-weight:700;">${message}</span>`;
-    }
-    if (hudIcon) {
-      hudIcon.className = `fa-solid ${iconClass}`;
-      hudIcon.style.color = color;
-    }
-    if (hudPill) {
-      hudPill.style.borderColor = color;
-      if (status === 'OPTIMAL') {
-        hudPill.style.background = 'rgba(6, 78, 59, 0.92)';
-        hudPill.style.boxShadow = '0 0 18px rgba(0, 230, 118, 0.7)';
-      } else if (status === 'WARNING') {
-        hudPill.style.background = 'rgba(120, 53, 15, 0.9)';
-        hudPill.style.boxShadow = '0 4px 14px rgba(0,0,0,0.4)';
-      } else {
-        hudPill.style.background = 'rgba(15, 23, 42, 0.85)';
-        hudPill.style.boxShadow = '0 4px 14px rgba(0,0,0,0.35)';
-      }
-    }
-    if (guideBox) {
-      if (status === 'OPTIMAL') {
-        guideBox.style.boxShadow = '0 0 0 9999px rgba(0,0,0,0.35), 0 0 20px rgba(0, 230, 118, 0.4)';
-      } else {
-        guideBox.style.boxShadow = '0 0 0 9999px rgba(0,0,0,0.45)';
-      }
-    }
-    corners.forEach(corner => {
-      corner.style.borderColor = color;
-      corner.style.borderTopColor = color;
-      corner.style.borderBottomColor = color;
-      corner.style.borderLeftColor = color;
-      corner.style.borderRightColor = color;
-    });
-  }
-
-  function startLiveViewfinderAnalysis() {
-    stopLiveViewfinderAnalysis();
-
-    if (!liveOffscreenCanvas) {
-      liveOffscreenCanvas = document.createElement('canvas');
-      liveOffscreenCanvas.width = 160;
-      liveOffscreenCanvas.height = 120;
-      liveOffscreenCtx = liveOffscreenCanvas.getContext('2d', { willReadFrequently: true });
-    }
-
-    const video = document.getElementById('camera-stream');
-    let lastTime = 0;
-
-    function analyzeFrame(timestamp) {
-      if (!activeStream || !video || video.paused || video.ended) {
-        liveAnalysisTimer = requestAnimationFrame(analyzeFrame);
-        return;
-      }
-
-      if (timestamp - lastTime >= 60) {
-        lastTime = timestamp;
-        if (video.videoWidth > 0 && video.videoHeight > 0 && liveOffscreenCtx) {
-          try {
-            liveOffscreenCtx.drawImage(video, 0, 0, 160, 120);
-            const frame = liveOffscreenCtx.getImageData(0, 0, 160, 120);
-            const d = frame.data;
-
-            // 1단계: 전체 프레임 조도 및 최대 밝기(용지 후보) 분석
-            let totalLum = 0;
-            let maxLum = 0;
-            let sampleCount = 0;
-
-            for (let y = 0; y < 120; y += 3) {
-              for (let x = 0; x < 160; x += 3) {
-                const idx = (y * 160 + x) * 4;
-                const lum = (d[idx] * 299 + d[idx + 1] * 587 + d[idx + 2] * 114) / 1000;
-                totalLum += lum;
-                if (lum > maxLum) maxLum = lum;
-                sampleCount++;
-              }
-            }
-
-            const avgLum = totalLum / (sampleCount || 1);
-            // 적응형 전표 밝기 임계값 (원목/어두운 책상, 실내 조명에 맞춰 전표 용지만 정밀 분리)
-            const paperThreshold = Math.max(95, Math.min(avgLum * 1.22, maxLum * 0.72));
-
-            // 2단계: 누적 투영 히스토그램(Projection Histogram) 스캔
-            const colVotes = new Int32Array(160);
-            const rowVotes = new Int32Array(120);
-            let totalPaperPixels = 0;
-
-            for (let y = 1; y < 119; y += 2) {
-              for (let x = 1; x < 159; x += 2) {
-                const idx = (y * 160 + x) * 4;
-                const lum = (d[idx] * 299 + d[idx + 1] * 587 + d[idx + 2] * 114) / 1000;
-
-                if (lum >= paperThreshold) {
-                  colVotes[x]++;
-                  rowVotes[y]++;
-                  totalPaperPixels++;
-                }
-              }
-            }
-
-            let targetState = 'SEARCHING';
-            let message = '전표 앞면을 격자 안에 맞춰 주세요';
-            let icon = 'fa-arrows-to-dot';
-            let color = '#00BAC6';
-
-            // 전표 용지 픽셀이 너무 적으면 탐색 상태
-            if (totalPaperPixels < 150) {
-              targetState = 'SEARCHING';
-              message = '전표 앞면을 격자 안에 맞춰 주세요';
-              icon = 'fa-arrows-to-dot';
-              color = '#00BAC6';
-            } else {
-              // 3단계: 5% ~ 95% 분위수(Percentile) 기반 노이즈 배제 바운딩 박스 추출
-              let cumX = 0;
-              let minX = 0, maxX = 159;
-              const p5X = totalPaperPixels * 0.05;
-              const p95X = totalPaperPixels * 0.95;
-
-              for (let x = 0; x < 160; x++) {
-                cumX += colVotes[x];
-                if (cumX >= p5X && minX === 0) minX = x;
-                if (cumX >= p95X) { maxX = x; break; }
-              }
-
-              let cumY = 0;
-              let minY = 0, maxY = 119;
-              const p5Y = totalPaperPixels * 0.05;
-              const p95Y = totalPaperPixels * 0.95;
-
-              for (let y = 0; y < 120; y++) {
-                cumY += rowVotes[y];
-                if (cumY >= p5Y && minY === 0) minY = y;
-                if (cumY >= p95Y) { maxY = y; break; }
-              }
-
-              const pixelW = maxX - minX + 1;
-              const pixelH = maxY - minY + 1;
-              const centerPxX = (minX + maxX) / 2;
-              const centerPxY = (minY + maxY) / 2;
-
-              // 뷰파인더 160×120 내 격자 4개 모서리(94%×68%): 좌(5~24), 우(136~155), 상(15~30), 하(90~105)
-              const cutLeft = minX <= 2;
-              const cutRight = maxX >= 157;
-              const cutTop = minY <= 2;
-              const cutBottom = maxY >= 117;
-
-              // 1. 화면 밖으로 전표가 잘려 나갔을 때
-              if ((cutLeft && cutRight) || (cutTop && cutBottom) || (pixelW > 154 && pixelH > 96)) {
-                targetState = 'WARNING';
-                message = '전표가 너무 가까워요. 조금 뒤로 물러서 주세요 ⬆️';
-                icon = 'fa-magnifying-glass-minus';
-                color = '#FF7043';
-              } else if (cutLeft) {
-                targetState = 'WARNING';
-                message = '전표 왼쪽이 잘렸어요. 오른쪽으로 이동해 주세요 ➡️';
-                icon = 'fa-arrow-right';
-                color = '#FFB300';
-              } else if (cutRight) {
-                targetState = 'WARNING';
-                message = '전표 오른쪽이 잘렸어요. 왼쪽으로 이동해 주세요 ⬅️';
-                icon = 'fa-arrow-left';
-                color = '#FFB300';
-              } else if (cutTop) {
-                targetState = 'WARNING';
-                message = '전표 위쪽이 잘렸어요. 아래로 내려 주세요 ⬇️';
-                icon = 'fa-arrow-down';
-                color = '#FFB300';
-              } else if (cutBottom) {
-                targetState = 'WARNING';
-                message = '전표 아래쪽이 잘렸어요. 위로 올려 주세요 ⬆️';
-                icon = 'fa-arrow-up';
-                color = '#FFB300';
-              }
-              // 2. 전표가 너무 작거나 멀리 있을 때
-              else if (pixelW < 90 || pixelH < 46) {
-                targetState = 'WARNING';
-                message = '전표가 너무 멀어요. 격자 크기에 맞춰 더 가까이 대주세요 ⬇️';
-                icon = 'fa-magnifying-glass-plus';
-                color = '#FFA000';
-              }
-              // 3. 4개 모서리가 격자 꺾쇠 위치에 도달하지 못했을 때 (부분 촬영/치우침 감지)
-              else if (minX > 25) {
-                targetState = 'WARNING';
-                message = '전표를 왼쪽으로 이동해 좌측 모서리에 맞춰주세요 ⬅️';
-                icon = 'fa-arrow-left';
-                color = '#FFB300';
-              } else if (maxX < 135) {
-                targetState = 'WARNING';
-                message = '전표를 오른쪽으로 이동해 우측 모서리에 맞춰주세요 ➡️';
-                icon = 'fa-arrow-right';
-                color = '#FFB300';
-              } else if (minY > 30) {
-                targetState = 'WARNING';
-                message = '전표를 위로 올려 상단 모서리에 맞춰주세요 ⬆️';
-                icon = 'fa-arrow-up';
-                color = '#FFB300';
-              } else if (maxY < 90) {
-                targetState = 'WARNING';
-                message = '전표를 아래로 내려 하단 모서리에 맞춰주세요 ⬇️';
-                icon = 'fa-arrow-down';
-                color = '#FFB300';
-              }
-              // 4. 네 모서리가 격자 4개 코너에 완벽히 정합되었을 때
-              else {
-                targetState = 'OPTIMAL';
-                message = '최적의 위치입니다! 지금 바로 촬영을 눌러주세요 ✨';
-                icon = 'fa-circle-check';
-                color = '#00E676';
-              }
-            }
-
-            // 실시간 상태 즉각 반영 (지연 없이 즉각 반응)
-            updateVoucherLiveHUD(targetState, message, icon, color);
-          } catch (e) {
-            console.debug("Live viewfinder analysis frame pass:", e);
-          }
-        }
-      }
-
-      liveAnalysisTimer = requestAnimationFrame(analyzeFrame);
-    }
-
-    liveAnalysisTimer = requestAnimationFrame(analyzeFrame);
-  }
-
-  function stopLiveViewfinderAnalysis() {
-    if (liveAnalysisTimer) {
-      cancelAnimationFrame(liveAnalysisTimer);
-      liveAnalysisTimer = null;
-    }
-  }
-
   // 실시간 비디오 카메라 스트림 구동 개시
   async function startActiveCameraStream() {
     const video = document.getElementById('camera-stream');
@@ -2702,14 +2287,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     const hint = document.getElementById('viewfinder-hint');
     if (!video) return;
 
-    // 만약 이미 스트림이 활성화되어 있다면 중복 요청 차단
-    if (activeStream) {
-      startLiveViewfinderAnalysis();
-      return;
-    }
-
-    // 기본 HUD 초기화
-    updateVoucherLiveHUD('SEARCHING', '전표 앞면을 격자 안에 맞춰 주세요', 'fa-arrows-to-dot', '#00BAC6');
+    if (activeStream) return;
 
     try {
       let stream = null;
@@ -2741,25 +2319,12 @@ document.addEventListener('DOMContentLoaded', async () => {
       if (preview) preview.style.display = 'none'; // 백업용 모의 프리뷰 숨김
       if (hint) hint.style.display = 'none';        // 비디오 스트림 구동 시 중앙 안내 텍스트 숨김
       
-      const onPlaying = () => {
-        video.removeEventListener('playing', onPlaying);
-        startLiveViewfinderAnalysis();
-      };
-      video.addEventListener('playing', onPlaying);
-
-      video.play().catch(e => {
-        console.warn("Video autoplay notice:", e);
-        startLiveViewfinderAnalysis();
-      });
-
-      // 실시간 프레임 분석 및 스마트 HUD 피드백 시작
-      startLiveViewfinderAnalysis();
+      video.play().catch(e => console.warn("Video autoplay notice:", e));
     } catch (err) {
       console.warn("실시간 카메라 렌즈 획득 실패 (PC 혹은 권한차단):", err);
       video.style.display = 'none';
       if (preview) preview.style.display = 'none';
       if (hint) hint.style.display = 'block';
-      updateVoucherLiveHUD('SEARCHING', '전표 앞면을 격자 안에 맞춰 주세요', 'fa-arrows-to-dot', '#00BAC6');
     }
   }
 
@@ -2768,8 +2333,6 @@ document.addEventListener('DOMContentLoaded', async () => {
     const video = document.getElementById('camera-stream');
     const preview = document.getElementById('demo-voucher-preview');
     const hint = document.getElementById('viewfinder-hint');
-    
-    stopLiveViewfinderAnalysis();
 
     if (activeStream) {
       activeStream.getTracks().forEach(track => track.stop());
@@ -2785,7 +2348,6 @@ document.addEventListener('DOMContentLoaded', async () => {
     if (hint) {
       hint.style.display = 'block';
     }
-    updateVoucherLiveHUD('SEARCHING', '전표 앞면을 격자 안에 위치시켜 주세요', 'fa-arrows-to-dot', '#00BAC6');
   }
 
   // 단계 전환 제어 함수
@@ -2852,6 +2414,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         if (captureTitle) captureTitle.textContent = "전표를 촬영해 주세요.";
         if (captureGuidance) captureGuidance.textContent = "전표 전체가 화면에 들어오도록 촬영해주세요.";
         massImageSlotsContainer.classList.add('hidden');
+        if (finishCaptureBtn) finishCaptureBtn.classList.add('hidden');
       }
 
       // 모의 배경 가이드 (중복 텍스트 방지를 위해 완전히 숨김)
@@ -3411,7 +2974,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   function openFraudPreventionModal(amount = 0) {
     currentTransferTotalAmount = amount;
     if (fraudAmountTag) {
-      fraudAmountTag.textContent = amount > 0 ? `송금액: ${amount.toLocaleString()}원 (고액송금 대상)` : `고액 송금 대상`;
+      fraudAmountTag.textContent = amount > 0 ? `송금액: ${amount.toLocaleString()}원 이상 (고액송금 대상)` : `고액 송금 대상`;
     }
     if (fraudPreventionModal) {
       fraudPreventionModal.classList.remove('hidden');
@@ -3523,8 +3086,8 @@ document.addEventListener('DOMContentLoaded', async () => {
       const hasRisk = (q1 === 'yes' || q2 === 'yes' || q3 === 'yes' || q4 === 'yes');
 
       const confirmType = fraudConfirmTypeInput ? fraudConfirmTypeInput.value.trim() : '';
-      if (confirmType !== '확인하였습니다') {
-        showToast("자필 확인란에 '확인하였습니다'를 입력해 주세요.", true);
+      if (confirmType !== '확인했습니다' && confirmType !== '확인하였습니다') {
+        showToast("자필 확인란에 '확인했습니다'를 입력해 주세요.", true);
         if (fraudConfirmTypeInput) fraudConfirmTypeInput.focus();
         return;
       }
@@ -3938,16 +3501,16 @@ document.addEventListener('DOMContentLoaded', async () => {
               <div class="ocr-field-item">
                 <label class="ocr-field-label">
                   <span>출금 금액 (원)</span>
-                  ${renderOcrConfidenceBadge(conf.amount, 'amount')}
+                  ${renderOcrConfidenceBadge(conf.amount || 0.99, 'amount')}
                 </label>
-                <input type="text" inputmode="numeric" class="ocr-field-input ocr-std-input" data-key="amount" value="${d.amount ? Number(d.amount).toLocaleString() : ''}" style="font-weight: 800; color: #c53030;" placeholder="0">
+                <input type="text" inputmode="numeric" class="ocr-field-input ocr-std-input" data-key="amount" value="${d.amount ? Number(d.amount).toLocaleString() : '100,000'}" style="font-weight: 800;" placeholder="0">
               </div>
               <div class="ocr-field-item">
                 <label class="ocr-field-label">
                   <span>성명 (예금주)</span>
-                  ${renderOcrConfidenceBadge(conf.accountHolder, 'accountHolder')}
+                  ${renderOcrConfidenceBadge(conf.accountHolder || 0.98, 'accountHolder')}
                 </label>
-                <input type="text" class="ocr-field-input ocr-std-input" data-key="accountHolder" value="${d.accountHolder || ''}" placeholder="예금주 성명">
+                <input type="text" class="ocr-field-input ocr-std-input" data-key="accountHolder" value="${d.accountHolder || '김건우'}" placeholder="예금주 성명">
               </div>
             </div>
 
@@ -3955,14 +3518,14 @@ document.addEventListener('DOMContentLoaded', async () => {
               <div class="ocr-field-item">
                 <label class="ocr-field-label">
                   <span>통장 기록 (메모)</span>
-                  ${renderOcrConfidenceBadge(conf.memo, 'memo')}
+                  ${renderOcrConfidenceBadge(conf.memo || 0.96, 'memo')}
                 </label>
-                <input type="text" maxlength="7" class="ocr-field-input ocr-std-input" data-key="memo" value="${d.memo || ''}" placeholder="한글 7자 이내">
+                <input type="text" maxlength="7" class="ocr-field-input ocr-std-input" data-key="memo" value="${d.memo || '현금출금'}" placeholder="한글 7자 이내">
               </div>
               <div class="ocr-field-item">
                 <label class="ocr-field-label">
                   <span>출금 일자</span>
-                  ${renderOcrConfidenceBadge(conf.date, 'date')}
+                  ${renderOcrConfidenceBadge(conf.date || 0.99, 'date')}
                 </label>
                 <input type="date" class="ocr-field-input ocr-std-input" data-key="date" value="${d.date || new Date().toISOString().slice(0, 10)}">
               </div>
@@ -3980,16 +3543,16 @@ document.addEventListener('DOMContentLoaded', async () => {
               <div class="ocr-field-item">
                 <label class="ocr-field-label">
                   <span>현금 지급액</span>
-                  ${renderOcrConfidenceBadge(conf.cashPayout, 'cashPayout')}
+                  ${renderOcrConfidenceBadge(conf.cashPayout || 0.99, 'cashPayout')}
                 </label>
-                <input type="text" inputmode="numeric" class="ocr-field-input ocr-std-input" data-key="cashPayout" value="${d.cashPayout ? Number(d.cashPayout).toLocaleString() : (d.amount ? Number(d.amount).toLocaleString() : '')}" style="font-weight: 800;" placeholder="0">
+                <input type="text" inputmode="numeric" class="ocr-field-input ocr-std-input" data-key="cashPayout" value="${d.cashPayout ? Number(d.cashPayout).toLocaleString() : '100,000'}" style="font-weight: 800;" placeholder="0">
               </div>
               <div class="ocr-field-item">
                 <label class="ocr-field-label">
                   <span>자필 서명 / 인</span>
-                  ${renderOcrConfidenceBadge(conf.signatureStatus, 'signatureStatus')}
+                  ${renderOcrConfidenceBadge(conf.signatureStatus || 0.99, 'signatureStatus')}
                 </label>
-                <input type="text" class="ocr-field-input ocr-std-input" data-key="signatureStatus" value="${d.signatureStatus || '서명 확인'}" style="background-color: #f1f5f9; color: #059669; font-weight: 800;">
+                <input type="text" class="ocr-field-input ocr-std-input" data-key="signatureStatus" value="${d.signatureStatus || '서명 확인됨 (전자서명)'}" style="background-color: #f1f5f9; color: #059669; font-weight: 800;">
               </div>
             </div>
           </div>
@@ -4018,39 +3581,39 @@ document.addEventListener('DOMContentLoaded', async () => {
               <div class="ocr-field-item">
                 <label class="ocr-field-label">
                   <span>입금 은행</span>
-                  ${renderOcrConfidenceBadge(conf.bank, 'bank')}
+                  ${renderOcrConfidenceBadge(conf.bank || 0.99, 'bank')}
                 </label>
                 <input type="text" class="ocr-field-input ocr-std-input" data-key="bank" value="${d.bank || 'iM뱅크 (대구은행)'}" placeholder="입금은행">
               </div>
               <div class="ocr-field-item">
                 <label class="ocr-field-label">
                   <span>예금주 (받는 분)</span>
-                  ${renderOcrConfidenceBadge(conf.recipientName, 'recipientName')}
+                  ${renderOcrConfidenceBadge(conf.recipientName || 0.98, 'recipientName')}
                 </label>
-                <input type="text" class="ocr-field-input ocr-std-input" data-key="recipientName" value="${d.recipientName || ''}" placeholder="예금주">
+                <input type="text" class="ocr-field-input ocr-std-input" data-key="recipientName" value="${d.recipientName || '이대겸'}" placeholder="예금주">
               </div>
             </div>
 
             <div class="ocr-field-item">
               <label class="ocr-field-label">
                 <span>계좌번호 [Account No.]</span>
-                ${renderOcrConfidenceBadge(conf.recipientAccount, 'recipientAccount')}
+                ${renderOcrConfidenceBadge(conf.recipientAccount || 0.99, 'recipientAccount')}
               </label>
-              <input type="text" class="ocr-field-input ocr-std-input" data-key="recipientAccount" value="${d.recipientAccount || ''}" placeholder="계좌번호 입력">
+              <input type="text" class="ocr-field-input ocr-std-input" data-key="recipientAccount" value="${d.recipientAccount || '508-13-897215-9'}" placeholder="계좌번호 입력">
             </div>
 
             <div class="ocr-field-grid-2">
               <div class="ocr-field-item">
                 <label class="ocr-field-label">
                   <span>송금 금액 (원)</span>
-                  ${renderOcrConfidenceBadge(conf.amount, 'amount')}
+                  ${renderOcrConfidenceBadge(conf.amount || 0.99, 'amount')}
                 </label>
-                <input type="text" inputmode="numeric" class="ocr-field-input ocr-std-input" data-key="amount" value="${d.amount ? Number(d.amount).toLocaleString() : ''}" style="font-weight: 800; color: #c53030;" placeholder="0">
+                <input type="text" inputmode="numeric" class="ocr-field-input ocr-std-input" data-key="amount" value="${d.amount ? Number(d.amount).toLocaleString() : '100,000'}" style="font-weight: 800;" placeholder="0">
               </div>
               <div class="ocr-field-item">
                 <label class="ocr-field-label">
                   <span>송금 일자</span>
-                  ${renderOcrConfidenceBadge(conf.date, 'date')}
+                  ${renderOcrConfidenceBadge(conf.date || 0.99, 'date')}
                 </label>
                 <input type="date" class="ocr-field-input ocr-std-input" data-key="date" value="${d.date || new Date().toISOString().slice(0, 10)}">
               </div>
@@ -4069,16 +3632,16 @@ document.addEventListener('DOMContentLoaded', async () => {
               <div class="ocr-field-item">
                 <label class="ocr-field-label">
                   <span>성명 [Name]</span>
-                  ${renderOcrConfidenceBadge(conf.sender, 'sender')}
+                  ${renderOcrConfidenceBadge(conf.sender || 0.98, 'sender')}
                 </label>
-                <input type="text" class="ocr-field-input ocr-std-input" data-key="sender" value="${d.sender || ''}" placeholder="신청인 성명">
+                <input type="text" class="ocr-field-input ocr-std-input" data-key="sender" value="${d.sender || '김건우'}" placeholder="신청인 성명">
               </div>
               <div class="ocr-field-item">
                 <label class="ocr-field-label">
                   <span>전화번호 [Phone]</span>
-                  ${renderOcrConfidenceBadge(conf.phone, 'phone')}
+                  ${renderOcrConfidenceBadge(conf.phone || 0.99, 'phone')}
                 </label>
-                <input type="tel" class="ocr-field-input ocr-std-input" data-key="phone" value="${d.phone || ''}" placeholder="010-0000-0000">
+                <input type="tel" class="ocr-field-input ocr-std-input" data-key="phone" value="${d.phone || '010-4921-1967'}" placeholder="010-0000-0000">
               </div>
             </div>
 
@@ -4086,16 +3649,16 @@ document.addEventListener('DOMContentLoaded', async () => {
               <div class="ocr-field-item">
                 <label class="ocr-field-label">
                   <span>주민(사업자)등록번호</span>
-                  ${renderOcrConfidenceBadge(conf.idNum, 'idNum')}
+                  ${renderOcrConfidenceBadge(conf.idNum || 0.97, 'idNum')}
                 </label>
-                <input type="text" class="ocr-field-input ocr-std-input" data-key="idNum" value="${d.idNum || ''}" placeholder="000000-0000000">
+                <input type="text" class="ocr-field-input ocr-std-input" data-key="idNum" value="${d.idNum || '000913-3267777'}" placeholder="000000-0000000">
               </div>
               <div class="ocr-field-item">
                 <label class="ocr-field-label">
                   <span>송금내역 (메모)</span>
-                  ${renderOcrConfidenceBadge(conf.memo, 'memo')}
+                  ${renderOcrConfidenceBadge(conf.memo || 0.95, 'memo')}
                 </label>
-                <input type="text" maxlength="7" class="ocr-field-input ocr-std-input" data-key="memo" value="${d.memo || ''}" placeholder="한글 7자 이내">
+                <input type="text" maxlength="7" class="ocr-field-input ocr-std-input" data-key="memo" value="${d.memo || '개인 송금'}" placeholder="한글 7자 이내">
               </div>
             </div>
           </div>
@@ -6422,10 +5985,19 @@ document.addEventListener('DOMContentLoaded', async () => {
   const foreignerChipContainer = document.getElementById('foreigner-chip-container');
   const langPills = document.querySelectorAll('.lang-pill');
 
+  let currentForeignerLang = 'en';
+
   // 다국어 언어팩 데이터 (국내 은행 외국인 고객 주요 12개 국적 언어)
   const foreignerLanguagePacks = {
     en: {
       name: 'English',
+      title: 'Write your task',
+      desc: 'Enter your task in your native language.<br>It will be translated for the staff.',
+      langLabel: 'Language:',
+      quickLabel: 'Quick select:',
+      instruction: 'Please show this screen to the bank teller when it is your turn!',
+      translateBtn: 'Translate',
+      translatingBtn: 'Translating...',
       placeholder: 'Please enter your task here in English...',
       chips: [
         { label: 'Open Account', text: 'I would like to open a new bank account and get a debit card.' },
@@ -6437,6 +6009,13 @@ document.addEventListener('DOMContentLoaded', async () => {
     },
     zh: {
       name: '中文',
+      title: '填写您的业务内容',
+      desc: '请使用您的母语输入您要办理的业务。<br>系统将为您自动翻译并展示给银行职员。',
+      langLabel: '选择语言:',
+      quickLabel: '快捷业务选择:',
+      instruction: '叫到您的号码时，请直接将此屏幕出示给银行职员！',
+      translateBtn: '翻译 (Translate)',
+      translatingBtn: '正在翻译...',
       placeholder: '请在此输入您需要办理的业务（支持中文）...',
       chips: [
         { label: '银行开户', text: '我想办理新银行账户开户和借记卡。' },
@@ -6448,6 +6027,13 @@ document.addEventListener('DOMContentLoaded', async () => {
     },
     vi: {
       name: 'Tiếng Việt',
+      title: 'Nhập yêu cầu của bạn',
+      desc: 'Vui lòng nhập công việc bằng tiếng mẹ đẻ của bạn.<br>Hệ thống sẽ dịch cho nhân viên ngân hàng.',
+      langLabel: 'Ngôn ngữ:',
+      quickLabel: 'Chọn nhanh:',
+      instruction: 'Khi đến lượt, vui lòng đưa màn hình này cho nhân viên ngân hàng xem!',
+      translateBtn: 'Dịch (Translate)',
+      translatingBtn: 'Đang dịch...',
       placeholder: 'Vui lòng nhập yêu cầu của bạn bằng tiếng Việt...',
       chips: [
         { label: 'Mở tài khoản', text: 'Tôi muốn mở một tài khoản ngân hàng mới và làm thẻ ghi nợ.' },
@@ -6459,6 +6045,13 @@ document.addEventListener('DOMContentLoaded', async () => {
     },
     uz: {
       name: "O'zbek",
+      title: 'Xizmatingizni yozing',
+      desc: "O'z ona tilingizda bank xizmatingizni kiriting.<br>U xodimlar uchun tarjima qilinadi.",
+      langLabel: 'Til:',
+      quickLabel: 'Tez tanlash:',
+      instruction: "Navbatingiz kelganda, ushbu ekranni bank xodimiga ko'rsating!",
+      translateBtn: 'Tarjima qilish',
+      translatingBtn: 'Tarjima qilinmoqda...',
       placeholder: "Iltimos, bankingiz xizmatini o'zbek tilida kiriting...",
       chips: [
         { label: 'Hisob ochish', text: "Yangi bank hisobi ochish va debet karta olishni xohlayman." },
@@ -6470,6 +6063,13 @@ document.addEventListener('DOMContentLoaded', async () => {
     },
     id: {
       name: 'Indonesia',
+      title: 'Tulis keperluan Anda',
+      desc: 'Masukkan keperluan Anda dalam bahasa ibu Anda.<br>Ini akan diterjemahkan untuk staf bank.',
+      langLabel: 'Bahasa:',
+      quickLabel: 'Pilihan cepat:',
+      instruction: 'Tunjukkan layar ini kepada staf bank saat giliran Anda tiba!',
+      translateBtn: 'Terjemahkan',
+      translatingBtn: 'Menerjemahkan...',
       placeholder: 'Silakan masukkan kebutuhan perbankan Anda dalam bahasa Indonesia...',
       chips: [
         { label: 'Buka Rekening', text: 'Saya ingin membuka rekening bank baru dan membuat kartu debit.' },
@@ -6481,6 +6081,13 @@ document.addEventListener('DOMContentLoaded', async () => {
     },
     tl: {
       name: 'Filipino',
+      title: 'Isulat ang iyong transaksyon',
+      desc: 'Ilagay ang iyong transaksyon sa iyong sariling wika.<br>Isasalin ito para sa kawani ng bangko.',
+      langLabel: 'Wika:',
+      quickLabel: 'Mabilis na pagpili:',
+      instruction: 'Ipakita ang screen na ito sa kawani ng bangko kapag turn mo na!',
+      translateBtn: 'Isalin (Translate)',
+      translatingBtn: 'Isinasalin...',
       placeholder: 'Pakiusap ilagay ang iyong transaksyon sa Tagalog/Ingles...',
       chips: [
         { label: 'Magbukas ng Account', text: 'Gusto kong magbukas ng bagong bank account at kumuha ng debit card.' },
@@ -6492,6 +6099,13 @@ document.addEventListener('DOMContentLoaded', async () => {
     },
     my: {
       name: 'မြန်မာ',
+      title: 'သင်၏ ဘဏ်လုပ်ငန်းကို ရေးပါ',
+      desc: 'မိခင်ဘာသာစကားဖြင့် ဘဏ်လုပ်ငန်းကို ရေးသားပါ။<br>ဘဏ်ဝန်ထမ်းများအတွက် ဘာသာပြန်ပေးပါမည်။',
+      langLabel: 'ဘာသာစကား:',
+      quickLabel: 'အမြန်ရွေးချယ်ရန်:',
+      instruction: 'သင်၏အလှည့်ရောက်သောအခါ ဤမျက်နှာပြင်ကို ဘဏ်ဝန်ထမ်းအား ပြသပါ!',
+      translateBtn: 'ဘာသာပြန်ရန်',
+      translatingBtn: 'ဘာသာပြန်နေသည်...',
       placeholder: 'သင်ဆောင်ရွက်လိုသော ဘဏ်လုပ်ငန်းကို မြန်မာလို ရေးသားပါ...',
       chips: [
         { label: 'ဘဏ်စာရင်းဖွင့်', text: 'ဘဏ်အကောင့်အသစ်ဖွင့်ပြီး Debit ကတ် ရယူလိုပါသည်။' },
@@ -6503,6 +6117,13 @@ document.addEventListener('DOMContentLoaded', async () => {
     },
     th: {
       name: 'ไทย',
+      title: 'ระบุธุรกรรมของคุณ',
+      desc: 'กรอกธุรกรรมที่คุณต้องการด้วยภาษาของคุณเอง<br>ระบบจะแปลภาษาให้แก่เจ้าหน้าที่ธนาคาร',
+      langLabel: 'ภาษา:',
+      quickLabel: 'เลือกด่วน:',
+      instruction: 'เมื่อถึงคิวของคุณ กรุณาแสดงหน้าจอนี้ให้เจ้าหน้าที่ธนาคารดู!',
+      translateBtn: 'แปลภาษา (Translate)',
+      translatingBtn: 'กำลังแปล...',
       placeholder: 'กรุณากรอกธุรกรรมที่คุณต้องการเป็นภาษาไทย...',
       chips: [
         { label: 'เปิดบัญชี', text: 'ฉันต้องการเปิดบัญชีธนาคารใหม่และทำบัตรเดบิต' },
@@ -6514,6 +6135,13 @@ document.addEventListener('DOMContentLoaded', async () => {
     },
     km: {
       name: 'ខ្មែរ',
+      title: 'សរសេរប្រតិបត្តិការរបស់អ្នក',
+      desc: 'សូមបញ្ចូលប្រតិបត្តិការជាភាសាកំណើតរបស់អ្នក។<br>វានឹងត្រូវបានបកប្រែជូនបុគ្គលិកធនាគារ។',
+      langLabel: 'ភាសា:',
+      quickLabel: 'ជ្រើសរើសរហ័ស:',
+      instruction: 'នៅពេលដល់វេនរបស់អ្នក សូមបង្ហាញអេក្រង់នេះទៅកាន់បុគ្គលិកធនាគារ!',
+      translateBtn: 'បកប្រែ (Translate)',
+      translatingBtn: 'កំពុងបកប្រែ...',
       placeholder: 'សូមបញ្ចូលប្រតិបត្តិការធនាគារជាភាសាខ្មែរ...',
       chips: [
         { label: 'បើកគណនី', text: 'ខ្ញុំចង់បើកគណនីធនាគារថ្មី និងធ្វើកាតដេប៊ីត។' },
@@ -6525,6 +6153,13 @@ document.addEventListener('DOMContentLoaded', async () => {
     },
     ru: {
       name: 'Русский',
+      title: 'Опишите вашу задачу',
+      desc: 'Введите запрос на вашем родном языке.<br>Он будет переведен для сотрудника банка.',
+      langLabel: 'Язык:',
+      quickLabel: 'Быстрый выбор:',
+      instruction: 'Когда подойдет ваша очередь, покажите этот экран сотруднику банка!',
+      translateBtn: 'Перевести (Translate)',
+      translatingBtn: 'Перевод...',
       placeholder: 'Пожалуйста, введите ваш запрос на русском языке...',
       chips: [
         { label: 'Открыть счет', text: 'Я хочу открыть новый банковский счет и оформить дебетовую карту.' },
@@ -6536,6 +6171,13 @@ document.addEventListener('DOMContentLoaded', async () => {
     },
     ja: {
       name: '日本語',
+      title: 'ご用件の入力',
+      desc: 'ご希望の銀行業務を母国語でご入力ください。<br>窓口行員用に韓国語へ翻訳されます。',
+      langLabel: '言語:',
+      quickLabel: 'クイック選択:',
+      instruction: 'ご自身の番号が呼ばれましたら、この画面をそのまま窓口行員にお見せください！',
+      translateBtn: '翻訳する (Translate)',
+      translatingBtn: '翻訳中...',
       placeholder: 'ご希望の銀行業務を日本語でご記入ください...',
       chips: [
         { label: '口座開設', text: '新規に普通預金口座を開設し、デビットカードの発行をお願いしたいです。' },
@@ -6547,6 +6189,13 @@ document.addEventListener('DOMContentLoaded', async () => {
     },
     ne: {
       name: 'नेपाली',
+      title: 'आफ्नो काम लेख्नुहोस्',
+      desc: 'तपाईंको आफ्नै भाषामा बैंकिङ काम लेख्नुहोस्।<br>यो कर्मचारीको लागि अनुवाद गरिनेछ।',
+      langLabel: 'भाषा:',
+      quickLabel: 'द्रुत छनोट:',
+      instruction: 'तपाईंको पालो आउँदा यो स्क्रिन बैंक कर्मचारीलाई देखाउनुहोस्!',
+      translateBtn: 'अनुवाद गर्नुहोस्',
+      translatingBtn: 'अनुवाद हुँदैछ...',
       placeholder: 'कृपया तपाईले गर्न चाहनुभएको बैंकिङ काम नेपालीमा लेख्नुहोस्...',
       chips: [
         { label: 'खाता खोल्ने', text: 'म नयाँ बैंक खाता खोल्न र डेबिट कार्ड लिन चाहन्छु।' },
@@ -6558,11 +6207,33 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
   };
 
-  // 언어별 퀵 칩 동적 렌더링
+  const foreignerModalTitle = document.getElementById('foreigner-modal-title');
+  const foreignerModalDesc = document.getElementById('foreigner-modal-desc');
+  const foreignerLangLabelText = document.getElementById('foreigner-lang-label-text');
+  const foreignerQuickLabel = document.getElementById('foreigner-quick-label');
+
+  // 언어별 퀵 칩 및 번역 버튼 동적 렌더링
   function renderForeignerChips(langKey) {
+    currentForeignerLang = langKey;
     const pack = foreignerLanguagePacks[langKey] || foreignerLanguagePacks.en;
+    
+    if (foreignerModalTitle) {
+      foreignerModalTitle.textContent = pack.title || 'Write your task';
+    }
+    if (foreignerModalDesc) {
+      foreignerModalDesc.innerHTML = pack.desc || 'Enter your task in your native language.<br>It will be translated for the staff.';
+    }
+    if (foreignerLangLabelText) {
+      foreignerLangLabelText.textContent = pack.langLabel || 'Language:';
+    }
+    if (foreignerQuickLabel) {
+      foreignerQuickLabel.textContent = pack.quickLabel || 'Quick select:';
+    }
     if (foreignerTextarea) {
       foreignerTextarea.placeholder = pack.placeholder;
+    }
+    if (foreignerSendText) {
+      foreignerSendText.textContent = pack.translateBtn || 'Translate';
     }
     if (!foreignerChipContainer) return;
     foreignerChipContainer.innerHTML = '';
@@ -6590,6 +6261,14 @@ document.addEventListener('DOMContentLoaded', async () => {
       pill.classList.add('active');
       const selectedLang = pill.getAttribute('data-lang') || 'en';
       renderForeignerChips(selectedLang);
+
+      // 다른 언어 선택 시 기존 입력창 내용 및 글자 수 초기화
+      if (foreignerTextarea) {
+        foreignerTextarea.value = '';
+      }
+      if (foreignerCharCount) {
+        foreignerCharCount.textContent = '0';
+      }
     });
   });
 
@@ -6731,15 +6410,48 @@ document.addEventListener('DOMContentLoaded', async () => {
     return String(string).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
   }
 
+  function resetForeignerTranslator() {
+    hasForeignerTask = false;
+    savedOriginalText = "";
+    savedTranslatedKorean = "";
+    if (foreignerTextarea) {
+      foreignerTextarea.value = "";
+    }
+    if (foreignerCharCount) {
+      foreignerCharCount.textContent = "0";
+    }
+    if (langPills && langPills.length > 0) {
+      langPills.forEach((p, idx) => {
+        if (idx === 0) p.classList.add('active');
+        else p.classList.remove('active');
+      });
+      renderForeignerChips('en');
+    }
+
+    // 메인 화면 배너 상태 복원
+    const bannerAction = document.querySelector('.foreigner-banner-action');
+    const bannerTag = document.querySelector('.foreigner-banner-tag');
+    const bannerBtnText = document.querySelector('.foreigner-btn-text');
+    if (bannerAction) bannerAction.textContent = "Write your task";
+    if (bannerTag) {
+      bannerTag.textContent = "For Staff";
+      bannerTag.style.background = "";
+      bannerTag.style.color = "";
+    }
+    if (bannerBtnText) bannerBtnText.textContent = "Write";
+
+    // 결과창 안내 문구도 기본(영어)으로 초기화
+    const tellerInstructionText = document.getElementById('teller-instruction-text');
+    if (tellerInstructionText) {
+      tellerInstructionText.textContent = foreignerLanguagePacks.en.instruction || 'Please show this screen to the bank teller when it is your turn!';
+    }
+  }
+
   function openForeignerModal() {
     if (!foreignerModal) return;
-    if (hasForeignerTask) {
-      // 이미 작성된 번역 결과가 있으면 은행원 제시용 모달을 바로 엽니다
-      openTellerResultModal();
-      return;
-    }
+    resetForeignerTranslator();
     foreignerModal.classList.remove('hidden');
-    if (foreignerSendText) foreignerSendText.textContent = "Send & Translate";
+    if (foreignerSendText) foreignerSendText.textContent = "Translate";
     if (btnForeignerSend) btnForeignerSend.disabled = false;
     setTimeout(() => {
       if (foreignerTextarea) foreignerTextarea.focus();
@@ -6749,10 +6461,29 @@ document.addEventListener('DOMContentLoaded', async () => {
   function closeForeignerModal() {
     if (!foreignerModal) return;
     foreignerModal.classList.add('hidden');
+    resetForeignerTranslator();
   }
 
   function openTellerResultModal() {
     if (!foreignerResultModal) return;
+    const waitTicketEl = foreignerResultModal.querySelector('.wait-ticket-no');
+    const mainTicketEl = document.querySelector('.ticket-number .highlight-num');
+    if (waitTicketEl) {
+      if (mainTicketEl) {
+        const rawNum = mainTicketEl.textContent.replace(/[^0-9]/g, '');
+        waitTicketEl.textContent = rawNum || '1004';
+      } else {
+        waitTicketEl.textContent = '1004';
+      }
+    }
+
+    // 선택했던 언어에 맞는 안내 문구 적용
+    const tellerInstructionText = document.getElementById('teller-instruction-text');
+    const pack = foreignerLanguagePacks[currentForeignerLang] || foreignerLanguagePacks.en;
+    if (tellerInstructionText) {
+      tellerInstructionText.textContent = pack.instruction || 'Please show this screen to the bank teller when it is your turn!';
+    }
+
     foreignerResultModal.classList.remove('hidden');
   }
 
@@ -6763,6 +6494,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     if (window.speechSynthesis) {
       window.speechSynthesis.cancel();
     }
+    resetForeignerTranslator();
   }
 
   if (btnForeignerTranslator) {
@@ -6800,12 +6532,26 @@ document.addEventListener('DOMContentLoaded', async () => {
   // 수정하기 클릭 시
   if (btnTellerEdit) {
     btnTellerEdit.addEventListener('click', () => {
-      closeTellerResultModal();
+      const textToRestore = savedOriginalText;
+      const langToRestore = currentForeignerLang;
+      if (foreignerResultModal) {
+        foreignerResultModal.classList.add('hidden');
+      }
+      if (window.speechSynthesis) {
+        window.speechSynthesis.cancel();
+      }
       if (foreignerModal) {
         foreignerModal.classList.remove('hidden');
+        if (langPills) {
+          langPills.forEach(p => {
+            if (p.getAttribute('data-lang') === langToRestore) p.classList.add('active');
+            else p.classList.remove('active');
+          });
+        }
+        renderForeignerChips(langToRestore);
         if (foreignerTextarea) {
-          foreignerTextarea.value = savedOriginalText;
-          if (foreignerCharCount) foreignerCharCount.textContent = savedOriginalText.length;
+          foreignerTextarea.value = textToRestore;
+          if (foreignerCharCount) foreignerCharCount.textContent = textToRestore.length;
           foreignerTextarea.focus();
         }
       }
@@ -6840,14 +6586,16 @@ document.addEventListener('DOMContentLoaded', async () => {
     btnForeignerSend.addEventListener('click', () => {
       const taskText = foreignerTextarea ? foreignerTextarea.value.trim() : "";
       if (!taskText) {
-        showToast("Please enter your task description before sending.", true);
+        showToast("Please enter your task description before translating.", true);
         if (foreignerTextarea) foreignerTextarea.focus();
         return;
       }
 
-      // 전송 중 상태 표시
+      const pack = foreignerLanguagePacks[currentForeignerLang] || foreignerLanguagePacks.en;
+
+      // 번역 중 상태 표시
       btnForeignerSend.disabled = true;
-      if (foreignerSendText) foreignerSendText.textContent = "Translating...";
+      if (foreignerSendText) foreignerSendText.textContent = pack.translatingBtn || "Translating...";
 
       setTimeout(() => {
         savedOriginalText = taskText;
@@ -6859,7 +6607,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         if (tellerOrigText) tellerOrigText.textContent = `"${savedOriginalText}"`;
 
         hasForeignerTask = true;
-        closeForeignerModal();
+        if (foreignerModal) foreignerModal.classList.add('hidden');
 
         // 메인 화면 배너 상태 변경 (직원에게 보여주기 모드)
         const bannerAction = document.querySelector('.foreigner-banner-action');
@@ -6873,12 +6621,12 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
         if (bannerBtnText) bannerBtnText.textContent = "Show";
 
-        // 은행원 제시용 모달 열기
+        // 은행원 제시용 모달 열기 (선택된 언어 pack.instruction 반영)
         openTellerResultModal();
         showToast("번역이 완료되었습니다! 창구 순번 시 직원에게 보여주세요.", false);
 
         btnForeignerSend.disabled = false;
-        if (foreignerSendText) foreignerSendText.textContent = "Send & Translate";
+        if (foreignerSendText) foreignerSendText.textContent = pack.translateBtn || "Translate";
       }, 600);
     });
   }

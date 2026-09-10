@@ -750,13 +750,26 @@ input:checked + .slider:before {
 
 .form-input {
   width: 100%;
-  padding: 12px;
+  padding: 10px 12px;
   border: 1px solid var(--light-gray);
   border-radius: 10px;
   font-size: 14px;
   outline: none;
   background-color: #fafafa;
   transition: border-color 0.2s, background-color 0.2s;
+  box-sizing: border-box;
+  font-family: inherit;
+}
+
+select.form-input {
+  height: 42px;
+  padding: 8px 12px;
+  line-height: 1.4;
+  font-size: 13.5px;
+  color: #1e293b;
+  box-sizing: border-box;
+  vertical-align: middle;
+  cursor: pointer;
 }
 
 .form-input:focus {
