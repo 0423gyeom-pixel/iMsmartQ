@@ -27,6 +27,14 @@
   font-family: 'Pretendard', -apple-system, BlinkMacSystemFont, 'Apple SD Gothic Neo', 'Noto Sans KR', sans-serif;
 }
 
+svg {
+  display: inline-block;
+  vertical-align: middle;
+  flex-shrink: 0;
+  max-width: 100%;
+  box-sizing: border-box;
+}
+
 body {
   background-color: #f3f4f6; /* 회색 톤 웹 배경 */
   color: var(--dark-text);
@@ -3215,23 +3223,13 @@ body {
   border-color: #f8f9fa;
 }
 
-/* ------------------------------------------------------- 쉬운 모드 메인 버튼 */
+/* ------------------------------------------------------- 스마트 서비스 허브 (2x2 그리드) */
 #easy-mode-layout-container {
-  display: flex;
-  flex-direction: column;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 10px;
   width: 100%;
-}
-
-.easy-card-btn {
-  border-radius: 16px;
-  transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
-  cursor: pointer;
-}
-
-.easy-card-btn:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.08);
+  box-sizing: border-box;
 }
 
 /* ------------------------------------------------------- 2x2 퀵 메뉴 */
@@ -3283,9 +3281,15 @@ body {
 }
 
 .quick-svg-icon {
-  width: 26px;
-  height: 26px;
+  width: 26px !important;
+  height: 26px !important;
+  min-width: 26px !important;
+  min-height: 26px !important;
+  max-width: 26px !important;
+  max-height: 26px !important;
   stroke-width: 2.2;
+  display: block !important;
+  flex-shrink: 0 !important;
 }
 
 .quick-card-text {
@@ -3960,11 +3964,12 @@ body {
 #easy-mode-layout-container.service-hub-grid-container,
 .service-hub-grid-container {
   display: grid !important;
-  grid-template-columns: repeat(2, 1fr) !important;
+  grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
   gap: 10px !important;
   align-items: stretch !important;
   box-sizing: border-box !important;
   width: 100% !important;
+  max-width: 100% !important;
   margin-bottom: 12px !important;
 }
 
@@ -3984,9 +3989,14 @@ body {
   -webkit-tap-highlight-color: transparent !important;
   box-sizing: border-box !important;
   width: 100% !important;
+  min-width: 0 !important;
+  max-width: 100% !important;
   text-align: left !important;
   position: relative !important;
   min-height: 105px !important;
+  overflow: hidden !important;
+  appearance: none !important;
+  -webkit-appearance: none !important;
 }
 
 .service-hub-card-item:hover {
@@ -4002,15 +4012,21 @@ body {
 }
 
 .hub-card-icon-box {
-  width: 40px;
-  height: 40px;
-  border-radius: 13px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  flex-shrink: 0;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
-  transition: transform 0.2s ease;
+  width: 40px !important;
+  height: 40px !important;
+  min-width: 40px !important;
+  min-height: 40px !important;
+  max-width: 40px !important;
+  max-height: 40px !important;
+  border-radius: 13px !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  flex-shrink: 0 !important;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04) !important;
+  transition: transform 0.2s ease !important;
+  overflow: hidden !important;
+  box-sizing: border-box !important;
 }
 
 .service-hub-card-item:hover .hub-card-icon-box {
@@ -4018,31 +4034,40 @@ body {
 }
 
 .hub-card-icon-box.scan-box {
-  background-color: #eff6ff;
+  background-color: #eff6ff !important;
 }
 
 .hub-card-icon-box.paper-box {
-  background-color: #ecfdf5;
+  background-color: #ecfdf5 !important;
 }
 
 .hub-card-icon-box.checklist-box {
-  background-color: #f0fdfa;
+  background-color: #f0fdfa !important;
 }
 
 .hub-card-icon-box.verify-box {
-  background-color: #f5f3ff;
+  background-color: #f5f3ff !important;
 }
 
-.hub-card-icon-box .service-hub-svg {
-  width: 22px;
-  height: 22px;
+.hub-card-icon-box .service-hub-svg,
+.service-hub-svg {
+  width: 22px !important;
+  height: 22px !important;
+  min-width: 22px !important;
+  min-height: 22px !important;
+  max-width: 22px !important;
+  max-height: 22px !important;
+  display: block !important;
+  flex-shrink: 0 !important;
+  box-sizing: border-box !important;
 }
 
 .hub-card-text-box {
-  display: flex;
-  flex-direction: column;
-  gap: 2px;
-  width: 100%;
+  display: flex !important;
+  flex-direction: column !important;
+  gap: 2px !important;
+  width: 100% !important;
+  min-width: 0 !important;
 }
 
 .hub-card-title {
@@ -4051,6 +4076,9 @@ body {
   color: #0f172a !important;
   line-height: 1.2 !important;
   letter-spacing: -0.3px !important;
+  white-space: nowrap !important;
+  overflow: hidden !important;
+  text-overflow: ellipsis !important;
 }
 
 .hub-card-desc {
@@ -4064,16 +4092,17 @@ body {
 }
 
 .hub-card-badge {
-  position: absolute;
-  top: 10px;
-  right: 10px;
-  background: #7c3aed;
-  color: #ffffff;
-  font-size: 9.5px;
-  font-weight: 800;
-  padding: 2px 6px;
-  border-radius: 6px;
-  letter-spacing: -0.2px;
+  position: absolute !important;
+  top: 10px !important;
+  right: 10px !important;
+  background: #7c3aed !important;
+  color: #ffffff !important;
+  font-size: 9.5px !important;
+  font-weight: 800 !important;
+  padding: 2px 6px !important;
+  border-radius: 6px !important;
+  letter-spacing: -0.2px !important;
+  white-space: nowrap !important;
 }
 
 .hub-verify-item:hover {
