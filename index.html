@@ -1228,34 +1228,34 @@
             <span style="font-size: clamp(12.5px, 1.8cqh, 15px); font-weight: 800; color: var(--brand-mint-dark); letter-spacing: -0.3px; line-height: 1.35; word-break: keep-all;">전표를 촬영해서 미리 정보를 보내두면 업무 처리 시간이 크게 단축돼요.</span>
           </div>
 
-          <!-- 2분할 전표 카드 그리드 (CSS 기반 고해상도 구현 및 꽉 차는 레이아웃) -->
+          <!-- 2분할 전표 카드 그리드 (입금하실때: 빨간색 / 찾으실때: 파란색) -->
           <div style="display: flex; gap: 14px; margin-bottom: 20px; width: 100%; box-sizing: border-box;">
-            <!-- 찾으실때 전표 (빨간색) -->
-            <button class="easy-voucher-select-btn" data-vtype="WITHDRAW_TRANSFER" style="flex: 1; padding: 0; background-color: #ffffff; border: 3px solid #00baae; border-radius: 20px; overflow: hidden; display: flex; flex-direction: column; cursor: pointer; box-shadow: 0 4px 14px rgba(0,0,0,0.06); box-sizing: border-box;">
+            <!-- 입금하실때 전표 (빨간색) -->
+            <button class="easy-voucher-select-btn" data-vtype="SINGLE_TRANSFER" style="flex: 1; padding: 0; background-color: #ffffff; border: 3px solid #00baae; border-radius: 20px; overflow: hidden; display: flex; flex-direction: column; cursor: pointer; box-shadow: 0 4px 14px rgba(0,0,0,0.06); box-sizing: border-box;">
               <!-- 헤더 -->
               <div style="background-color: #d63031; color: #ffffff; font-size: clamp(16px, 2.3cqw, 20px); font-weight: 900; padding: 14px 10px; width: 100%; text-align: center; box-sizing: border-box; letter-spacing: -0.5px;">
+                입금하실때 전표
+              </div>
+              <!-- 바디 -->
+              <div style="padding: clamp(16px, 2.8cqh, 24px) 10px; display: flex; flex-direction: column; align-items: center; gap: 18px; width: 100%; box-sizing: border-box;">
+                <img src="easy_voucher_withdraw_illust.png" alt="입금하실때 일러스트 (빨간색 전표)" style="width: 90%; height: auto; display: block; max-width: 160px; filter: drop-shadow(0 2px 6px rgba(0,0,0,0.05));" />
+                <span style="font-size: clamp(21px, 2.9cqh, 27px); font-weight: 900; color: #111111; line-height: 1.25; font-family: 'Pretendard', sans-serif; letter-spacing: -0.5px;">
+                  입금하실때<br><span style="color: #d63031;">(빨간색)</span>
+                </span>
+              </div>
+            </button>
+
+            <!-- 찾으실때 전표 (파란색) -->
+            <button class="easy-voucher-select-btn" data-vtype="WITHDRAW_TRANSFER" style="flex: 1; padding: 0; background-color: #ffffff; border: 3px solid #00baae; border-radius: 20px; overflow: hidden; display: flex; flex-direction: column; cursor: pointer; box-shadow: 0 4px 14px rgba(0,0,0,0.06); box-sizing: border-box;">
+              <!-- 헤더 -->
+              <div style="background-color: #0984e3; color: #ffffff; font-size: clamp(16px, 2.3cqw, 20px); font-weight: 900; padding: 14px 10px; width: 100%; text-align: center; box-sizing: border-box; letter-spacing: -0.5px;">
                 찾으실때 전표
               </div>
               <!-- 바디 -->
               <div style="padding: clamp(16px, 2.8cqh, 24px) 10px; display: flex; flex-direction: column; align-items: center; gap: 18px; width: 100%; box-sizing: border-box;">
-                <img src="easy_voucher_withdraw_illust.png" alt="찾으실때 일러스트" style="width: 90%; height: auto; display: block; max-width: 160px; filter: drop-shadow(0 2px 6px rgba(0,0,0,0.05));" />
+                <img src="easy_voucher_deposit_illust.png" alt="찾으실때 일러스트 (파란색 전표)" style="width: 90%; height: auto; display: block; max-width: 160px; filter: drop-shadow(0 2px 6px rgba(0,0,0,0.05));" />
                 <span style="font-size: clamp(21px, 2.9cqh, 27px); font-weight: 900; color: #111111; line-height: 1.25; font-family: 'Pretendard', sans-serif; letter-spacing: -0.5px;">
-                  찾으실때<br>(빨간색)
-                </span>
-              </div>
-            </button>
-            
-            <!-- 보내실때 전표 (파란색) -->
-            <button class="easy-voucher-select-btn" data-vtype="SINGLE_TRANSFER" style="flex: 1; padding: 0; background-color: #ffffff; border: 3px solid #00baae; border-radius: 20px; overflow: hidden; display: flex; flex-direction: column; cursor: pointer; box-shadow: 0 4px 14px rgba(0,0,0,0.06); box-sizing: border-box;">
-              <!-- 헤더 -->
-              <div style="background-color: #0984e3; color: #ffffff; font-size: clamp(16px, 2.3cqw, 20px); font-weight: 900; padding: 14px 10px; width: 100%; text-align: center; box-sizing: border-box; letter-spacing: -0.5px;">
-                보내실때 전표
-              </div>
-              <!-- 바디 -->
-              <div style="padding: clamp(16px, 2.8cqh, 24px) 10px; display: flex; flex-direction: column; align-items: center; gap: 18px; width: 100%; box-sizing: border-box;">
-                <img src="easy_voucher_deposit_illust.png" alt="보내실때 일러스트" style="width: 90%; height: auto; display: block; max-width: 160px; filter: drop-shadow(0 2px 6px rgba(0,0,0,0.05));" />
-                <span style="font-size: clamp(21px, 2.9cqh, 27px); font-weight: 900; color: #111111; line-height: 1.25; font-family: 'Pretendard', sans-serif; letter-spacing: -0.5px;">
-                  보내실때<br>(파란색)
+                  찾으실때<br><span style="color: #0984e3;">(파란색)</span>
                 </span>
               </div>
             </button>
