@@ -90,64 +90,143 @@
 
       <!-- 우측 열: 스마트 뱅킹 서비스 허브 -->
       <div class="layout-col-services">
-        <!-- 쉬운 모드 전용 비대칭 레이아웃 컨테이너 (아이디어 2번 미니멀: 1 대형 히어로 카드 + 2단 서브 카드) -->
-        <div id="easy-mode-layout-container" class="service-hub-asymmetric-box">
+        <!-- 스마트 서비스 허브 (4대 핵심 기능 2x2 반응형 카드 그리드) -->
+        <div id="easy-mode-layout-container" class="service-hub-grid-container">
           
-          <!-- 좌측: 1 대형 히어로 카드 (송금전표 사진찍기) -->
-          <button class="hero-main-card-btn" id="btn-easy-scan">
-            <div class="hero-card-icon-box scan-box">
+          <!-- 1. 송금전표 사진찍기 -->
+          <button class="service-hub-card-item" id="btn-easy-scan">
+            <div class="hub-card-icon-box scan-box">
               <svg class="service-hub-svg" viewBox="0 0 24 24" fill="none" stroke="#2563EB" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round">
                 <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"></path>
                 <circle cx="12" cy="13" r="4"></circle>
               </svg>
             </div>
-            <strong class="hero-card-title">송금전표<br>사진찍기</strong>
+            <div class="hub-card-text-box">
+              <strong class="hub-card-title">송금전표 사진찍기</strong>
+              <span class="hub-card-desc">종이전표 자동인식</span>
+            </div>
           </button>
 
-          <!-- 우측: 2단 서브 카드 스택 (미리작성 + 서류 챙기기) -->
-          <div class="hero-sub-card-stack">
-            <!-- 2. 미리작성 -->
-            <button class="hero-sub-item-btn" id="btn-easy-pre-writing">
-              <div class="hero-sub-icon-box paper-box">
-                <svg class="hero-sub-svg" viewBox="0 0 24 24" fill="none" stroke="#059669" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round">
-                  <path d="M12 20h9"></path>
-                  <path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"></path>
-                </svg>
-              </div>
-              <strong class="hero-sub-title">미리작성</strong>
-              <i class="fa-solid fa-chevron-right hero-sub-arrow"></i>
-            </button>
+          <!-- 2. 모바일 서식 미리작성 -->
+          <button class="service-hub-card-item" id="btn-easy-pre-writing">
+            <div class="hub-card-icon-box paper-box">
+              <svg class="service-hub-svg" viewBox="0 0 24 24" fill="none" stroke="#059669" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M12 20h9"></path>
+                <path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"></path>
+              </svg>
+            </div>
+            <div class="hub-card-text-box">
+              <strong class="hub-card-title">미리작성</strong>
+              <span class="hub-card-desc">입출금·송금 모바일 전표</span>
+            </div>
+          </button>
 
-            <!-- 3. 서류 챙기기 -->
-            <button class="hero-sub-item-btn" id="btn-easy-checklist">
-              <div class="hero-sub-icon-box checklist-box">
-                <svg class="hero-sub-svg" viewBox="0 0 24 24" fill="none" stroke="#00C7A9" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round">
-                  <polyline points="9 11 12 14 22 4"></polyline>
-                  <path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"></path>
-                </svg>
-              </div>
-              <strong class="hero-sub-title">서류 챙기기</strong>
-              <i class="fa-solid fa-chevron-right hero-sub-arrow"></i>
-            </button>
-          </div>
+          <!-- 3. 서류 챙기기 (필요서류 체크리스트) -->
+          <button class="service-hub-card-item" id="btn-easy-checklist">
+            <div class="hub-card-icon-box checklist-box">
+              <svg class="service-hub-svg" viewBox="0 0 24 24" fill="none" stroke="#00C7A9" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round">
+                <polyline points="9 11 12 14 22 4"></polyline>
+                <path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"></path>
+              </svg>
+            </div>
+            <div class="hub-card-text-box">
+              <strong class="hub-card-title">서류 챙기기</strong>
+              <span class="hub-card-desc">업무별 필수서류 안내</span>
+            </div>
+          </button>
+
+          <!-- 4. 서류 진위확인 (독립된 신규 기능) -->
+          <button class="service-hub-card-item hub-verify-item" id="btn-easy-doc-verify">
+            <span class="hub-card-badge">AI 즉시검증</span>
+            <div class="hub-card-icon-box verify-box">
+              <svg class="service-hub-svg" viewBox="0 0 24 24" fill="none" stroke="#7C3AED" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>
+                <path d="m9 12 2 2 4-4"></path>
+              </svg>
+            </div>
+            <div class="hub-card-text-box">
+              <strong class="hub-card-title">서류 진위확인</strong>
+              <span class="hub-card-desc">신분증·등본 원본 판별</span>
+            </div>
+          </button>
 
         </div>
 
-        <!-- 대기시간 보조 혜택 배너 (금융성향 알아보기 - 보조 서비스) -->
-        <div class="service-sub-banner-container">
-          <button type="button" class="service-sub-banner" id="btn-easy-financial-test">
+        <!-- [고액송금 특화] 500만원 이상 송금 고객 전용 금융사기예방진단표 사전작성 강조 배너 -->
+        <div class="service-sub-banner-container high-transfer-banner-container">
+          <button type="button" class="high-transfer-service-banner common-sub-banner" id="btn-open-fraud-prevention-banner">
             <div class="sub-banner-left">
-              <div class="sub-banner-icon">
-                <i class="fa-solid fa-lightbulb"></i>
+              <div class="sub-banner-icon fraud-icon">
+                <i class="fa-solid fa-shield-virus"></i>
               </div>
               <div class="sub-banner-text-box">
-                <span class="sub-banner-subtitle">대기 시간이 지루하시다면?</span>
-                <span class="sub-banner-title"><strong>나의 금융성향 알아보기</strong> <span class="sub-banner-tag">맞춤 매칭</span></span>
+                <div class="sub-banner-subtitle-row">
+                  <span class="sub-banner-pill fraud-pill"><span class="fraud-live-dot"></span>500만원 이상 송금</span>
+                  <span class="sub-banner-desc fraud-desc">창구 대기시간 80% 단축!</span>
+                </div>
+                <div class="sub-banner-title-row">
+                  <strong class="sub-banner-main-title fraud-title">금융사기예방진단표</strong>
+                  <span class="sub-banner-action-text fraud-action">미리 작성하기</span>
+                </div>
               </div>
             </div>
             <div class="sub-banner-right">
-              <span class="sub-banner-btn-text">진단하기</span>
-              <i class="fa-solid fa-chevron-right"></i>
+              <span class="sub-banner-badge fraud-badge">사전작성</span>
+              <i class="fa-solid fa-chevron-right sub-banner-arrow fraud-arrow"></i>
+            </div>
+          </button>
+        </div>
+
+        <!-- 외국인 업무 번역 서비스 배너 -->
+        <div class="service-sub-banner-container foreigner-banner-container">
+          <button type="button" class="foreigner-service-banner common-sub-banner" id="btn-foreigner-translator">
+            <div class="sub-banner-left">
+              <div class="sub-banner-icon foreigner-icon">
+                <svg viewBox="0 0 24 24" width="20" height="20" stroke="currentColor" stroke-width="2.2" fill="none" stroke-linecap="round" stroke-linejoin="round" class="foreigner-globe-svg">
+                  <circle cx="12" cy="12" r="10"></circle>
+                  <line x1="2" y1="12" x2="22" y2="12"></line>
+                  <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path>
+                </svg>
+              </div>
+              <div class="sub-banner-text-box">
+                <div class="sub-banner-subtitle-row">
+                  <span class="sub-banner-pill foreigner-pill">Foreigner</span>
+                  <span class="sub-banner-desc foreigner-desc foreigner-banner-greeting">Hello foreigner !</span>
+                </div>
+                <div class="sub-banner-title-row">
+                  <strong class="sub-banner-main-title foreigner-title foreigner-banner-action">Writing your task here</strong>
+                  <span class="sub-banner-tag foreigner-banner-tag">[ Translated for staff ]</span>
+                </div>
+              </div>
+            </div>
+            <div class="sub-banner-right">
+              <span class="sub-banner-badge foreigner-badge foreigner-btn-text">Write</span>
+              <i class="fa-solid fa-chevron-right sub-banner-arrow foreigner-arrow"></i>
+            </div>
+          </button>
+        </div>
+
+        <!-- 대기시간 보조 혜택 배너 (금융성향 알아보기 - 보조 서비스) -->
+        <div class="service-sub-banner-container quiz-banner-container">
+          <button type="button" class="service-sub-banner common-sub-banner quiz-service-banner" id="btn-easy-financial-test">
+            <div class="sub-banner-left">
+              <div class="sub-banner-icon quiz-icon">
+                <i class="fa-solid fa-lightbulb"></i>
+              </div>
+              <div class="sub-banner-text-box">
+                <div class="sub-banner-subtitle-row">
+                  <span class="sub-banner-pill quiz-pill">대기시간 맞춤</span>
+                  <span class="sub-banner-desc quiz-desc">대기 시간이 지루하시다면?</span>
+                </div>
+                <div class="sub-banner-title-row">
+                  <strong class="sub-banner-main-title quiz-title">나의 금융성향 알아보기</strong>
+                  <span class="sub-banner-action-text quiz-action">맞춤 금융 매칭</span>
+                </div>
+              </div>
+            </div>
+            <div class="sub-banner-right">
+              <span class="sub-banner-badge quiz-badge sub-banner-btn-text">진단하기</span>
+              <i class="fa-solid fa-chevron-right sub-banner-arrow quiz-arrow"></i>
             </div>
           </button>
         </div>
@@ -193,19 +272,18 @@
               <span class="quick-card-desc">전표 촬영으로 빠른 접수</span>
             </span>
           </button>
-          <button class="quick-card-btn" id="btn-quick-financial-test">
-            <div class="quick-card-icon-wrapper investment">
-              <svg class="quick-svg-icon" viewBox="0 0 24 24" fill="none" stroke="#F5A623" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                <circle cx="11" cy="11" r="8"></circle>
-                <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
-                <line x1="11" y1="8" x2="11" y2="14"></line>
-                <line x1="8" y1="11" x2="14" y2="11"></line>
+          <button class="quick-card-btn" id="btn-quick-doc-verify">
+            <div class="quick-card-icon-wrapper verify" style="background-color: #f5f3ff;">
+              <svg class="quick-svg-icon" viewBox="0 0 24 24" fill="none" stroke="#7C3AED" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>
+                <path d="m9 12 2 2 4-4"></path>
               </svg>
             </div>
             <span class="quick-card-text">
-              <span class="quick-card-title">금융성향</span>
-              <span class="quick-card-desc">5문항 맞춤 상품 추천</span>
+              <span class="quick-card-title">진위확인</span>
+              <span class="quick-card-desc">신분증·등본 원본 판별</span>
             </span>
+          </button>
         </section>
       </div>
 
@@ -241,6 +319,170 @@
   <!-- 토스트 알림창 -->
   <div id="toast" class="toast hidden">대기 정보가 성공적으로 갱신되었습니다.</div>
 
+
+  <!-- 외국인 업무 작성 및 번역 모달 (Write your task) -->
+  <div id="foreigner-translator-modal" class="modal-overlay hidden" style="z-index: 10050;">
+    <div class="modal-content foreigner-modal-content animate-slide-up">
+      <div class="foreigner-modal-header">
+        <div class="foreigner-modal-header-left">
+          <div class="foreigner-modal-icon-badge">
+            <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="#2563eb" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+              <polyline points="14 2 14 8 20 8"></polyline>
+              <line x1="16" y1="13" x2="8" y2="13"></line>
+              <line x1="16" y1="17" x2="8" y2="17"></line>
+              <polyline points="10 9 9 9 8 9"></polyline>
+            </svg>
+          </div>
+          <div class="foreigner-modal-header-titles">
+            <h3 class="foreigner-modal-title">Write your task</h3>
+            <p class="foreigner-modal-desc">
+              Enter your task in your native language.<br>
+              It will be translated for the staff.
+            </p>
+          </div>
+        </div>
+        <button type="button" class="foreigner-modal-close" id="close-foreigner-modal-btn" aria-label="Close modal">&times;</button>
+      </div>
+
+      <!-- 언어 선택 버튼 바 (Language Selector) -->
+      <div class="foreigner-lang-selector">
+        <span class="lang-selector-label"><i class="fa-solid fa-earth-americas"></i> Language:</span>
+        <div class="foreigner-scroll-wrapper">
+          <button type="button" class="foreigner-nav-arrow prev" id="btn-lang-prev" aria-label="이전 언어">
+            <i class="fa-solid fa-chevron-left"></i>
+          </button>
+          <div class="lang-pill-group" id="lang-pill-group">
+            <button type="button" class="lang-pill active" data-lang="en">🇺🇸 English</button>
+            <button type="button" class="lang-pill" data-lang="zh">🇨🇳 中文</button>
+            <button type="button" class="lang-pill" data-lang="vi">🇻🇳 Tiếng Việt</button>
+            <button type="button" class="lang-pill" data-lang="uz">🇺🇿 O'zbek</button>
+            <button type="button" class="lang-pill" data-lang="id">🇮🇩 Indonesia</button>
+            <button type="button" class="lang-pill" data-lang="tl">🇵🇭 Filipino</button>
+            <button type="button" class="lang-pill" data-lang="my">🇲🇲 မြန်မာ</button>
+            <button type="button" class="lang-pill" data-lang="th">🇹🇭 ไทย</button>
+            <button type="button" class="lang-pill" data-lang="km">🇰🇭 ខ្មែរ</button>
+            <button type="button" class="lang-pill" data-lang="ru">🇷🇺 Русский</button>
+            <button type="button" class="lang-pill" data-lang="ja">🇯🇵 日本語</button>
+            <button type="button" class="lang-pill" data-lang="ne">🇳🇵 नेपाली</button>
+          </div>
+          <button type="button" class="foreigner-nav-arrow next" id="btn-lang-next" aria-label="다음 언어">
+            <i class="fa-solid fa-chevron-right"></i>
+          </button>
+        </div>
+      </div>
+
+      <!-- 다국어 퀵 템플릿 칩 -->
+      <div class="foreigner-quick-templates">
+        <span class="quick-chip-label">Quick select:</span>
+        <div class="foreigner-scroll-wrapper">
+          <button type="button" class="foreigner-nav-arrow prev" id="btn-chip-prev" aria-label="이전 템플릿">
+            <i class="fa-solid fa-chevron-left"></i>
+          </button>
+          <div class="quick-chip-list" id="foreigner-chip-container">
+            <button type="button" class="foreigner-chip" data-text="I would like to open a new bank account and get a debit card.">Open Account</button>
+            <button type="button" class="foreigner-chip" data-text="I need to send money overseas (international remittance).">Send Money</button>
+            <button type="button" class="foreigner-chip" data-text="I want to issue or reissue my debit card.">Debit Card</button>
+            <button type="button" class="foreigner-chip" data-text="I would like to exchange foreign currency.">Exchange</button>
+            <button type="button" class="foreigner-chip" data-text="I want to register for mobile banking service.">Mobile Banking</button>
+          </div>
+          <button type="button" class="foreigner-nav-arrow next" id="btn-chip-next" aria-label="다음 템플릿">
+            <i class="fa-solid fa-chevron-right"></i>
+          </button>
+        </div>
+      </div>
+
+      <div class="foreigner-modal-body">
+        <div class="foreigner-input-box" id="foreigner-input-container">
+          <div class="foreigner-textarea-wrap">
+            <div class="foreigner-input-globe-icon">
+              <svg viewBox="0 0 24 24" width="18" height="18" stroke="#94a3b8" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                <circle cx="12" cy="12" r="10"></circle>
+                <line x1="2" y1="12" x2="22" y2="12"></line>
+                <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path>
+              </svg>
+            </div>
+            <textarea 
+              id="foreigner-task-textarea" 
+              class="foreigner-textarea" 
+              placeholder="Please enter your task here..." 
+              maxlength="1500"
+            ></textarea>
+          </div>
+          <div class="foreigner-char-counter">
+            <span id="foreigner-char-count">0</span>/1500
+          </div>
+        </div>
+      </div>
+
+      <div class="foreigner-modal-footer">
+        <button type="button" class="foreigner-send-btn" id="btn-foreigner-send">
+          <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" class="foreigner-send-svg">
+            <line x1="22" y1="2" x2="11" y2="13"></line>
+            <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
+          </svg>
+          <span id="foreigner-send-text">Send & Translate</span>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 은행원 제시용 번역 완료 카드 모달 (Show to Bank Teller) -->
+  <div id="foreigner-result-modal" class="modal-overlay hidden" style="z-index: 10060;">
+    <div class="modal-content foreigner-result-modal-content animate-slide-up">
+      <div class="teller-modal-header">
+        <div class="teller-modal-badge">
+          <i class="fa-solid fa-hand-holding-hand"></i>
+          <span>은행원 제시용 화면 / Show to Teller</span>
+        </div>
+        <button type="button" class="foreigner-modal-close" id="close-teller-modal-btn" aria-label="Close modal">&times;</button>
+      </div>
+
+      <div class="teller-instruction-bar">
+        <i class="fa-solid fa-circle-info"></i>
+        <span>순번이 되었을 때 이 화면을 은행원에게 그대로 보여주세요!</span>
+      </div>
+
+      <div class="teller-translation-card">
+        <div class="teller-card-top">
+          <span class="teller-lang-tag kr">🇰🇷 창구 전달용 한국어 번역</span>
+          <button type="button" class="teller-tts-btn" id="btn-teller-speak" title="한국어 음성으로 들려주기">
+            <i class="fa-solid fa-volume-high"></i>
+            <span>음성 듣기</span>
+          </button>
+        </div>
+        
+        <div class="teller-kr-text" id="teller-translated-korean">
+          "안녕하세요, <strong>외국인 계좌 개설 및 체크카드 발급</strong>을 신청하고자 합니다."
+        </div>
+
+        <div class="teller-card-divider"></div>
+
+        <div class="teller-card-bottom">
+          <span class="teller-lang-tag orig">🌐 작성하신 원문 (Original)</span>
+          <div class="teller-orig-text" id="teller-original-text">
+            "I want to open a new bank account and get a debit card."
+          </div>
+        </div>
+      </div>
+
+      <div class="teller-ticket-info-pill">
+        <span>현재 대기번호: <strong>#<span class="wait-ticket-no">104</span></strong></span>
+        <span class="teller-dot">•</span>
+        <span class="teller-status-ready">번역 준비 완료 ✓</span>
+      </div>
+
+      <div class="teller-modal-actions">
+        <button type="button" class="teller-btn-edit" id="btn-teller-edit">
+          <i class="fa-solid fa-pen"></i>
+          <span>내용 수정 (Edit)</span>
+        </button>
+        <button type="button" class="teller-btn-confirm" id="btn-teller-done">
+          <span>확인 완료 (Done)</span>
+        </button>
+      </div>
+    </div>
+  </div>
 
   <!-- 카카오톡 알림신청 모달 -->
   <div id="kakao-modal" class="modal-overlay hidden">
@@ -309,6 +551,181 @@
       <div class="modal-footer" style="grid-template-columns: 1fr 1.5fr;">
         <button class="btn-cancel" id="cancel-delay-modal-btn">아니오</button>
         <button class="btn-confirm" id="confirm-delay-modal-btn" style="background-color: var(--brand-mint);">예, 미루겠습니다</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 서류 진위확인 전용 독립 모달 (Government / Court Verification System) -->
+  <div id="doc-verify-modal" class="modal-overlay hidden" style="z-index: 10100;">
+    <div class="modal-content doc-verify-modal-content animate-slide-up">
+      <div class="doc-verify-header">
+        <div class="doc-verify-header-left">
+          <div class="doc-verify-icon-badge">
+            <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="#7C3AED" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>
+              <path d="m9 12 2 2 4-4"></path>
+            </svg>
+          </div>
+          <div class="doc-verify-header-titles">
+            <h3 class="doc-verify-title">공공기관 서류 진위확인</h3>
+            <p class="doc-verify-desc">정부24 · 대법원 전산망 실시간 연동 원본 검증</p>
+          </div>
+        </div>
+        <button type="button" class="close-btn" id="close-doc-verify-modal-btn">&times;</button>
+      </div>
+
+      <!-- 검증 대상 서류 업무 카테고리 및 세부 서류 선택 영역 -->
+      <div class="doc-verify-type-selector">
+        <!-- 상단 카테고리 탭 래퍼 및 좌우 스크롤 화살표 -->
+        <div class="verify-scroll-wrapper">
+          <button type="button" class="verify-scroll-arrow left" id="btn-verify-cat-left" aria-label="이전 카테고리">
+            <i class="fa-solid fa-chevron-left"></i>
+          </button>
+          <div class="verify-category-tabs" id="verify-category-tabs-container">
+            <button type="button" class="verify-cat-btn active" data-cat="all">전체/주요서류</button>
+            <button type="button" class="verify-cat-btn" data-cat="personal">개인·신규</button>
+            <button type="button" class="verify-cat-btn" data-cat="loan">전세·주담대</button>
+            <button type="button" class="verify-cat-btn" data-cat="corp">법인·기업</button>
+            <button type="button" class="verify-cat-btn" data-cat="inherit">대리·상속</button>
+          </div>
+          <button type="button" class="verify-scroll-arrow right" id="btn-verify-cat-right" aria-label="다음 카테고리">
+            <i class="fa-solid fa-chevron-right"></i>
+          </button>
+        </div>
+        
+        <!-- 하단 세부 서류 칩 래퍼 및 좌우 스크롤 화살표 -->
+        <div class="verify-scroll-wrapper">
+          <button type="button" class="verify-scroll-arrow left" id="btn-verify-pill-left" aria-label="이전 서류">
+            <i class="fa-solid fa-chevron-left"></i>
+          </button>
+          <div class="verify-type-pill-group" id="verify-doc-pill-container">
+            <!-- JS에서 업무별 서류 목록 동적 렌더링 -->
+          </div>
+          <button type="button" class="verify-scroll-arrow right" id="btn-verify-pill-right" aria-label="다음 서류">
+            <i class="fa-solid fa-chevron-right"></i>
+          </button>
+        </div>
+      </div>
+
+      <div class="doc-verify-body">
+        <!-- 1단계: 카메라 스캔 뷰파인더 -->
+        <div id="doc-verify-step-scan">
+          <div class="doc-viewfinder-box" id="doc-viewfinder-box">
+            <!-- 스마트폰 실시간 후면 카메라 비디오 스트림 -->
+            <video id="doc-verify-camera-stream" autoplay playsinline style="width: 100%; height: 100%; object-fit: cover; display: none;"></video>
+            
+            <!-- 촬영/업로드된 이미지 프리뷰 -->
+            <img id="doc-captured-preview" style="width: 100%; height: 100%; object-fit: contain; display: none;" alt="촬영된 서류">
+
+            <!-- 가상 서류 견본 (카메라 권한 미연결 시 표시) -->
+            <div class="doc-mock-preview" id="doc-mock-preview">
+              <div class="doc-mock-content" id="doc-mock-content">
+                <i class="fa-regular fa-id-card doc-preview-icon" id="doc-preview-icon"></i>
+                <span id="doc-preview-text">주민등록증 / 운전면허증</span>
+                <span class="doc-preview-sub">문서의 위변조 방지 2차원 바코드 및 확인번호를 사각형 안에 맞춰주세요</span>
+              </div>
+            </div>
+
+            <!-- 카메라 브라켓 가이드라인 -->
+            <div class="doc-guide-bracket">
+              <span class="bracket tl"></span>
+              <span class="bracket tr"></span>
+              <span class="bracket bl"></span>
+              <span class="bracket br"></span>
+              <div class="doc-laser-line" id="doc-verify-laser"></div>
+            </div>
+          </div>
+
+          <!-- 스마트폰 기본 카메라 앱 직접 실행 숨김 파일 인풋 -->
+          <input type="file" id="doc-camera-file-input" accept="image/*" capture="environment" style="display: none;">
+          <!-- 캡처 캔버스 -->
+          <canvas id="doc-verify-canvas" style="display: none;"></canvas>
+
+          <div class="doc-verify-scan-actions">
+            <!-- 1. 뷰파인더 즉시 스캔 촬영 버튼 -->
+            <button type="button" class="btn-doc-scan-action" id="btn-start-doc-verify">
+              <i class="fa-solid fa-camera"></i>
+              <span id="doc-scan-btn-text">서류 촬영 및 자동 진위확인</span>
+            </button>
+            
+            <!-- 2. 휴대폰 기본 카메라 어플 열기 버튼 -->
+            <button type="button" class="btn-doc-app-camera" id="btn-open-camera-app">
+              <i class="fa-solid fa-mobile-screen-button"></i>
+              <span>휴대폰 카메라 앱으로 촬영하기</span>
+            </button>
+          </div>
+
+          <!-- 번호 직접 입력 진위조회 간편 영역 (사업자번호 / 16자리 발급번호) -->
+          <div class="doc-manual-input-box" id="doc-manual-input-box">
+            <div class="manual-input-header">
+              <span id="manual-input-title"><i class="fa-solid fa-keyboard"></i> 확인번호 직접 입력 진위확인</span>
+            </div>
+            <div class="manual-input-row">
+              <input type="text" id="doc-direct-input-val" class="doc-direct-input" placeholder="사업자등록번호 10자리 입력 (예: 504-85-12345)">
+              <button type="button" class="btn-direct-verify" id="btn-direct-verify">조회</button>
+            </div>
+            <div class="manual-input-hint" id="manual-input-hint">
+              * 국세청 홈택스 사업자 계속사업자(정상 가동) 여부 실시간 조회
+            </div>
+          </div>
+        </div>
+
+        <!-- 2단계: 실시간 진위확인 결과 리포트 -->
+        <div id="doc-verify-step-result" class="doc-verify-result-box hidden">
+          <div class="verify-result-header success" id="res-header-badge">
+            <i class="fa-solid fa-circle-check" id="res-header-icon"></i>
+            <div class="verify-result-badge-text">
+              <strong id="res-header-title">진위 검증 완료 (정상 원본 서류)</strong>
+              <span id="res-header-sub">국세청 · 대법원 · 정부24 전산 원장 실시간 일치</span>
+            </div>
+          </div>
+
+          <!-- 3대 핵심 포인트 진단 요약 카드 -->
+          <div class="verify-key-highlight-grid" id="verify-key-highlight-grid">
+            <div class="highlight-item" id="hl-status-item">
+              <span class="hl-label">사업자 / 인감 상태</span>
+              <strong class="hl-val pass" id="hl-status-val">계속사업자 (정상가동)</strong>
+            </div>
+            <div class="highlight-item" id="hl-date-item">
+              <span class="hl-label">발급일자 유효성 (3개월 이내)</span>
+              <strong class="hl-val pass" id="hl-date-val">3개월 이내 유효 (적합)</strong>
+            </div>
+          </div>
+
+          <div class="verify-result-details">
+            <div class="verify-detail-row">
+              <span class="verify-label">확인 서류</span>
+              <strong class="verify-val" id="res-doc-name">사업자등록증명원 (3개월 이내)</strong>
+            </div>
+            <div class="verify-detail-row">
+              <span class="verify-label">발급 기관</span>
+              <span class="verify-val" id="res-doc-issuer">국세청 홈택스 (Hometax)</span>
+            </div>
+            <div class="verify-detail-row">
+              <span class="verify-label" id="res-code-label">사업자 / 발급번호</span>
+              <span class="verify-val code" id="res-doc-code">504-85-12345</span>
+            </div>
+            <div class="verify-detail-row">
+              <span class="verify-label">발급 일자</span>
+              <span class="verify-val" id="res-doc-date">2026.08.20 (유효기간 이내 적합)</span>
+            </div>
+            <div class="verify-detail-row">
+              <span class="verify-label">진위 및 상태 판정</span>
+              <span class="verify-val pass" id="res-doc-status-text"><i class="fa-solid fa-shield-check"></i> 계속사업자 · 원본 유효 (PASS)</span>
+            </div>
+          </div>
+
+          <div class="verify-result-footer-actions">
+            <button type="button" class="btn-verify-retry" id="btn-doc-verify-retry">
+              <i class="fa-solid fa-rotate-left"></i>
+              <span>다시 조회/스캔</span>
+            </button>
+            <button type="button" class="btn-verify-submit" id="btn-doc-verify-submit">
+              <i class="fa-solid fa-check"></i>
+              <span>창구 직원에 전달 접수</span>
+            </button>
+          </div>
+        </div>
       </div>
     </div>
   </div>
@@ -939,7 +1356,7 @@
               <!-- ┘ 우하단 꺾쇠 -->
               <span style="position:absolute; bottom:0; right:0; width:28px; height:18px; border-bottom:3px solid #00BAC6; border-right:3px solid #00BAC6; border-radius:0 0 3px 0;"></span>
               <!-- 가이드 중앙 안내 텍스트 (카메라 미연결 시에만 표시) -->
-              <span id="viewfinder-hint" style="position:absolute; top:50%; left:50%; transform:translate(-50%,-50%); color:rgba(255,255,255,0.55); font-size:11px; font-weight:600; white-space:nowrap; letter-spacing:-0.2px; text-shadow:0 1px 4px rgba(0,0,0,0.8);">전표를 이 격자 안에 맞춰 주세요</span>
+              <span id="viewfinder-hint" style="position:absolute; top:50%; left:50%; transform:translate(-50%,-50%); color:rgba(255,255,255,0.85); font-size:13.5px; font-weight:700; white-space:nowrap; letter-spacing:-0.3px; text-shadow:0 1px 4px rgba(0,0,0,0.8); text-align:center;">전표 앞면을 격자 안에 위치시켜 주세요</span>
             </div>
             <div class="scan-laser" id="laser-effect" style="position: absolute; width: 94%; height: 2px; background-color: #00BAC6; box-shadow: 0 0 8px #00BAC6; display: none; animation: scanMove 2.2s infinite ease-in-out;"></div>
           </div>
@@ -1177,7 +1594,155 @@
 
 
 
-  <!-- 팝업 모달: 업무별 필요 서류 체크리스트 -->
+  <!-- [고액송금 특화] 금융사기예방진단표 (모바일 사전 전자진단) 모달 -->
+  <div id="fraud-prevention-modal" class="modal-overlay hidden" style="z-index: 10300;">
+    <div class="modal-content fraud-modal-content animate-slide-up" style="max-width: 440px; max-height: 88vh; display: flex; flex-direction: column; overflow: hidden; border-radius: 18px;">
+      <div class="modal-header" style="background: linear-gradient(135deg, #FFF1F2 0%, #FFE4E6 100%); border-bottom: 1.5px solid #FECDD3; padding: 14px 16px;">
+        <div class="modal-header-title">
+          <i class="fa-solid fa-shield-virus" style="color: #E11D48; font-size: 18px;"></i>
+          <div>
+            <h3 style="font-size: 14.5px; font-weight: 800; color: #9F1239; margin: 0;">금융사기예방진단표 (사전 전자작성)</h3>
+            <p style="font-size: 10.5px; color: #BE123C; margin: 2px 0 0 0;">보이스피싱 피해 예방 및 창구 대기시간 80% 단축</p>
+          </div>
+        </div>
+        <button type="button" class="close-btn" id="close-fraud-modal-btn">&times;</button>
+      </div>
+
+      <div class="modal-body" style="padding: 16px; overflow-y: auto; flex: 1;">
+        <!-- 송금 금액 및 사전 파악 안내 배너 -->
+        <div style="background-color: #FFF1F2; border: 1px solid #FECDD3; border-radius: 10px; padding: 10px 12px; margin-bottom: 14px;">
+          <div style="font-size: 11.5px; font-weight: 700; color: #9F1239; display: flex; align-items: center; justify-content: space-between;">
+            <span><i class="fa-solid fa-triangle-exclamation"></i> 고액 송금 확인</span>
+            <span id="fraud-amount-tag" style="background: #E11D48; color: #fff; padding: 2px 8px; border-radius: 12px; font-size: 10.5px; font-weight: 800;">고액 송금 대상</span>
+          </div>
+          <p style="font-size: 11px; color: #BE123C; margin: 4px 0 0 0; line-height: 1.4;">
+            영업점 창구 필수 수기 작성 서식인 <strong>'금융사기예방진단표'</strong>를 모바일에서 미리 작성하시면 창구에서 대기 및 처리 시간이 대폭 단축됩니다.
+          </p>
+        </div>
+
+        <!-- 1. 송금 목적 직접 타이핑 / 퀵 선택 -->
+        <div class="fraud-section-group" style="margin-bottom: 16px;">
+          <label class="fraud-label" style="display: block; font-size: 12.5px; font-weight: 800; color: #1E293B; margin-bottom: 6px;">
+            1. 송금(인출) 목적이 무엇인가요? <span style="color: #E11D48;">*</span>
+          </label>
+          <div class="fraud-purpose-chips" style="display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 8px;">
+            <button type="button" class="fraud-chip-btn active" data-purpose="아들/가족 사업자금 지원">아들/가족 사업자금</button>
+            <button type="button" class="fraud-chip-btn" data-purpose="부동산 매매 및 전월세 잔금">부동산 잔금 결제</button>
+            <button type="button" class="fraud-chip-btn" data-purpose="차량 구매 및 물품 대금">차량/물품 대금</button>
+            <button type="button" class="fraud-chip-btn" data-purpose="기존 타행 대출금 직접 상환">타행 대출금 상환</button>
+            <button type="button" class="fraud-chip-btn" data-purpose="기타 직접입력">직접 입력</button>
+          </div>
+          <input type="text" id="fraud-purpose-input" class="doc-direct-input" style="width: 100%; height: 38px; box-sizing: border-box;" value="아들/가족 사업자금 지원" placeholder="송금 목적을 상세히 입력해 주세요">
+        </div>
+
+        <!-- 2. 보이스피싱 예방 4대 체크리스트 (예/아니오) -->
+        <div class="fraud-section-group" style="margin-bottom: 16px;">
+          <label class="fraud-label" style="display: block; font-size: 12.5px; font-weight: 800; color: #1E293B; margin-bottom: 8px;">
+            2. 금융사기 예방 체크리스트 <span style="font-size: 11px; font-weight: 500; color: #64748B;">(모두 해당 없어야 정상)</span>
+          </label>
+          
+          <div class="fraud-check-list" style="display: flex; flex-direction: column; gap: 8px;">
+            <!-- 문항 1 -->
+            <div class="fraud-check-card" style="background: #F8FAFC; border: 1px solid #E2E8F0; border-radius: 10px; padding: 10px 12px;">
+              <p style="font-size: 11.5px; font-weight: 700; color: #334155; margin: 0 0 6px 0; line-height: 1.4;">
+                ① 검찰·경찰·금감원이라며 예금을 보호해 준다고 송금을 요구받으셨나요?
+              </p>
+              <div class="fraud-yn-toggle" style="display: flex; gap: 6px;">
+                <label class="fraud-radio-label"><input type="radio" name="fraud-q1" value="no" checked><span>아니오 (정상)</span></label>
+                <label class="fraud-radio-label danger"><input type="radio" name="fraud-q1" value="yes"><span>예 (위험)</span></label>
+              </div>
+            </div>
+
+            <!-- 문항 2 -->
+            <div class="fraud-check-card" style="background: #F8FAFC; border: 1px solid #E2E8F0; border-radius: 10px; padding: 10px 12px;">
+              <p style="font-size: 11.5px; font-weight: 700; color: #334155; margin: 0 0 6px 0; line-height: 1.4;">
+                ② 대출 진행을 위해 기존 대출을 타인 계좌로 먼저 상환하라고 요구받으셨나요?
+              </p>
+              <div class="fraud-yn-toggle" style="display: flex; gap: 6px;">
+                <label class="fraud-radio-label"><input type="radio" name="fraud-q2" value="no" checked><span>아니오 (정상)</span></label>
+                <label class="fraud-radio-label danger"><input type="radio" name="fraud-q2" value="yes"><span>예 (위험)</span></label>
+              </div>
+            </div>
+
+            <!-- 문항 3 -->
+            <div class="fraud-check-card" style="background: #F8FAFC; border: 1px solid #E2E8F0; border-radius: 10px; padding: 10px 12px;">
+              <p style="font-size: 11.5px; font-weight: 700; color: #334155; margin: 0 0 6px 0; line-height: 1.4;">
+                ③ 모르는 사람이 보낸 문자 링크(URL)나 앱(App)을 설치하신 적이 있나요?
+              </p>
+              <div class="fraud-yn-toggle" style="display: flex; gap: 6px;">
+                <label class="fraud-radio-label"><input type="radio" name="fraud-q3" value="no" checked><span>아니오 (정상)</span></label>
+                <label class="fraud-radio-label danger"><input type="radio" name="fraud-q3" value="yes"><span>예 (위험)</span></label>
+              </div>
+            </div>
+
+            <!-- 문항 4 -->
+            <div class="fraud-check-card" style="background: #F8FAFC; border: 1px solid #E2E8F0; border-radius: 10px; padding: 10px 12px;">
+              <p style="font-size: 11.5px; font-weight: 700; color: #334155; margin: 0 0 6px 0; line-height: 1.4;">
+                ④ 가족·지인이 납치되었다거나 휴대폰이 고장 났다며 급히 돈을 요구받으셨나요?
+              </p>
+              <div class="fraud-yn-toggle" style="display: flex; gap: 6px;">
+                <label class="fraud-radio-label"><input type="radio" name="fraud-q4" value="no" checked><span>아니오 (정상)</span></label>
+                <label class="fraud-radio-label danger"><input type="radio" name="fraud-q4" value="yes"><span>예 (위험)</span></label>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- 3. 창구 자필 덧칠 문구 타이핑 (자필확인 모바일 사전 동의) -->
+        <div class="fraud-section-group" style="background-color: #FFFBEB; border: 1px solid #FDE68A; border-radius: 10px; padding: 12px;">
+          <label class="fraud-label" style="display: block; font-size: 12px; font-weight: 800; color: #92400E; margin-bottom: 4px;">
+            3. 자필 기재 확약 문구 (창구 자필서명 사전 대체)
+          </label>
+          <p style="font-size: 11px; color: #B45309; margin: 0 0 8px 0; line-height: 1.4;">
+            "본인은 보이스피싱 사기 위험에 대해 충분히 안내받았음을 확인합니다."
+          </p>
+          <div style="display: flex; align-items: center; gap: 6px;">
+            <input type="text" id="fraud-confirm-type-input" class="doc-direct-input" style="flex: 1; height: 36px; background:#fff; font-size: 12px;" placeholder="'확인하였습니다' 입력" value="확인하였습니다">
+          </div>
+        </div>
+      </div>
+
+      <div class="modal-footer" style="display: grid; grid-template-columns: 1fr 1.8fr; gap: 8px; padding: 12px 16px; background: #FAFBFC; border-top: 1px solid #E2E8F0;">
+        <button type="button" class="btn-cancel" id="cancel-fraud-modal-btn" style="margin: 0; height: 44px; font-size: 13.5px; font-weight: 700;">취소</button>
+        <button type="button" class="btn-confirm" id="submit-fraud-modal-btn" style="margin: 0; height: 44px; font-size: 13.5px; font-weight: 800; background: linear-gradient(135deg, #F43F5E 0%, #E11D48 100%); color: #fff; border: none; border-radius: 10px; cursor: pointer; box-shadow: 0 3px 10px rgba(225, 29, 72, 0.25); display: flex; align-items: center; justify-content: center; gap: 6px;">
+          <span>진단표 제출하기</span>
+          <i class="fa-solid fa-check" style="font-size: 12px;"></i>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- [고액송금 특화] 금융사기예방진단표 제출 완료 후 송금 진행 여부 팝업 확인 모달 -->
+  <div id="fraud-post-submit-modal" class="modal-overlay hidden" style="z-index: 10350;">
+    <div class="modal-content animate-slide-up" style="max-width: 380px; border-radius: 20px; overflow: hidden; box-shadow: 0 20px 40px rgba(0,0,0,0.18);">
+      <div class="modal-header" style="background: linear-gradient(135deg, #E6FAF6 0%, #D0F7F0 100%); border-bottom: 1.5px solid rgba(0, 199, 169, 0.25); padding: 14px 16px;">
+        <div class="modal-header-title">
+          <i class="fa-solid fa-circle-check" style="color: #00C7A9; font-size: 17px;"></i>
+          <h3 style="font-size: 14.5px; font-weight: 800; color: #007A68; margin: 0;">진단표 접수 완료</h3>
+        </div>
+        <button type="button" class="close-btn" id="close-fraud-post-modal-btn">&times;</button>
+      </div>
+      <div class="modal-body" style="padding: 22px 18px 16px 18px; text-align: center;">
+        <div style="width: 52px; height: 52px; border-radius: 50%; background: #E6FAF6; color: #00C7A9; display: flex; align-items: center; justify-content: center; font-size: 24px; margin: 0 auto 14px auto; box-shadow: 0 4px 14px rgba(0, 199, 169, 0.2);">
+          <i class="fa-solid fa-money-bill-transfer"></i>
+        </div>
+        <h4 style="font-size: 15.5px; font-weight: 800; color: #0F172A; margin: 0 0 8px 0; letter-spacing: -0.3px;">
+          금융사기예방진단표가 접수되었습니다.
+        </h4>
+        <p style="font-size: 13px; color: #475569; line-height: 1.5; margin: 0 0 12px 0; letter-spacing: -0.2px;">
+          이어서 <strong>송금 전표를 작성(촬영)</strong>하시겠습니까?<br>
+          <span style="font-size: 11.5px; color: #00A990; font-weight: 700;">(미리 촬영해 두시면 창구 대기시간이 80% 단축됩니다)</span>
+        </p>
+      </div>
+      <div class="modal-footer" style="display: grid; grid-template-columns: 1fr 1.5fr; gap: 8px; padding: 12px 16px; background-color: #FAFBFC; border-top: 1px solid #EDF2F7;">
+        <button type="button" class="btn-cancel" id="btn-fraud-post-later" style="margin: 0; height: 44px; font-size: 13.5px; font-weight: 700; border-radius: 10px;">다음에 하기</button>
+        <button type="button" class="btn-confirm" id="btn-fraud-post-transfer" style="margin: 0; height: 44px; font-size: 13.5px; font-weight: 800; background: linear-gradient(135deg, #00DDBB 0%, #00C7A9 60%, #00A990 100%); color: #ffffff; border: none; border-radius: 10px; cursor: pointer; box-shadow: 0 3px 12px rgba(0, 199, 169, 0.3); display: flex; align-items: center; justify-content: center; gap: 6px;">
+          <span>송금하기 (전표촬영)</span>
+          <i class="fa-solid fa-chevron-right" style="font-size: 11px;"></i>
+        </button>
+      </div>
+    </div>
+  </div>
   <div id="checklist-modal" class="modal-overlay hidden">
     <div class="modal-content animate-slide-up" style="max-width: 480px; width: 100%; max-height: 90vh; border-radius: 24px; display: flex; flex-direction: column; overflow: hidden;">
       <div class="modal-header">
@@ -1243,12 +1808,19 @@
             <!-- JavaScript에서 동적으로 생성 예정 -->
           </div>
 
-          <!-- AI 일괄 서류 진단 시작 버튼 -->
-          <div class="ai-batch-btn-wrapper" style="margin-top: 14px;">
-            <button type="button" class="btn-ai-batch-start" id="ai-batch-start-btn">
-              <i class="fa-solid fa-wand-magic-sparkles"></i>
-              <span>AI 일괄 서류 진단 시작</span>
-            </button>
+          <!-- 체크리스트 하단 안내 및 완료/진위확인 액션 바 -->
+          <div class="checklist-action-footer-box" style="margin-top: 16px; display: flex; flex-direction: column; gap: 8px;">
+            <div style="display: grid; grid-template-columns: 1fr 1.25fr; gap: 8px;">
+              <button type="button" class="btn-checklist-finish" id="btn-checklist-finish" style="background: var(--brand-mint); color: #ffffff; border: none; border-radius: 12px; padding: 13px; font-size: 14px; font-weight: 700; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 6px;">
+                <i class="fa-solid fa-check"></i>
+                <span>준비 확인 완료</span>
+              </button>
+              <button type="button" class="btn-checklist-to-verify" id="btn-checklist-to-verify" style="background: #f5f3ff; color: #7c3aed; border: 1.5px solid #c4b5fd; border-radius: 12px; padding: 13px; font-size: 13.5px; font-weight: 700; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 6px;">
+                <i class="fa-solid fa-file-shield"></i>
+                <span>서류 진위확인 하기</span>
+              </button>
+            </div>
+            <p style="font-size: 11px; color: #64748b; text-align: center; margin: 4px 0 0 0;">* 은행 창구 방문 전 필요 서류를 미리 챙겨 빠른 처리를 받아보세요.</p>
           </div>
         </div>
       </div>

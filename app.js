@@ -2162,12 +2162,12 @@ document.addEventListener('DOMContentLoaded', async () => {
       video.srcObject = stream;
       video.style.display = 'block'; // 비디오 스트림 표출
       if (preview) preview.style.display = 'none'; // 백업용 모의 프리뷰 숨김
-      if (hint) hint.style.display = 'none';        // 안내 텍스트 숨김
+      if (hint) hint.style.display = 'none';        // 비디오 스트림 구동 시 중앙 안내 텍스트 숨김
     }).catch(err => {
       console.warn("실시간 카메라 렌즈 획득 실패 (PC 혹은 권한차단):", err);
       video.style.display = 'none';
-      if (preview) preview.style.display = 'block'; // 실패 시 모의 프리뷰로 폴백
-      if (hint) hint.style.display = 'block';       // 안내 텍스트 유지
+      if (preview) preview.style.display = 'none'; // 중복 텍스트 방지를 위해 preview 숨김
+      if (hint) hint.style.display = 'block';       // 단일 안내 텍스트만 표시
     });
   }
 
@@ -2175,6 +2175,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   function stopActiveCameraStream() {
     const video = document.getElementById('camera-stream');
     const preview = document.getElementById('demo-voucher-preview');
+    const hint = document.getElementById('viewfinder-hint');
     
     if (activeStream) {
       activeStream.getTracks().forEach(track => track.stop());
@@ -2185,7 +2186,10 @@ document.addEventListener('DOMContentLoaded', async () => {
       video.style.display = 'none';
     }
     if (preview) {
-      preview.style.display = 'block';
+      preview.style.display = 'none';
+    }
+    if (hint) {
+      hint.style.display = 'block';
     }
   }
 
@@ -2255,28 +2259,10 @@ document.addEventListener('DOMContentLoaded', async () => {
         massImageSlotsContainer.classList.add('hidden');
       }
 
-      // 모의 배경 가이드 이미지 매핑 (실시간 비디오 실패 시의 렌더용 백업)
+      // 모의 배경 가이드 (중복 텍스트 방지를 위해 완전히 숨김)
       if (demoVoucherPreview) {
-        demoVoucherPreview.style.background = selectedVoucherType === 'MASS_TRANSFER' 
-          ? "linear-gradient(135deg, #ede7f6 0%, #b39ddb 100%)" 
-          : "linear-gradient(135deg, #e0f7fa 0%, #80deea 100%)";
-        demoVoucherPreview.style.borderRadius = "8px";
-        demoVoucherPreview.style.boxShadow = "0 6px 18px rgba(0,0,0,0.35)";
-        demoVoucherPreview.style.width = "75%";
-        demoVoucherPreview.style.height = "55%";
-        demoVoucherPreview.innerHTML = `
-          <div style="padding: 14px; color: #333; font-family: sans-serif; display: flex; flex-direction: column; justify-content: space-between; height: 100%; box-sizing: border-box;">
-            <div style="display:flex; justify-content: space-between; border-bottom: 2px solid #005670; padding-bottom: 4px;">
-              <strong style="font-size: 11px; color:#005670;">iM Bank 전표 스캔</strong>
-              <span style="font-size: 8px; font-weight:700; color: #e74c3c;">[대기중]</span>
-            </div>
-            <div style="font-size: 10px; font-weight: 700; margin-top: 10px;">
-              업무유형: ${selectedVoucherType === 'MASS_TRANSFER' ? '대량이체 (다중 전표)' : '단일이체 (전표 1장)'}<br>
-              가이드 격자선에 맞춰 전표 앞면을 위치시켜 주세요.
-            </div>
-            <div style="text-align: right; font-size: 8px; color: #666;">iM SmartQ AI OCR</div>
-          </div>
-        `;
+        demoVoucherPreview.style.display = "none";
+        demoVoucherPreview.innerHTML = '';
       }
 
     } else if (stepNum === 3) {
@@ -2789,6 +2775,162 @@ document.addEventListener('DOMContentLoaded', async () => {
   if (voucherConfirmModal) {
     voucherConfirmModal.addEventListener('click', (e) => {
       if (e.target === voucherConfirmModal) closeVoucherConfirmModal();
+    });
+  }
+
+  // [고액송금 특화] 금융사기예방진단표 모달 제어 로직
+  const fraudPreventionModal = document.getElementById('fraud-prevention-modal');
+  const closeFraudModalBtn = document.getElementById('close-fraud-modal-btn');
+  const cancelFraudModalBtn = document.getElementById('cancel-fraud-modal-btn');
+  const submitFraudModalBtn = document.getElementById('submit-fraud-modal-btn');
+  const fraudPurposeChips = document.querySelectorAll('.fraud-chip-btn');
+  const fraudPurposeInput = document.getElementById('fraud-purpose-input');
+  const fraudAmountTag = document.getElementById('fraud-amount-tag');
+  const fraudConfirmTypeInput = document.getElementById('fraud-confirm-type-input');
+
+  let currentTransferTotalAmount = 0;
+
+  function openFraudPreventionModal(amount = 0) {
+    currentTransferTotalAmount = amount;
+    if (fraudAmountTag) {
+      fraudAmountTag.textContent = amount > 0 ? `송금액: ${amount.toLocaleString()}원 (고액송금 대상)` : `고액 송금 대상`;
+    }
+    if (fraudPreventionModal) {
+      fraudPreventionModal.classList.remove('hidden');
+      playNotificationSound('beep');
+    }
+  }
+
+  function closeFraudPreventionModal() {
+    if (fraudPreventionModal) fraudPreventionModal.classList.add('hidden');
+  }
+
+  if (closeFraudModalBtn) closeFraudModalBtn.addEventListener('click', closeFraudPreventionModal);
+  if (cancelFraudModalBtn) cancelFraudModalBtn.addEventListener('click', closeFraudPreventionModal);
+
+  // 목적 선택 칩 클릭
+  fraudPurposeChips.forEach(chip => {
+    chip.addEventListener('click', () => {
+      fraudPurposeChips.forEach(c => c.classList.remove('active'));
+      chip.classList.add('active');
+      const val = chip.getAttribute('data-purpose');
+      if (val === '기타 직접입력') {
+        if (fraudPurposeInput) {
+          fraudPurposeInput.value = '';
+          fraudPurposeInput.focus();
+        }
+      } else {
+        if (fraudPurposeInput) {
+          fraudPurposeInput.value = val;
+        }
+      }
+    });
+  });
+
+  // 진단표 제출 완료 후 송금 여부 팝업 확인 모달 제어
+  const fraudPostSubmitModal = document.getElementById('fraud-post-submit-modal');
+  const closeFraudPostModalBtn = document.getElementById('close-fraud-post-modal-btn');
+  const btnFraudPostLater = document.getElementById('btn-fraud-post-later');
+  const btnFraudPostTransfer = document.getElementById('btn-fraud-post-transfer');
+
+  function openFraudPostSubmitModal() {
+    if (fraudPostSubmitModal) {
+      fraudPostSubmitModal.classList.remove('hidden');
+      playNotificationSound('beep');
+    }
+  }
+
+  function closeFraudPostSubmitModal() {
+    if (fraudPostSubmitModal) {
+      fraudPostSubmitModal.classList.add('hidden');
+    }
+  }
+
+  if (closeFraudPostModalBtn) closeFraudPostModalBtn.addEventListener('click', closeFraudPostSubmitModal);
+  if (fraudPostSubmitModal) {
+    fraudPostSubmitModal.addEventListener('click', (e) => {
+      if (e.target === fraudPostSubmitModal) closeFraudPostSubmitModal();
+    });
+  }
+
+  // 팝업에서 '다음에 하기' 클릭 시
+  if (btnFraudPostLater) {
+    btnFraudPostLater.addEventListener('click', () => {
+      closeFraudPostSubmitModal();
+      showToast("금융사기예방진단표가 저장되었습니다. 창구 순번 시 직원에게 말씀해 주세요.", false);
+      playNotificationSound('beep');
+    });
+  }
+
+  // 팝업에서 '송금하기 (전표촬영)' 클릭 시
+  if (btnFraudPostTransfer) {
+    btnFraudPostTransfer.addEventListener('click', () => {
+      closeFraudPostSubmitModal();
+      showToast("송금 전표 촬영으로 이동합니다.", false);
+      
+      // 송금하기(보내실때 전표 촬영 모드)로 전환
+      selectedVoucherType = 'SINGLE_TRANSFER';
+      
+      setTimeout(() => {
+        if (typeof openModalWithConsentCheck === 'function') {
+          openModalWithConsentCheck('transfer-voucher-modal');
+        } else {
+          const transferVoucherModal = document.getElementById('transfer-voucher-modal');
+          if (transferVoucherModal) transferVoucherModal.classList.remove('hidden');
+        }
+
+        if (typeof gotoScanStep === 'function') {
+          gotoScanStep(2); // 보내실때 전표(송금) 카메라 촬영 화면으로 바로 진입
+        }
+      }, 300);
+    });
+  }
+
+  // 진단표 제출하기 버튼 클릭 시
+  if (submitFraudModalBtn) {
+    submitFraudModalBtn.addEventListener('click', () => {
+      const purpose = fraudPurposeInput ? fraudPurposeInput.value.trim() : '';
+      if (!purpose) {
+        showToast("송금 목적을 입력해 주세요.", true);
+        if (fraudPurposeInput) fraudPurposeInput.focus();
+        return;
+      }
+
+      // 사기 의심 문항 체크 여부 확인
+      const q1 = document.querySelector('input[name="fraud-q1"]:checked')?.value;
+      const q2 = document.querySelector('input[name="fraud-q2"]:checked')?.value;
+      const q3 = document.querySelector('input[name="fraud-q3"]:checked')?.value;
+      const q4 = document.querySelector('input[name="fraud-q4"]:checked')?.value;
+
+      const hasRisk = (q1 === 'yes' || q2 === 'yes' || q3 === 'yes' || q4 === 'yes');
+
+      const confirmType = fraudConfirmTypeInput ? fraudConfirmTypeInput.value.trim() : '';
+      if (confirmType !== '확인하였습니다') {
+        showToast("자필 확인란에 '확인하였습니다'를 입력해 주세요.", true);
+        if (fraudConfirmTypeInput) fraudConfirmTypeInput.focus();
+        return;
+      }
+
+      closeFraudPreventionModal();
+      
+      if (hasRisk) {
+        showToast("⚠ 보이스피싱 의심 항목이 체크되었습니다. 안전을 위해 창구 직원이 전담 확인을 진행합니다.", true);
+      } else {
+        showToast("금융사기예방진단표가 안전하게 접수되었습니다.", false);
+      }
+
+      // '송금하실 건지 물어보는 팝업 확인 모달' 오픈!
+      setTimeout(() => {
+        openFraudPostSubmitModal();
+      }, 250);
+    });
+  }
+
+  // 메인 화면의 '500만원 이상 송금 예정 고객 전용 진단표 배너' 클릭 시 열기
+  const btnOpenFraudBanner = document.getElementById('btn-open-fraud-prevention-banner');
+  if (btnOpenFraudBanner) {
+    btnOpenFraudBanner.addEventListener('click', () => {
+      openFraudPreventionModal(5000000); // 500만원 이상 고액송금 기본 모드로 오픈
     });
   }
 
@@ -4207,6 +4349,742 @@ document.addEventListener('DOMContentLoaded', async () => {
     });
   }
 
+  // --- 서류 진위확인 (Doc Verify) 전용 독립 모달 연동 ---
+  const btnEasyDocVerify = document.getElementById('btn-easy-doc-verify');
+  const btnQuickDocVerify = document.getElementById('btn-quick-doc-verify');
+  const docVerifyModal = document.getElementById('doc-verify-modal');
+  const closeDocVerifyModalBtn = document.getElementById('close-doc-verify-modal-btn');
+  const verifyDocPillContainer = document.getElementById('verify-doc-pill-container');
+  const verifyCatBtns = document.querySelectorAll('.verify-cat-btn');
+  const btnStartDocVerify = document.getElementById('btn-start-doc-verify');
+  const btnOpenCameraApp = document.getElementById('btn-open-camera-app');
+  const docCameraFileInput = document.getElementById('doc-camera-file-input');
+  const docVerifyCameraStream = document.getElementById('doc-verify-camera-stream');
+  const docCapturedPreview = document.getElementById('doc-captured-preview');
+  const docMockPreview = document.getElementById('doc-mock-preview');
+  const docScanBtnText = document.getElementById('doc-scan-btn-text');
+  const docVerifyLaser = document.getElementById('doc-verify-laser');
+  const docVerifyStepScan = document.getElementById('doc-verify-step-scan');
+  const docVerifyStepResult = document.getElementById('doc-verify-step-result');
+  const btnDocVerifyRetry = document.getElementById('btn-doc-verify-retry');
+  const btnDocVerifySubmit = document.getElementById('btn-doc-verify-submit');
+  const docPreviewText = document.getElementById('doc-preview-text');
+  const resDocName = document.getElementById('res-doc-name');
+  const resDocIssuer = document.getElementById('res-doc-issuer');
+  const resDocCode = document.getElementById('res-doc-code');
+  const resDocDate = document.getElementById('res-doc-date');
+
+  // 체크리스트 하단 전용 버튼
+  const btnChecklistFinish = document.getElementById('btn-checklist-finish');
+  const btnChecklistToVerify = document.getElementById('btn-checklist-to-verify');
+
+  let docVerifyActiveStream = null;
+
+  // 서류 챙기기 업무 전체를 아우르는 공공기관/금융 세부 서류 진위확인 데이터베이스
+  // 피드백 반영 3대 핵심 검증: 1. 계속사업자 여부 (국세청), 2. 법인인감 16자리 발급번호, 3. 3개월 이내 발급일자(Date Check)
+  const docVerifyDatabase = {
+    // 1. 개인 및 신규 업무 서류
+    idcard: {
+      category: 'personal',
+      name: '실명확인 신분증 (주민등록증 / 운전면허증)',
+      shortName: '🆔 신분증/면허증',
+      issuer: '행정안전부 / 경찰청',
+      code: '9842-1502-3914-7721',
+      date: '2026.08.15',
+      dateStatus: '유효기간 이내 정상 (적합)',
+      dateValid: true,
+      statusLabel: '신분증 진위확인',
+      statusValue: '행안부 실명대조 일치 (PASS)',
+      statusPass: true,
+      inputType: 'number',
+      inputLabel: '신분증 발급일자/확인번호 입력 (예: 20260815)',
+      inputPlaceholder: '발급일자 8자리 입력 (예: 20260815)',
+      inputHint: '* 행정안전부 주민등록증 진위확인 / 경찰청 면허 전산 원장 대조'
+    },
+    job_cert: {
+      category: 'personal',
+      name: '재직증명서 / 건강보험자격득실확인서',
+      shortName: '💼 재직/건보자격확인서',
+      issuer: '국민건강보험공단 / 발급사 전산망',
+      code: 'NHIS-2026-9812-4011',
+      date: '2026.09.01',
+      dateStatus: '발급 1개월 이내 (3개월 기준 충족)',
+      dateValid: true,
+      statusLabel: '건보자격 상태',
+      statusValue: '직장가입자 정상 자격유지 (적합)',
+      statusPass: true,
+      inputType: 'code',
+      inputLabel: '건보 확인번호 14자리 입력',
+      inputPlaceholder: '발급확인번호 14자리 입력',
+      inputHint: '* 국민건강보험공단 전산망 발급사실 실시간 확인'
+    },
+    purpose_cert: {
+      category: 'personal',
+      name: '금융거래목적확인 증빙 서류 (근로계약서/원천징수)',
+      shortName: '📜 거래목적증빙서',
+      issuer: '국세청 홈택스 / 사업장 공인서식',
+      code: '2026-Hometax-7821-39',
+      date: '2026.08.20',
+      dateStatus: '발급 1개월 이내 (3개월 기준 충족)',
+      dateValid: true,
+      statusLabel: '증빙 진위 상태',
+      statusValue: '국세청 소득자료 대조 일치 (PASS)',
+      statusPass: true,
+      inputType: 'code',
+      inputLabel: '발급번호 입력',
+      inputPlaceholder: '문서발급번호 입력',
+      inputHint: '* 국세청 홈택스 원천징수 진위 대조'
+    },
+
+    // 2. 대출 및 부동산 서류 (전세대출, 주담대)
+    resident: {
+      category: 'loan',
+      name: '주민등록표등본 / 주민등록초본',
+      shortName: '📄 주민등록등본(초본)',
+      issuer: '정부24 (행정안전부)',
+      code: '2026-4190-7812-4011',
+      date: '2026.09.01',
+      dateStatus: '발급 9일 경과 (3개월 이내 유효)',
+      dateValid: true,
+      statusLabel: '정부24 발급 상태',
+      statusValue: '행안부 전자문서 원본 유효 (PASS)',
+      statusPass: true,
+      inputType: 'code',
+      inputLabel: '정부24 문서확인번호 16자리 입력',
+      inputPlaceholder: '문서확인번호 16자리 (4자리씩 4개)',
+      inputHint: '* 정부24 인터넷 발급문서 진위확인 전산 연동'
+    },
+    lease_contract: {
+      category: 'loan',
+      name: '확정일자 부여 임대차계약서 원본',
+      shortName: '📑 확정일자 임대차계약서',
+      issuer: '대법원 인터넷등기소 / 관할 주민센터',
+      code: 'FIX-2026-0819-3329',
+      date: '2026.08.19',
+      dateStatus: '확정일자 유효 (3개월 이내 계약)',
+      dateValid: true,
+      statusLabel: '확정일자 부여현황',
+      statusValue: '대법원 인터넷등기소 일치 (적합)',
+      statusPass: true,
+      inputType: 'code',
+      inputLabel: '확정일자 부여번호 입력',
+      inputPlaceholder: '확정일자 식별번호 입력',
+      inputHint: '* 대법원 등기정보광장 확정일자 진위 확인'
+    },
+    estate_reg: {
+      category: 'loan',
+      name: '부동산 등기사항전부증명서 (등기부등본)',
+      shortName: '🏛️ 부동산 등기부등본',
+      issuer: '대법원 인터넷등기소',
+      code: 'IROS-2026-9914-5520',
+      date: '2026.09.08',
+      dateStatus: '발급 2일 전 (당월/3개월 이내 최신본)',
+      dateValid: true,
+      statusLabel: '등기사항 유효성',
+      statusValue: '대법원 등기 원장 실시간 일치 (PASS)',
+      statusPass: true,
+      inputType: 'code',
+      inputLabel: '발급확인번호 16자리 입력',
+      inputPlaceholder: '16자리 발급확인번호 (예: 9914-5520-...)',
+      inputHint: '* 대법원 인터넷등기소 발급확인번호 실시간 검증'
+    },
+    income_cert: {
+      category: 'loan',
+      name: '소득금액증명원 / 근로소득원천징수영수증',
+      shortName: '📊 소득금액증명원',
+      issuer: '국세청 홈택스 (Hometax)',
+      code: 'HT-2026-4109-8832-11',
+      date: '2026.08.10',
+      dateStatus: '발급 1개월 이내 (3개월 기준 충족)',
+      dateValid: true,
+      statusLabel: '소득신고 진위',
+      statusValue: '국세청 전산 과세원장 일치 (적합)',
+      statusPass: true,
+      inputType: 'code',
+      inputLabel: '국세청 발급번호 14자리 입력',
+      inputPlaceholder: '홈택스 발급확인번호 입력',
+      inputHint: '* 국세청 민원증명 진위확인 실시간 조회'
+    },
+    seal_cert: {
+      category: 'loan',
+      name: '개인 인감증명서 / 본인서명사실확인서',
+      shortName: '📜 인감증명서(대출용)',
+      issuer: '전국 읍·면·동 주민센터',
+      code: '8831-2904-1184-5690',
+      date: '2026.08.28',
+      dateStatus: '발급 13일 경과 (3개월 이내 유효)',
+      dateValid: true,
+      statusLabel: '인감 발급 진위',
+      statusValue: '정부24 인감증명발급 사실확인 일치 (PASS)',
+      statusPass: true,
+      inputType: 'code',
+      inputLabel: '인감증명서 문서확인번호 16자리',
+      inputPlaceholder: '문서확인번호 16자리 입력',
+      inputHint: '* 정부24 인감증명서/본인서명사실확인서 발급사실 확인'
+    },
+    movein_cert: {
+      category: 'loan',
+      name: '전입세대 열람내역원',
+      shortName: '📋 전입세대열람원',
+      issuer: '관할 읍·면·동 행정복지센터',
+      code: 'GOV-2026-7712-4091',
+      date: '2026.09.02',
+      dateStatus: '발급 8일 경과 (3개월 이내 유효)',
+      dateValid: true,
+      statusLabel: '전입 열람 상태',
+      statusValue: '행정복지센터 발급원장 일치 (적합)',
+      statusPass: true,
+      inputType: 'code',
+      inputLabel: '열람내역원 발급번호 입력',
+      inputPlaceholder: '발급 일련번호 입력',
+      inputHint: '* 행정안전부 전입세대 열람내역 진위 검증'
+    },
+
+    // 3. 법인 및 기업 금융 서류 (★ 피드백 1: 계속사업자 여부 & 2: 16자리 법인인감 발급번호)
+    biz_reg: {
+      category: 'corp',
+      name: '사업자등록증명원 (3개월 이내)',
+      shortName: '🏢 사업자등록증명원',
+      issuer: '국세청 홈택스 (Hometax)',
+      code: '504-85-12345',
+      date: '2026.08.20',
+      dateStatus: '발급 21일 경과 (3개월 이내 유효)',
+      dateValid: true,
+      statusLabel: '사업자 과세유형/상태',
+      statusValue: '계속사업자 (정상가동 · 폐휴업 없음)',
+      statusPass: true,
+      inputType: 'bizno',
+      inputLabel: '사업자등록번호 10자리 직접 입력 진위조회',
+      inputPlaceholder: '사업자등록번호 10자리 입력 (예: 504-85-12345)',
+      inputHint: '* 국세청 홈택스 전산망 실시간 연동: 계속사업자/휴업/폐업 즉시 판정'
+    },
+    corp_reg: {
+      category: 'corp',
+      name: '법인 등기사항전부증명서 (말소사항포함)',
+      shortName: '🏛️ 법인등기부등본',
+      issuer: '대법원 인터넷등기소',
+      code: '110111-2345678 (법인등록번호)',
+      date: '2026.08.25',
+      dateStatus: '발급 16일 경과 (3개월 이내 유효)',
+      dateValid: true,
+      statusLabel: '법인 등기 상태',
+      statusValue: '유효 법인등기 (해산/청산 없음, 적합)',
+      statusPass: true,
+      inputType: 'code',
+      inputLabel: '법인등기 16자리 발급확인번호 입력',
+      inputPlaceholder: '16자리 발급확인번호 입력 (예: 1102-4491-...)',
+      inputHint: '* 대법원 인터넷등기소 법인 등기사항 전부증명서 진위 검증'
+    },
+    corp_seal: {
+      category: 'corp',
+      name: '법인 인감증명서 (3개월 이내)',
+      shortName: '📜 법인인감증명서',
+      issuer: '대법원 등기국 / 인터넷등기소',
+      code: '8841-0923-4412-9018',
+      date: '2026.08.30',
+      dateStatus: '발급 11일 경과 (3개월 이내 유효)',
+      dateValid: true,
+      statusLabel: '법인인감 진위 상태',
+      statusValue: '대법원 16자리 발급번호 대조 일치 (정상 인영)',
+      statusPass: true,
+      inputType: 'corp_seal_16',
+      inputLabel: '법인인감 16자리 발급확인번호 직접 입력',
+      inputPlaceholder: '16자리 발급번호 입력 (예: 8841-0923-4412-9018)',
+      inputHint: '* 대법원 인터넷등기소 법인인감 16자리 발급확인번호 실시간 원장 대조'
+    },
+    tax_cert: {
+      category: 'corp',
+      name: '국세 및 지방세 완납증명서',
+      shortName: '🧾 국세·지방세 납세증명서',
+      issuer: '국세청 홈택스 / 행정안전부 위택스',
+      code: 'TAX-2026-3391-7710',
+      date: '2026.09.05',
+      dateStatus: '발급 5일 경과 (유효기간 30일 이내 적합)',
+      dateValid: true,
+      statusLabel: '납세 완납 상태',
+      statusValue: '체납 내역 없음 (완납 증명 정상)',
+      statusPass: true,
+      inputType: 'code',
+      inputLabel: '납세증명서 문서번호 입력',
+      inputPlaceholder: '문서번호 14자리 입력',
+      inputHint: '* 국세청/위택스 체납 및 완납 여부 실시간 확인'
+    },
+    financial_stmt: {
+      category: 'corp',
+      name: '최근 3개년도 표준재무제표증명원',
+      shortName: '📈 법인 재무제표증명',
+      issuer: '국세청 홈택스 / 공인회계사회',
+      code: 'FS-2026-1904-8821',
+      date: '2026.06.30',
+      dateStatus: '최근 결산기 귀속 (정상 반영)',
+      dateValid: true,
+      statusLabel: '재무제표 확정 상태',
+      statusValue: '국세청 확정 표준재무제표 (적합)',
+      statusPass: true,
+      inputType: 'code',
+      inputLabel: '재무제표 발급번호 입력',
+      inputPlaceholder: '홈택스 발급번호 입력',
+      inputHint: '* 국세청 표준재무제표 발급사실 진위 대조'
+    },
+
+    // 4. 대리인 및 상속 업무 서류 (★ 피드백 3: 3개월 이내 발급된 서류인지 Date Check)
+    family_cert: {
+      category: 'inherit',
+      name: '가족관계증명서 (상세/주민번호 공개)',
+      shortName: '👨‍👩‍👧 가족관계증명서(상세)',
+      issuer: '대법원 전자가족관계등록시스템',
+      code: '5521-3940-1093-8472',
+      date: '2026.09.05',
+      dateStatus: '발급 5일 경과 (3개월 이내 유효/적합)',
+      dateValid: true,
+      statusLabel: '가족관계등록 원장',
+      statusValue: '대법원 전산정보 일치 (상세 유효)',
+      statusPass: true,
+      inputType: 'code',
+      inputLabel: '16자리 발급확인번호 직접 입력',
+      inputPlaceholder: '16자리 발급확인번호 (예: 5521-3940-...)',
+      inputHint: '* 대법원 전자가족관계등록시스템 발급확인번호 실시간 검증'
+    },
+    minor_basic: {
+      category: 'inherit',
+      name: '미성년자 자녀 기준 기본증명서 (상세)',
+      shortName: '👶 기본증명서(친권확인용)',
+      issuer: '대법원 전자가족관계등록시스템',
+      code: 'BASIC-2026-4401-9921',
+      date: '2026.09.05',
+      dateStatus: '발급 5일 경과 (3개월 이내 유효/적합)',
+      dateValid: true,
+      statusLabel: '친권/후견 권리상태',
+      statusValue: '단독/공동 친권 지정 정상 (적합)',
+      statusPass: true,
+      inputType: 'code',
+      inputLabel: '기본증명서 발급확인번호 입력',
+      inputPlaceholder: '16자리 발급번호 입력',
+      inputHint: '* 대법원 친권 권리관계 원장 실시간 대조'
+    },
+    power_attorney: {
+      category: 'inherit',
+      name: '위임장 원본 (인감날인 및 위임인 인감증명서)',
+      shortName: '📝 위임장 원본(인감날인)',
+      issuer: '위임자 본인 인감 날인 대조',
+      code: 'POA-2026-8812-4410',
+      date: '2026.09.03',
+      dateStatus: '발급 7일 경과 (3개월 이내 유효)',
+      dateValid: true,
+      statusLabel: '위임 및 인영 상태',
+      statusValue: '인감증명서 인영 100% 일치 (PASS)',
+      statusPass: true,
+      inputType: 'code',
+      inputLabel: '첨부 인감증명서 발급번호 입력',
+      inputPlaceholder: '위임자 인감증명서 발급번호 입력',
+      inputHint: '* 위임장 첨부 인감증명서 진위 및 인영 대조'
+    },
+    closed_family: {
+      category: 'inherit',
+      name: '피상속인(사망자) 폐쇄가족관계증명서 / 제적등본',
+      shortName: '⚰️ 폐쇄가족관계증명서',
+      issuer: '대법원 전자가족관계등록시스템',
+      code: 'DEATH-2026-9901-2241',
+      date: '2026.08.18',
+      dateStatus: '발급 23일 경과 (3개월 이내 유효)',
+      dateValid: true,
+      statusLabel: '피상속인 사망 기재',
+      statusValue: '사망일자 및 폐쇄원인 정상 기재 (적합)',
+      statusPass: true,
+      inputType: 'code',
+      inputLabel: '폐쇄증명서 16자리 발급번호',
+      inputPlaceholder: '16자리 발급확인번호 입력',
+      inputHint: '* 대법원 전자가족관계 폐쇄 원장 실시간 확인'
+    },
+    inheritance_agree: {
+      category: 'inherit',
+      name: '상속재산 분할협의서 (상속인 전원 인감날인)',
+      shortName: '🤝 상속재산 분할협의서',
+      issuer: '상속인 전원 인감증명서 대조 공증본',
+      code: 'AGREE-2026-5510-3381',
+      date: '2026.08.20',
+      dateStatus: '작성 21일 경과 (인감증명서 3개월 이내)',
+      dateValid: true,
+      statusLabel: '상속인 전원 합의',
+      statusValue: '법정상속인 전원 인감 날인 일치 (PASS)',
+      statusPass: true,
+      inputType: 'code',
+      inputLabel: '협의서 관리번호 또는 공증번호',
+      inputPlaceholder: '협의서 관리번호 입력',
+      inputHint: '* 상속인 전원 인감증명서 발급일자 및 인영 검증'
+    },
+    will_cert: {
+      category: 'inherit',
+      name: '유언공정증서 / 법원 검인필 유언서 원본',
+      shortName: '📜 유언공정증서 원본',
+      issuer: '법무부 공증인가 법무법인 / 관할 가정법원',
+      code: 'WILL-2026-1190-7732',
+      date: '2026.07.15',
+      dateStatus: '법원 검인 유효본 (3개월 이내 등본 발급)',
+      dateValid: true,
+      statusLabel: '유언서 법적 효력',
+      statusValue: '법원 검인필 / 공증인가 적법 유효 (PASS)',
+      statusPass: true,
+      inputType: 'code',
+      inputLabel: '공증번호 또는 법원 사건번호',
+      inputPlaceholder: '공증번호 / 사건번호 입력',
+      inputHint: '* 법무부 공증 전산망 및 법원 검인결정 원장 대조'
+    }
+  };
+
+  let currentDocVerifyType = 'biz_reg'; // 기본 선택을 직관적인 사업자등록증명원으로 지정
+  let currentVerifyCategory = 'corp';
+
+  // 서류 직접 입력 폼 인풋 및 힌트 세팅
+  function updateManualInputForm(docKey) {
+    const doc = docVerifyDatabase[docKey] || docVerifyDatabase.biz_reg;
+    const directInput = document.getElementById('doc-direct-input-val');
+    const directTitle = document.getElementById('manual-input-title');
+    const directHint = document.getElementById('manual-input-hint');
+    
+    if (directInput && doc.inputPlaceholder) {
+      directInput.placeholder = doc.inputPlaceholder;
+      directInput.value = doc.code.split(' ')[0] || '';
+    }
+    if (directTitle && doc.inputLabel) {
+      directTitle.innerHTML = `<i class="fa-solid fa-keyboard"></i> ${doc.inputLabel}`;
+    }
+    if (directHint && doc.inputHint) {
+      directHint.textContent = doc.inputHint;
+    }
+  }
+
+  // 서류 진위확인 칩 동적 렌더링
+  function renderDocVerifyPills(category = 'all') {
+    if (!verifyDocPillContainer) return;
+    verifyDocPillContainer.innerHTML = '';
+    currentVerifyCategory = category;
+
+    const keys = Object.keys(docVerifyDatabase).filter(key => {
+      if (category === 'all') return true;
+      return docVerifyDatabase[key].category === category;
+    });
+
+    // 만약 현재 선택된 서류가 필터링된 목록에 없으면 첫 번째 항목으로 선택
+    if (!keys.includes(currentDocVerifyType)) {
+      currentDocVerifyType = keys[0] || 'biz_reg';
+    }
+
+    keys.forEach(key => {
+      const item = docVerifyDatabase[key];
+      const pill = document.createElement('button');
+      pill.type = 'button';
+      pill.className = `verify-type-pill ${key === currentDocVerifyType ? 'active' : ''}`;
+      pill.setAttribute('data-doc', key);
+      pill.textContent = item.shortName;
+      pill.addEventListener('click', () => {
+        document.querySelectorAll('.verify-type-pill').forEach(p => p.classList.remove('active'));
+        pill.classList.add('active');
+        currentDocVerifyType = key;
+        const info = docVerifyDatabase[currentDocVerifyType];
+        if (docPreviewText) docPreviewText.textContent = info.name;
+        updateManualInputForm(key);
+      });
+      verifyDocPillContainer.appendChild(pill);
+    });
+
+    const currentInfo = docVerifyDatabase[currentDocVerifyType] || docVerifyDatabase.biz_reg;
+    if (docPreviewText) docPreviewText.textContent = currentInfo.name;
+    updateManualInputForm(currentDocVerifyType);
+  }
+
+  // 카테고리 탭 클릭
+  verifyCatBtns.forEach(btn => {
+    btn.addEventListener('click', () => {
+      verifyCatBtns.forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      const cat = btn.getAttribute('data-cat') || 'all';
+      renderDocVerifyPills(cat);
+    });
+  });
+
+  // 카테고리 탭 좌우 화살표 스크롤 버튼 및 마우스 휠 지원
+  const verifyCatTabsContainer = document.getElementById('verify-category-tabs-container');
+  const btnVerifyCatLeft = document.getElementById('btn-verify-cat-left');
+  const btnVerifyCatRight = document.getElementById('btn-verify-cat-right');
+
+  if (btnVerifyCatLeft && verifyCatTabsContainer) {
+    btnVerifyCatLeft.addEventListener('click', () => {
+      verifyCatTabsContainer.scrollBy({ left: -120, behavior: 'smooth' });
+    });
+  }
+  if (btnVerifyCatRight && verifyCatTabsContainer) {
+    btnVerifyCatRight.addEventListener('click', () => {
+      verifyCatTabsContainer.scrollBy({ left: 120, behavior: 'smooth' });
+    });
+  }
+  if (verifyCatTabsContainer) {
+    verifyCatTabsContainer.addEventListener('wheel', (e) => {
+      if (e.deltaY !== 0) {
+        e.preventDefault();
+        verifyCatTabsContainer.scrollLeft += e.deltaY;
+      }
+    }, { passive: false });
+  }
+
+  // 세부 서류 칩 좌우 화살표 스크롤 버튼 및 마우스 휠 지원
+  const btnVerifyPillLeft = document.getElementById('btn-verify-pill-left');
+  const btnVerifyPillRight = document.getElementById('btn-verify-pill-right');
+
+  if (btnVerifyPillLeft && verifyDocPillContainer) {
+    btnVerifyPillLeft.addEventListener('click', () => {
+      verifyDocPillContainer.scrollBy({ left: -140, behavior: 'smooth' });
+    });
+  }
+  if (btnVerifyPillRight && verifyDocPillContainer) {
+    btnVerifyPillRight.addEventListener('click', () => {
+      verifyDocPillContainer.scrollBy({ left: 140, behavior: 'smooth' });
+    });
+  }
+  if (verifyDocPillContainer) {
+    verifyDocPillContainer.addEventListener('wheel', (e) => {
+      if (e.deltaY !== 0) {
+        e.preventDefault();
+        verifyDocPillContainer.scrollLeft += e.deltaY;
+      }
+    }, { passive: false });
+  }
+
+  // 서류 진위확인 실시간 카메라 스트림 시작
+  function startDocVerifyCameraStream() {
+    if (docVerifyActiveStream) return;
+    if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) return;
+
+    navigator.mediaDevices.getUserMedia({
+      video: {
+        facingMode: "environment", // 스마트폰 후면 카메라
+        width: { ideal: 1920 },
+        height: { ideal: 1080 }
+      },
+      audio: false
+    }).then(stream => {
+      docVerifyActiveStream = stream;
+      if (docVerifyCameraStream) {
+        docVerifyCameraStream.srcObject = stream;
+        docVerifyCameraStream.style.display = 'block';
+      }
+      if (docMockPreview) docMockPreview.style.display = 'none';
+      if (docCapturedPreview) docCapturedPreview.style.display = 'none';
+    }).catch(err => {
+      console.warn("서류 진위확인 카메라 획득 실패 (모의 프리뷰로 폴백):", err);
+      if (docVerifyCameraStream) docVerifyCameraStream.style.display = 'none';
+      if (docMockPreview) docMockPreview.style.display = 'flex';
+    });
+  }
+
+  // 서류 진위확인 카메라 스트림 정지
+  function stopDocVerifyCameraStream() {
+    if (docVerifyActiveStream) {
+      docVerifyActiveStream.getTracks().forEach(track => track.stop());
+      docVerifyActiveStream = null;
+    }
+    if (docVerifyCameraStream) {
+      docVerifyCameraStream.srcObject = null;
+      docVerifyCameraStream.style.display = 'none';
+    }
+    if (docMockPreview) docMockPreview.style.display = 'flex';
+    if (docCapturedPreview) docCapturedPreview.style.display = 'none';
+  }
+
+  function openDocVerifyModal(targetDocType = null) {
+    if (!docVerifyModal) return;
+    docVerifyModal.classList.remove('hidden');
+    if (docVerifyStepScan) docVerifyStepScan.style.display = 'block';
+    if (docVerifyStepResult) docVerifyStepResult.classList.add('hidden');
+    if (docVerifyLaser) docVerifyLaser.style.display = 'none';
+    if (docCapturedPreview) docCapturedPreview.style.display = 'none';
+    if (docScanBtnText) docScanBtnText.textContent = "서류 촬영 및 진위확인";
+    if (btnStartDocVerify) btnStartDocVerify.disabled = false;
+
+    if (targetDocType && docVerifyDatabase[targetDocType]) {
+      currentDocVerifyType = targetDocType;
+      const cat = docVerifyDatabase[targetDocType].category;
+      verifyCatBtns.forEach(b => {
+        b.classList.toggle('active', b.getAttribute('data-cat') === cat);
+      });
+      renderDocVerifyPills(cat);
+    } else {
+      renderDocVerifyPills(currentVerifyCategory);
+    }
+    
+    // 실시간 카메라 구동
+    startDocVerifyCameraStream();
+    playNotificationSound('beep');
+  }
+
+  function closeDocVerifyModal() {
+    if (!docVerifyModal) return;
+    docVerifyModal.classList.add('hidden');
+    if (docVerifyLaser) docVerifyLaser.style.display = 'none';
+    stopDocVerifyCameraStream();
+  }
+
+  if (btnEasyDocVerify) {
+    btnEasyDocVerify.addEventListener('click', () => openDocVerifyModal());
+  }
+  if (btnQuickDocVerify) {
+    btnQuickDocVerify.addEventListener('click', () => openDocVerifyModal());
+  }
+  if (closeDocVerifyModalBtn) {
+    closeDocVerifyModalBtn.addEventListener('click', closeDocVerifyModal);
+  }
+  if (docVerifyModal) {
+    docVerifyModal.addEventListener('click', (e) => {
+      if (e.target === docVerifyModal) closeDocVerifyModal();
+    });
+  }
+
+  // 체크리스트 하단 버튼 연동
+  if (btnChecklistFinish) {
+    btnChecklistFinish.addEventListener('click', () => {
+      showToast("필요 서류 준비 체크를 완료하였습니다.", false);
+      if (checklistModal) checklistModal.classList.add('hidden');
+    });
+  }
+
+  if (btnChecklistToVerify) {
+    btnChecklistToVerify.addEventListener('click', () => {
+      if (checklistModal) checklistModal.classList.add('hidden');
+      openDocVerifyModal();
+    });
+  }
+
+  // 스마트폰 기본 카메라 앱 실행 버튼 연동
+  if (btnOpenCameraApp && docCameraFileInput) {
+    btnOpenCameraApp.addEventListener('click', () => {
+      docCameraFileInput.click();
+    });
+  }
+
+  // 스마트폰 기본 카메라로 촬영된 사진 수신 시 처리
+  if (docCameraFileInput) {
+    docCameraFileInput.addEventListener('change', (e) => {
+      const file = e.target.files && e.target.files[0];
+      if (!file) return;
+
+      const reader = new FileReader();
+      reader.onload = (event) => {
+        // 촬영된 사진을 뷰파인더에 프리뷰로 표시
+        if (docCapturedPreview) {
+          docCapturedPreview.src = event.target.result;
+          docCapturedPreview.style.display = 'block';
+        }
+        if (docVerifyCameraStream) docVerifyCameraStream.style.display = 'none';
+        if (docMockPreview) docMockPreview.style.display = 'none';
+
+        // 자동 진위확인 스캔 진행
+        executeDocVerification();
+      };
+      reader.readAsDataURL(file);
+    });
+  }
+
+  // 진위확인 실행 공통 함수
+  function executeDocVerification(customCode = null) {
+    if (btnStartDocVerify) btnStartDocVerify.disabled = true;
+    if (docVerifyLaser) docVerifyLaser.style.display = 'block';
+    if (docScanBtnText) docScanBtnText.textContent = "위변조 코드 및 공공기관 원장 대조 중...";
+    playNotificationSound('beep');
+
+    const info = docVerifyDatabase[currentDocVerifyType] || docVerifyDatabase.biz_reg;
+
+    setTimeout(() => {
+      // 1. 결과 헤더 및 기본 서류 정보 주입
+      if (resDocName) resDocName.textContent = info.name;
+      if (resDocIssuer) resDocIssuer.textContent = info.issuer;
+      if (resDocCode) resDocCode.textContent = customCode || info.code;
+      if (resDocDate) resDocDate.textContent = `${info.date} (${info.dateStatus})`;
+
+      // 2. 피드백 반영 3대 핵심 진단 요약 박스 세팅
+      const hlStatusItem = document.getElementById('hl-status-item');
+      const hlStatusVal = document.getElementById('hl-status-val');
+      const hlDateItem = document.getElementById('hl-date-item');
+      const hlDateVal = document.getElementById('hl-date-val');
+      const resDocStatusText = document.getElementById('res-doc-status-text');
+
+      if (hlStatusVal) {
+        hlStatusVal.textContent = info.statusValue;
+        if (hlStatusItem) {
+          hlStatusItem.className = `highlight-item ${info.statusPass ? 'pass' : 'fail'}`;
+        }
+      }
+
+      if (hlDateVal) {
+        hlDateVal.textContent = info.dateValid ? `발급 3개월 이내 유효 (${info.date})` : `발급 3개월 초과 (재발급 요망)`;
+        if (hlDateItem) {
+          hlDateItem.className = `highlight-item ${info.dateValid ? 'pass' : 'warning'}`;
+        }
+      }
+
+      if (resDocStatusText) {
+        resDocStatusText.innerHTML = `<i class="fa-solid fa-shield-check"></i> ${info.statusValue} (PASS)`;
+      }
+
+      if (docVerifyLaser) docVerifyLaser.style.display = 'none';
+      if (docVerifyStepScan) docVerifyStepScan.style.display = 'none';
+      if (docVerifyStepResult) docVerifyStepResult.classList.remove('hidden');
+
+      stopDocVerifyCameraStream();
+
+      showToast(`'${info.shortName}' 공공기관 전산 원장 진위확인이 완료되었습니다.`, false);
+      if (btnStartDocVerify) btnStartDocVerify.disabled = false;
+      if (docScanBtnText) docScanBtnText.textContent = "서류 촬영 및 자동 진위확인";
+    }, 900);
+  }
+
+  // 직접 번호 입력 조회 버튼 클릭
+  const btnDirectVerify = document.getElementById('btn-direct-verify');
+  const docDirectInputVal = document.getElementById('doc-direct-input-val');
+  if (btnDirectVerify && docDirectInputVal) {
+    btnDirectVerify.addEventListener('click', () => {
+      const val = docDirectInputVal.value.trim();
+      if (!val) {
+        showToast("확인할 번호를 입력해 주세요.", true);
+        docDirectInputVal.focus();
+        return;
+      }
+      executeDocVerification(val);
+    });
+
+    docDirectInputVal.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter') {
+        btnDirectVerify.click();
+      }
+    });
+  }
+
+  // 진위확인 스캔 버튼 클릭
+  if (btnStartDocVerify) {
+    btnStartDocVerify.addEventListener('click', () => executeDocVerification());
+  }
+
+  // 다시 스캔
+  if (btnDocVerifyRetry) {
+    btnDocVerifyRetry.addEventListener('click', () => {
+      if (docVerifyStepScan) docVerifyStepScan.style.display = 'block';
+      if (docVerifyStepResult) docVerifyStepResult.classList.add('hidden');
+      if (docVerifyLaser) docVerifyLaser.style.display = 'none';
+      if (docCapturedPreview) docCapturedPreview.style.display = 'none';
+      if (docCameraFileInput) docCameraFileInput.value = '';
+      startDocVerifyCameraStream();
+    });
+  }
+
+  // 창구 직원 전달 접수
+  if (btnDocVerifySubmit) {
+    btnDocVerifySubmit.addEventListener('click', () => {
+      showToast("서류 진위확인 결과가 담당 창구 직원에게 안전하게 전송되었습니다.", false);
+      setTimeout(() => {
+        closeDocVerifyModal();
+      }, 600);
+    });
+  }
+
   // 쉬운 모드 전용 금융성향 테스트 버튼 열기 연동
   const easyFinancialTestBtn = document.getElementById('btn-easy-financial-test');
   if (easyFinancialTestBtn) {
@@ -4675,6 +5553,478 @@ document.addEventListener('DOMContentLoaded', async () => {
       } else {
         secretTapTimer = setTimeout(() => { secretTapCount = 0; }, 2000);
       }
+    });
+  }
+
+  // --- 6. 외국인 전용 업무 번역기 (Foreigner Task Translator & Show to Teller) ---
+  const btnForeignerTranslator = document.getElementById('btn-foreigner-translator');
+  const foreignerModal = document.getElementById('foreigner-translator-modal');
+  const closeForeignerModalBtn = document.getElementById('close-foreigner-modal-btn');
+  const foreignerTextarea = document.getElementById('foreigner-task-textarea');
+  const foreignerCharCount = document.getElementById('foreigner-char-count');
+  const btnForeignerSend = document.getElementById('btn-foreigner-send');
+  const foreignerSendText = document.getElementById('foreigner-send-text');
+  const foreignerChipContainer = document.getElementById('foreigner-chip-container');
+  const langPills = document.querySelectorAll('.lang-pill');
+
+  // 다국어 언어팩 데이터 (국내 은행 외국인 고객 주요 12개 국적 언어)
+  const foreignerLanguagePacks = {
+    en: {
+      name: 'English',
+      placeholder: 'Please enter your task here in English...',
+      chips: [
+        { label: 'Open Account', text: 'I would like to open a new bank account and get a debit card.' },
+        { label: 'Send Money', text: 'I need to send money overseas (international remittance).' },
+        { label: 'Debit Card', text: 'I want to issue or reissue my debit card.' },
+        { label: 'Exchange', text: 'I would like to exchange foreign currency.' },
+        { label: 'Mobile Banking', text: 'I want to register for mobile banking service.' }
+      ]
+    },
+    zh: {
+      name: '中文',
+      placeholder: '请在此输入您需要办理的业务（支持中文）...',
+      chips: [
+        { label: '银行开户', text: '我想办理新银行账户开户和借记卡。' },
+        { label: '境外汇款', text: '我想办理跨境汇款业务。' },
+        { label: '补办借记卡', text: '我的银行卡需要重新办理一张借记卡。' },
+        { label: '外币兑换', text: '我想办理外币兑换业务。' },
+        { label: '手机银行', text: '我想开通手机银行和网上银行业务。' }
+      ]
+    },
+    vi: {
+      name: 'Tiếng Việt',
+      placeholder: 'Vui lòng nhập yêu cầu của bạn bằng tiếng Việt...',
+      chips: [
+        { label: 'Mở tài khoản', text: 'Tôi muốn mở một tài khoản ngân hàng mới và làm thẻ ghi nợ.' },
+        { label: 'Chuyển tiền', text: 'Tôi muốn chuyển tiền quốc tế về nước.' },
+        { label: 'Làm lại thẻ', text: 'Tôi muốn cấp lại thẻ ghi nợ ATM.' },
+        { label: 'Đổi ngoại tệ', text: 'Tôi muốn đổi tiền ngoại tệ sang Won.' },
+        { label: 'Mobile Banking', text: 'Tôi muốn đăng ký dịch vụ ngân hàng điện tử.' }
+      ]
+    },
+    uz: {
+      name: "O'zbek",
+      placeholder: "Iltimos, bankingiz xizmatini o'zbek tilida kiriting...",
+      chips: [
+        { label: 'Hisob ochish', text: "Yangi bank hisobi ochish va debet karta olishni xohlayman." },
+        { label: "Pul jo'natish", text: "Chet elga pul o'tkazish (xalqaro pul jo'natmasi) xizmatidan foydalanmoqchiman." },
+        { label: 'Karta tiklash', text: "Bank debet kartamni qayta rasmiylashtirmoqchiman." },
+        { label: 'Valyuta ayirboshlash', text: "Valyuta ayirboshlash (von sotib olish) xizmati kerak." },
+        { label: 'Mobil ilova', text: "Mobil banking ilovasini faollashtirmoqchiman." }
+      ]
+    },
+    id: {
+      name: 'Indonesia',
+      placeholder: 'Silakan masukkan kebutuhan perbankan Anda dalam bahasa Indonesia...',
+      chips: [
+        { label: 'Buka Rekening', text: 'Saya ingin membuka rekening bank baru dan membuat kartu debit.' },
+        { label: 'Kirim Uang', text: 'Saya ingin mengirim uang ke luar negeri (remitansi internasional).' },
+        { label: 'Buat Kartu Baru', text: 'Saya ingin menerbitkan kembali kartu debit ATM saya.' },
+        { label: 'Tukar Valuta', text: 'Saya ingin menukar mata uang asing ke Won.' },
+        { label: 'Mobile Banking', text: 'Saya ingin mendaftar layanan mobile banking.' }
+      ]
+    },
+    tl: {
+      name: 'Filipino',
+      placeholder: 'Pakiusap ilagay ang iyong transaksyon sa Tagalog/Ingles...',
+      chips: [
+        { label: 'Magbukas ng Account', text: 'Gusto kong magbukas ng bagong bank account at kumuha ng debit card.' },
+        { label: 'Magpadala ng Pera', text: 'Gusto kong magpadala ng pera sa ibang bansa (remittance).' },
+        { label: 'Reissue ng Card', text: 'Nais kong magpa-reissue ng aking debit card.' },
+        { label: 'Palit ng Pera', text: 'Gusto kong magpapalit ng foreign currency sa Won.' },
+        { label: 'Mobile Banking', text: 'Gusto kong mag-register sa mobile banking app.' }
+      ]
+    },
+    my: {
+      name: 'မြန်မာ',
+      placeholder: 'သင်ဆောင်ရွက်လိုသော ဘဏ်လုပ်ငန်းကို မြန်မာလို ရေးသားပါ...',
+      chips: [
+        { label: 'ဘဏ်စာရင်းဖွင့်', text: 'ဘဏ်အကောင့်အသစ်ဖွင့်ပြီး Debit ကတ် ရယူလိုပါသည်။' },
+        { label: 'နိုင်ငံခြားငွေလွှဲ', text: 'ပြည်ပသို့ ငွေလွှဲလိုပါသည်။ (အပြည်ပြည်ဆိုင်ရာ ငွေလွှဲခြင်း)' },
+        { label: 'ကတ်အသစ်ထုတ်', text: 'Debit ကတ် အသစ်ပြန်လည်ထုတ်ယူလိုပါသည်။' },
+        { label: 'ငွေလဲလှယ်ခြင်း', text: 'နိုင်ငံခြားငွေ လဲလှယ်လိုပါသည်။' },
+        { label: 'မိုဘိုင်းဘဏ်စနစ်', text: 'မိုဘိုင်းဘဏ်လုပ်ငန်း လျှောက်ထားလိုပါသည်။' }
+      ]
+    },
+    th: {
+      name: 'ไทย',
+      placeholder: 'กรุณากรอกธุรกรรมที่คุณต้องการเป็นภาษาไทย...',
+      chips: [
+        { label: 'เปิดบัญชี', text: 'ฉันต้องการเปิดบัญชีธนาคารใหม่และทำบัตรเดบิต' },
+        { label: 'โอนเงินต่างประเทศ', text: 'ฉันต้องการโอนเงินไปต่างประเทศ (โอนเงินระหว่างประเทศ)' },
+        { label: 'ออกบัตรใหม่', text: 'ฉันต้องการออกบัตรเดบิตใหม่เนื่องจากสูญหาย/หมดอายุ' },
+        { label: 'แลกเปลี่ยนเงิน', text: 'ฉันต้องการแลกเปลี่ยนเงินตราต่างประเทศ' },
+        { label: 'โมบายแบงก์กิ้ง', text: 'ฉันต้องการสมัครใช้บริการโมบายแบงก์กิ้ง' }
+      ]
+    },
+    km: {
+      name: 'ខ្មែរ',
+      placeholder: 'សូមបញ្ចូលប្រតិបត្តិការធនាគារជាភាសាខ្មែរ...',
+      chips: [
+        { label: 'បើកគណនី', text: 'ខ្ញុំចង់បើកគណនីធនាគារថ្មី និងធ្វើកាតដេប៊ីត។' },
+        { label: 'ផ្ទេរប្រាក់ទៅក្រៅប្រទេស', text: 'ខ្ញុំចង់ផ្ទេរប្រាក់ទៅក្រៅប្រទេស (ផ្ញើប្រាក់អន្តរជាតិ)។' },
+        { label: 'ធ្វើកាតឡើងវិញ', text: 'ខ្ញុំចង់ស្នើសុំធ្វើកាតដេប៊ីតឡើងវិញ។' },
+        { label: 'ប្តូរប្រាក់', text: 'ខ្ញុំចង់ប្តូរប្រាក់បរទេសទៅជាប្រាក់វ៉ុន។' },
+        { label: 'សេវាធនាគារលើទូរស័ព្ទ', text: 'ខ្ញុំចង់ចុះឈ្មោះប្រើប្រាស់កម្មវិធីធនាគារលើទូរស័ព្ទដៃ។' }
+      ]
+    },
+    ru: {
+      name: 'Русский',
+      placeholder: 'Пожалуйста, введите ваш запрос на русском языке...',
+      chips: [
+        { label: 'Открыть счет', text: 'Я хочу открыть новый банковский счет и оформить дебетовую карту.' },
+        { label: 'Перевод денег', text: 'Мне необходимо сделать международный перевод денег за границу.' },
+        { label: 'Перевыпуск карты', text: 'Я хочу перевыпустить свою банковскую дебетовую карту.' },
+        { label: 'Обмен валюты', text: 'Я хочу совершить обмен иностранной валюты на воны.' },
+        { label: 'Мобильный банк', text: 'Я хочу подключить услугу мобильного банкинга.' }
+      ]
+    },
+    ja: {
+      name: '日本語',
+      placeholder: 'ご希望の銀行業務を日本語でご記入ください...',
+      chips: [
+        { label: '口座開設', text: '新規に普通預金口座を開設し、デビットカードの発行をお願いしたいです。' },
+        { label: '海外送金', text: '海外への送金（外国送金）手続きをお願いしたいです。' },
+        { label: 'カード再発行', text: 'デビットカードの再発行をお願いします。' },
+        { label: '外貨両替', text: '外貨両替の手続きをお願いしたいです。' },
+        { label: 'モバイルバンキング', text: 'モバイルバンキングの利用申込みをしたいです。' }
+      ]
+    },
+    ne: {
+      name: 'नेपाली',
+      placeholder: 'कृपया तपाईले गर्न चाहनुभएको बैंकिङ काम नेपालीमा लेख्नुहोस्...',
+      chips: [
+        { label: 'खाता खोल्ने', text: 'म नयाँ बैंक खाता खोल्न र डेबिट कार्ड लिन चाहन्छु।' },
+        { label: 'विदेश पैसा पठाउने', text: 'म विदेशमा पैसा पठाउन चाहन्छु (अन्तर्राष्ट्रिय रेमिट्यान्स)।' },
+        { label: 'कार्ड पुन: जारी', text: 'म मेरो डेबिट कार्ड पुन: जारी गर्न चाहन्छु।' },
+        { label: 'मुद्रा साट्ने', text: 'म विदेशी मुद्रा कोरियन वोनमा साट्न चाहन्छु।' },
+        { label: 'मोबाइल बैंकिङ', text: 'म मोबाइल बैंकिङ सेवा दर्ता गर्न चाहन्छु।' }
+      ]
+    }
+  };
+
+  // 언어별 퀵 칩 동적 렌더링
+  function renderForeignerChips(langKey) {
+    const pack = foreignerLanguagePacks[langKey] || foreignerLanguagePacks.en;
+    if (foreignerTextarea) {
+      foreignerTextarea.placeholder = pack.placeholder;
+    }
+    if (!foreignerChipContainer) return;
+    foreignerChipContainer.innerHTML = '';
+    pack.chips.forEach(item => {
+      const btn = document.createElement('button');
+      btn.type = 'button';
+      btn.className = 'foreigner-chip';
+      btn.textContent = item.label;
+      btn.setAttribute('data-text', item.text);
+      btn.addEventListener('click', () => {
+        if (foreignerTextarea) {
+          foreignerTextarea.value = item.text;
+          if (foreignerCharCount) foreignerCharCount.textContent = item.text.length;
+          foreignerTextarea.focus();
+        }
+      });
+      foreignerChipContainer.appendChild(btn);
+    });
+  }
+
+  // 언어 선택 버튼 클릭 이벤트
+  langPills.forEach(pill => {
+    pill.addEventListener('click', () => {
+      langPills.forEach(p => p.classList.remove('active'));
+      pill.classList.add('active');
+      const selectedLang = pill.getAttribute('data-lang') || 'en';
+      renderForeignerChips(selectedLang);
+    });
+  });
+
+  // 초기 칩 렌더링 (English 기본)
+  renderForeignerChips('en');
+
+  // 좌우 화살표 버튼 네비게이션 제어
+  const btnLangPrev = document.getElementById('btn-lang-prev');
+  const btnLangNext = document.getElementById('btn-lang-next');
+  const langPillGroup = document.getElementById('lang-pill-group');
+  const btnChipPrev = document.getElementById('btn-chip-prev');
+  const btnChipNext = document.getElementById('btn-chip-next');
+
+  if (btnLangPrev && langPillGroup) {
+    btnLangPrev.addEventListener('click', () => {
+      langPillGroup.scrollBy({ left: -120, behavior: 'smooth' });
+    });
+  }
+  if (btnLangNext && langPillGroup) {
+    btnLangNext.addEventListener('click', () => {
+      langPillGroup.scrollBy({ left: 120, behavior: 'smooth' });
+    });
+  }
+
+  if (btnChipPrev && foreignerChipContainer) {
+    btnChipPrev.addEventListener('click', () => {
+      foreignerChipContainer.scrollBy({ left: -140, behavior: 'smooth' });
+    });
+  }
+  if (btnChipNext && foreignerChipContainer) {
+    btnChipNext.addEventListener('click', () => {
+      foreignerChipContainer.scrollBy({ left: 140, behavior: 'smooth' });
+    });
+  }
+
+  // PC 마우스 휠 가로 스크롤 지원
+  [langPillGroup, foreignerChipContainer].forEach(el => {
+    if (!el) return;
+    el.addEventListener('wheel', (e) => {
+      if (e.deltaY !== 0) {
+        e.preventDefault();
+        el.scrollLeft += e.deltaY;
+      }
+    }, { passive: false });
+  });
+
+  // 은행원 제시용 모달 요소
+  const foreignerResultModal = document.getElementById('foreigner-result-modal');
+  const closeTellerModalBtn = document.getElementById('close-teller-modal-btn');
+  const btnTellerSpeak = document.getElementById('btn-teller-speak');
+  const tellerKrText = document.getElementById('teller-translated-korean');
+  const tellerOrigText = document.getElementById('teller-original-text');
+  const btnTellerEdit = document.getElementById('btn-teller-edit');
+  const btnTellerDone = document.getElementById('btn-teller-done');
+
+  // 번역 상태 저장
+  let hasForeignerTask = false;
+  let savedOriginalText = "";
+  let savedTranslatedKorean = "";
+
+  // 스마트 은행 창구 한국어 번역 변환 함수 (12개 언어 금융 키워드 지원)
+  function translateToBankKorean(text) {
+    const lower = text.toLowerCase();
+    
+    // 1. 계좌 개설 / 통장 개설
+    if (lower.includes('account') || lower.includes('open') || text.includes('开户') || text.includes('tài khoản') || 
+        lower.includes('hisob') || lower.includes('rekening') || lower.includes('bukas') || text.includes('စာရင်းဖွင့်') || 
+        text.includes('เปิดบัญชี') || text.includes('បើកគណនី') || text.includes('счет') || text.includes('口座') || text.includes('खाता')) {
+      return {
+        html: `안녕하세요, <strong>외국인 전용 입출금 통장 개설 및 체크카드 발급</strong>을 신청하고자 합니다.`,
+        speech: `안녕하세요, 외국인 전용 입출금 통장 개설 및 체크카드 발급을 신청하고자 합니다.`
+      };
+    } 
+    // 2. 해외 송금 / 국제 송금
+    else if (lower.includes('send') || lower.includes('remit') || lower.includes('transfer') || text.includes('汇款') || 
+             text.includes('chuyển tiền') || lower.includes("jo'nat") || lower.includes('kirim') || lower.includes('padala') || 
+             text.includes('ငွေလွှဲ') || text.includes('โอนเงิน') || text.includes('ផ្ទេរប្រាក់') || text.includes('перевод') || 
+             text.includes('送金') || text.includes('पैसा')) {
+      return {
+        html: `안녕하세요, <strong>해외 송금(외화 송금) 및 환전 업무</strong>를 처리하고자 합니다.`,
+        speech: `안녕하세요, 해외 송금 및 환전 업무를 처리하고자 합니다.`
+      };
+    } 
+    // 3. 카드 발급 / 재발급
+    else if (lower.includes('card') || lower.includes('debit') || lower.includes('reissue') || text.includes('借记卡') || 
+             text.includes('thẻ') || lower.includes('karta') || lower.includes('kartu') || text.includes('ကတ်') || 
+             text.includes('บัตร') || text.includes('កាត') || text.includes('карт') || text.includes('カード') || text.includes('कार्ड')) {
+      return {
+        html: `안녕하세요, <strong>체크카드 신규 발급 및 분실 재발급</strong>을 신청하고자 합니다.`,
+        speech: `안녕하세요, 체크카드 신규 발급 및 분실 재발급을 신청하고자 합니다.`
+      };
+    } 
+    // 4. 환전 / 외화 환전
+    else if (lower.includes('exchange') || lower.includes('currency') || text.includes('兑换') || text.includes('换汇') || 
+             text.includes('ngoại tệ') || lower.includes('valyuta') || lower.includes('valuta') || lower.includes('palit') || 
+             text.includes('ငွေလဲ') || text.includes('แลกเปลี่ยน') || text.includes('ប្តូរប្រាក់') || text.includes('обмен') || 
+             text.includes('両替') || text.includes('साट्ने')) {
+      return {
+        html: `안녕하세요, <strong>외화 환전 및 원화 환전 업무</strong>를 신청하고자 합니다.`,
+        speech: `안녕하세요, 외화 환전 및 원화 환전 업무를 신청하고자 합니다.`
+      };
+    } 
+    // 5. 모바일/인터넷 뱅킹
+    else if (lower.includes('mobile') || lower.includes('app') || text.includes('手机银行') || text.includes('ngân hàng điện tử') || 
+             lower.includes('mobil') || text.includes('မိုဘိုင်း') || text.includes('โมบาย') || text.includes('ទូរស័ព្ទ') || 
+             text.includes('банкинг') || text.includes('バンキング') || text.includes('बैंकिङ')) {
+      return {
+        html: `안녕하세요, <strong>모바일 뱅킹(스마트뱅킹) 가입 및 보안매체 발급</strong>을 신청하고자 합니다.`,
+        speech: `안녕하세요, 모바일 뱅킹 가입 및 보안매체 발급을 신청하고자 합니다.`
+      };
+    } 
+    // 6. 예금 / 입출금
+    else if (lower.includes('deposit') || lower.includes('withdraw') || text.includes('存款') || text.includes('取款') || 
+             text.includes('gửi') || text.includes('rút') || text.includes('預金') || text.includes('引き出し')) {
+      return {
+        html: `안녕하세요, <strong>현금 입금 및 출금 업무</strong>를 처리하고자 합니다.`,
+        speech: `안녕하세요, 현금 입금 및 출금 업무를 처리하고자 합니다.`
+      };
+    } 
+    // 7. 대출 / 금융 상담
+    else if (lower.includes('loan') || text.includes('贷款') || text.includes('vay') || lower.includes('kredit') || 
+             lower.includes('pinjaman') || lower.includes('utang') || text.includes('ချေးငွေ') || text.includes('สินเชื่อ') || 
+             text.includes('ឥណទាន') || text.includes('кредит') || text.includes('ローン') || text.includes('ऋण')) {
+      return {
+        html: `안녕하세요, <strong>외국인 전용 금융 상품 및 대출 상담</strong>을 받고자 합니다.`,
+        speech: `안녕하세요, 외국인 전용 금융 상품 및 대출 상담을 받고자 합니다.`
+      };
+    } 
+    // 8. 기타 직접 입력
+    else {
+      return {
+        html: `안녕하세요, 창구 업무로 다음과 같이 신청하고자 합니다:<br><strong>「 ${escapeHtml(text)} 」</strong>`,
+        speech: `안녕하세요, 창구 업무로 다음과 같이 신청하고자 합니다. ${text}`
+      };
+    }
+  }
+
+  function escapeHtml(string) {
+    return String(string).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+  }
+
+  function openForeignerModal() {
+    if (!foreignerModal) return;
+    if (hasForeignerTask) {
+      // 이미 작성된 번역 결과가 있으면 은행원 제시용 모달을 바로 엽니다
+      openTellerResultModal();
+      return;
+    }
+    foreignerModal.classList.remove('hidden');
+    if (foreignerSendText) foreignerSendText.textContent = "Send & Translate";
+    if (btnForeignerSend) btnForeignerSend.disabled = false;
+    setTimeout(() => {
+      if (foreignerTextarea) foreignerTextarea.focus();
+    }, 150);
+  }
+
+  function closeForeignerModal() {
+    if (!foreignerModal) return;
+    foreignerModal.classList.add('hidden');
+  }
+
+  function openTellerResultModal() {
+    if (!foreignerResultModal) return;
+    foreignerResultModal.classList.remove('hidden');
+  }
+
+  function closeTellerResultModal() {
+    if (!foreignerResultModal) return;
+    foreignerResultModal.classList.add('hidden');
+    // 음성 재생 중지
+    if (window.speechSynthesis) {
+      window.speechSynthesis.cancel();
+    }
+  }
+
+  if (btnForeignerTranslator) {
+    btnForeignerTranslator.addEventListener('click', openForeignerModal);
+  }
+
+  if (closeForeignerModalBtn) {
+    closeForeignerModalBtn.addEventListener('click', closeForeignerModal);
+  }
+
+  if (foreignerModal) {
+    foreignerModal.addEventListener('click', (e) => {
+      if (e.target === foreignerModal) {
+        closeForeignerModal();
+      }
+    });
+  }
+
+  if (closeTellerModalBtn) {
+    closeTellerModalBtn.addEventListener('click', closeTellerResultModal);
+  }
+
+  if (btnTellerDone) {
+    btnTellerDone.addEventListener('click', closeTellerResultModal);
+  }
+
+  if (foreignerResultModal) {
+    foreignerResultModal.addEventListener('click', (e) => {
+      if (e.target === foreignerResultModal) {
+        closeTellerResultModal();
+      }
+    });
+  }
+
+  // 수정하기 클릭 시
+  if (btnTellerEdit) {
+    btnTellerEdit.addEventListener('click', () => {
+      closeTellerResultModal();
+      if (foreignerModal) {
+        foreignerModal.classList.remove('hidden');
+        if (foreignerTextarea) {
+          foreignerTextarea.value = savedOriginalText;
+          if (foreignerCharCount) foreignerCharCount.textContent = savedOriginalText.length;
+          foreignerTextarea.focus();
+        }
+      }
+    });
+  }
+
+  // 한국어 음성 TTS 듣기
+  if (btnTellerSpeak) {
+    btnTellerSpeak.addEventListener('click', () => {
+      if (!window.speechSynthesis) {
+        showToast("이 브라우저에서는 음성 안내를 지원하지 않습니다.", true);
+        return;
+      }
+      window.speechSynthesis.cancel();
+      const translationObj = translateToBankKorean(savedOriginalText);
+      const utterance = new SpeechSynthesisUtterance(translationObj.speech);
+      utterance.lang = 'ko-KR';
+      utterance.rate = 0.95; // 듣기 편한 속도
+      window.speechSynthesis.speak(utterance);
+    });
+  }
+
+  // 실시간 글자수 카운트
+  if (foreignerTextarea && foreignerCharCount) {
+    foreignerTextarea.addEventListener('input', () => {
+      foreignerCharCount.textContent = foreignerTextarea.value.length;
+    });
+  }
+
+  // 번역 및 창구 전송 / 저장 처리
+  if (btnForeignerSend) {
+    btnForeignerSend.addEventListener('click', () => {
+      const taskText = foreignerTextarea ? foreignerTextarea.value.trim() : "";
+      if (!taskText) {
+        showToast("Please enter your task description before sending.", true);
+        if (foreignerTextarea) foreignerTextarea.focus();
+        return;
+      }
+
+      // 전송 중 상태 표시
+      btnForeignerSend.disabled = true;
+      if (foreignerSendText) foreignerSendText.textContent = "Translating...";
+
+      setTimeout(() => {
+        savedOriginalText = taskText;
+        const translationObj = translateToBankKorean(taskText);
+        savedTranslatedKorean = translationObj.html;
+
+        // 제시용 카드에 내용 반영
+        if (tellerKrText) tellerKrText.innerHTML = `"${savedTranslatedKorean}"`;
+        if (tellerOrigText) tellerOrigText.textContent = `"${savedOriginalText}"`;
+
+        hasForeignerTask = true;
+        closeForeignerModal();
+
+        // 메인 화면 배너 상태 변경 (직원에게 보여주기 모드)
+        const bannerAction = document.querySelector('.foreigner-banner-action');
+        const bannerTag = document.querySelector('.foreigner-banner-tag');
+        const bannerBtnText = document.querySelector('.foreigner-btn-text');
+        if (bannerAction) bannerAction.textContent = "Show translation to Teller";
+        if (bannerTag) {
+          bannerTag.textContent = "[ Ready / 번역 완료 ✓ ]";
+          bannerTag.style.background = "#dcfce7";
+          bannerTag.style.color = "#16a34a";
+        }
+        if (bannerBtnText) bannerBtnText.textContent = "Show";
+
+        // 은행원 제시용 모달 열기
+        openTellerResultModal();
+        showToast("번역이 완료되었습니다! 창구 순번 시 직원에게 보여주세요.", false);
+
+        btnForeignerSend.disabled = false;
+        if (foreignerSendText) foreignerSendText.textContent = "Send & Translate";
+      }, 600);
     });
   }
 
