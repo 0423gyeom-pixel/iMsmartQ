@@ -6010,9 +6010,9 @@ document.addEventListener('DOMContentLoaded', async () => {
         const bannerAction = document.querySelector('.foreigner-banner-action');
         const bannerTag = document.querySelector('.foreigner-banner-tag');
         const bannerBtnText = document.querySelector('.foreigner-btn-text');
-        if (bannerAction) bannerAction.textContent = "Show translation to Teller";
+        if (bannerAction) bannerAction.textContent = "Show to Teller";
         if (bannerTag) {
-          bannerTag.textContent = "[ Ready / 번역 완료 ✓ ]";
+          bannerTag.textContent = "Ready ✓";
           bannerTag.style.background = "#dcfce7";
           bannerTag.style.color = "#16a34a";
         }

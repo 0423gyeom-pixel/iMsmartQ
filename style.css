@@ -4906,6 +4906,8 @@ body {
   gap: 6px !important;
   line-height: 1.25 !important;
   flex-wrap: nowrap !important;
+  min-width: 0 !important;
+  overflow: hidden !important;
 }
 
 .sub-banner-main-title {
@@ -4914,14 +4916,19 @@ body {
   letter-spacing: -0.3px !important;
   white-space: nowrap !important;
   color: #0f172a !important;
+  min-width: 0 !important;
+  overflow: hidden !important;
+  text-overflow: ellipsis !important;
+  flex-shrink: 1 !important;
 }
 
 .sub-banner-action-text,
 .sub-banner-tag {
-  font-size: 11.5px !important;
+  font-size: 11px !important;
   font-weight: 700 !important;
   letter-spacing: -0.2px !important;
   white-space: nowrap !important;
+  flex-shrink: 0 !important;
 }
 
 /* 배너 우측 액션 배지 및 화살표 */
@@ -4930,7 +4937,7 @@ body {
   align-items: center !important;
   gap: 4px !important;
   flex-shrink: 0 !important;
-  margin-left: 4px !important;
+  margin-left: 8px !important;
 }
 
 .sub-banner-badge {
@@ -4942,6 +4949,7 @@ body {
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04) !important;
   white-space: nowrap !important;
   letter-spacing: -0.2px !important;
+  flex-shrink: 0 !important;
 }
 
 .sub-banner-arrow {
@@ -5071,10 +5079,12 @@ body {
   color: #2563eb !important;
   background: #eff6ff !important;
   border: 1px solid #bfdbfe !important;
-  padding: 1px 6px !important;
+  padding: 1.5px 6px !important;
   border-radius: 5px !important;
   font-size: 10px !important;
   font-weight: 700 !important;
+  white-space: nowrap !important;
+  flex-shrink: 0 !important;
 }
 
 .foreigner-badge {
