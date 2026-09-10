@@ -1,0 +1,1977 @@
+﻿<!DOCTYPE html>
+<html lang="ko"><head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <title>iM諭낇겕 SmartQ</title>
+  <!-- Google Fonts: Inter & Noto Sans KR -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&amp;family=Noto+Sans+KR:wght@300;400;500;700;900&amp;display=swap" rel="stylesheet">
+  <!-- Pretendard web font -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.css">
+  <!-- FontAwesome for icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link rel="stylesheet" href="style.css?v=20260910_real_ocr_engine">
+  <!-- Tesseract.js In-Browser Real OCR Engine -->
+  <script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
+</head>
+<body>
+  <div class="mobile-web-container">
+    <!-- ?ㅻ뜑 (1以??뺤텞??- ?쒓컙 ?덈궡臾멸뎄 ?곗륫 ?곷떒 ?듯빀) -->
+    <header class="app-header">
+      <div class="web-title-bar" style="display: flex; justify-content: space-between; align-items: center; width: 100%;">
+        <h1 class="web-title-text" style="display: flex; align-items: center; gap: 4px;">
+          <!-- iM諭낇겕 怨듭떇 M ?щ낵 怨좏솕吏??먮낯 ?대?吏 濡쒕뱶 (源⑥쭚 諛⑹?) -->
+          <img src="im_logo.png" alt="iM" style="height: clamp(14px, 2.1cqh, 19px); width: auto; object-fit: contain; flex-shrink: 0; display: block; filter: saturate(1.05);">
+          
+          <!-- iM Bank 濡쒓퀬???援ъ꽦 (?숈씪 ?고듃/援듦린 諛??먭컙 媛꾧꺽 異뺤냼) -->
+          <span class="logo-im-bank" style="font-family: 'Inter', sans-serif; font-weight: 800; color: #2c3e50; font-size: clamp(14.5px, 2.1cqh, 19px); letter-spacing: -0.6px;">iM Bank</span>
+          <span class="logo-smartq" style="font-family: 'Pretendard', sans-serif; font-weight: 800; color: var(--brand-mint-dark); font-size: clamp(12px, 1.75cqh, 15.5px); letter-spacing: -0.5px; margin-left: 5px; padding-left: 6px; border-left: 1.5px solid #dcdde1; display: inline-flex; align-items: center; white-space: nowrap;">SmartQ (?묐삊???湲곗뿴)</span>
+        </h1>
+        
+        <!-- ?곗륫 ?곷떒 ?곸뿭: ?쒓컙 ?덈궡臾멸뎄 -->
+        <div class="header-right-group" style="display: flex; align-items: center; gap: 10px; flex-shrink: 0;">
+          <div class="header-bottom" style="margin: 0; display: flex; align-items: center; gap: 6px; flex-shrink: 0;">
+            <div class="live-indicator" style="margin: 0;"></div>
+            <span class="timestamp" id="live-timestamp" style="font-size: clamp(10px, 1.42cqh, 13.5px); color: var(--cool-gray); font-weight: 500; white-space: nowrap;">?ㅽ썑 3:37 湲곗?</span>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <!-- 硫붿씤 肄섑뀗痢??곸뿭 -->
+    <main class="app-content">
+      <!-- 醫뚯륫 ?? 踰덊샇??諛??湲?愿由?/ ?좎쓽?ы빆 -->
+      <div class="layout-col-ticket">
+        <!-- 硫붿씤 踰덊샇??移대뱶 -->
+        <section class="ticket-card animate-fade-in">
+          <!-- 吏?먮챸 + ?곹깭 諛곗? (1???듯빀) -->
+          <div class="ticket-top-row">
+            <div class="ticket-branch">
+              <i class="fa-solid fa-location-dot"></i>
+              <span>蹂몄젏?곸뾽遺</span>
+            </div>
+            <div class="ticket-badge-group">
+              <div class="ticket-status-badge">?湲?以?/div>
+              <div class="qr-verify-badge"><i class="fa-solid fa-qrcode"></i> QR?몄쬆</div>
+            </div>
+          </div>
+
+          <!-- ??踰덊샇 ?⑤룆 以묒븰 ?뺣젹 -->
+          <div class="ticket-hero">
+            <h2 class="ticket-number">
+              <span class="ticket-number-label">??踰덊샇</span>
+              <span class="highlight-num">1004<em>踰?/em></span>
+            </h2>
+          </div>
+
+          <div class="ticket-stats-grid">
+            <div class="stat-box">
+              <span class="stat-label">?????湲곗씤??/span>
+              <span class="stat-value" id="waiting-count">5紐?/span>
+            </div>
+            <div class="stat-line"></div>
+            <div class="stat-box">
+              <span class="stat-label">珥??덉긽 ?湲곗떆媛?/span>
+              <span class="stat-value highlight-time" id="waiting-time">??15遺?/span>
+            </div>
+          </div>
+
+          <!-- ?쒕쾲 誘몃（湲??⑤룆 諛곗튂 (媛濡??뺤옣) -->
+          <div class="ticket-action-row">
+            <button class="delay-btn" id="delay-queue-btn">
+              <i class="fa-solid fa-arrows-spin"></i>
+              <span>?쒕쾲 誘몃（湲?/span>
+              <span class="delay-badge" id="delay-status-badge">1??媛??/span>
+            </button>
+          </div>
+        </section>
+
+      </div>
+
+      <!-- ?곗륫 ?? ?ㅻ쭏??諭낇궧 ?쒕퉬???덈툕 -->
+      <div class="layout-col-services">
+        <!-- ?ㅻ쭏???쒕퉬???덈툕 (4? ?듭떖 湲곕뒫 2x2 諛섏쓳??移대뱶 洹몃━?? -->
+        <div id="easy-mode-layout-container" class="service-hub-grid-container">
+          
+          <!-- 1. ?↔툑?꾪몴 ?ъ쭊李띻린 -->
+          <button type="button" class="service-hub-card-item" id="btn-easy-scan">
+            <div class="hub-card-icon-box scan-box">
+              <svg class="service-hub-svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#2563EB" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"></path>
+                <circle cx="12" cy="13" r="4"></circle>
+              </svg>
+            </div>
+            <div class="hub-card-text-box">
+              <strong class="hub-card-title">?↔툑?꾪몴 ?ъ쭊李띻린</strong>
+              <span class="hub-card-desc">醫낆씠?꾪몴 ?먮룞?몄떇</span>
+            </div>
+          </button>
+
+          <!-- 2. 紐⑤컮???쒖떇 誘몃━?묒꽦 -->
+          <button type="button" class="service-hub-card-item" id="btn-easy-pre-writing">
+            <div class="hub-card-icon-box paper-box">
+              <svg class="service-hub-svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#059669" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M12 20h9"></path>
+                <path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"></path>
+              </svg>
+            </div>
+            <div class="hub-card-text-box">
+              <strong class="hub-card-title">誘몃━?묒꽦</strong>
+              <span class="hub-card-desc">?낆텧湲댟룹넚湲?紐⑤컮???꾪몴</span>
+            </div>
+          </button>
+
+          <!-- 3. ?쒕쪟 梨숆린湲?(?꾩슂?쒕쪟 泥댄겕由ъ뒪?? -->
+          <button type="button" class="service-hub-card-item" id="btn-easy-checklist">
+            <div class="hub-card-icon-box checklist-box">
+              <svg class="service-hub-svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#00C7A9" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round">
+                <polyline points="9 11 12 14 22 4"></polyline>
+                <path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"></path>
+              </svg>
+            </div>
+            <div class="hub-card-text-box">
+              <strong class="hub-card-title">?쒕쪟 梨숆린湲?/strong>
+              <span class="hub-card-desc">?낅Т蹂??꾩닔?쒕쪟 ?덈궡</span>
+            </div>
+          </button>
+
+          <!-- 4. ?쒕쪟 吏꾩쐞?뺤씤 (?낅┰???좉퇋 湲곕뒫) -->
+          <button type="button" class="service-hub-card-item hub-verify-item" id="btn-easy-doc-verify">
+            <span class="hub-card-badge">AI 利됱떆寃利?/span>
+            <div class="hub-card-icon-box verify-box">
+              <svg class="service-hub-svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#7C3AED" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>
+                <path d="m9 12 2 2 4-4"></path>
+              </svg>
+            </div>
+            <div class="hub-card-text-box">
+              <strong class="hub-card-title">?쒕쪟 吏꾩쐞?뺤씤</strong>
+              <span class="hub-card-desc">?좊텇利씲룸벑蹂??먮낯 ?먮퀎</span>
+            </div>
+          </button>
+
+        </div>
+
+        <!-- [怨좎븸?↔툑 ?뱁솕] 500留뚯썝 ?댁긽 ?↔툑 怨좉컼 ?꾩슜 湲덉쑖?ш린?덈갑吏꾨떒???ъ쟾?묒꽦 媛뺤“ 諛곕꼫 -->
+        <div class="service-sub-banner-container high-transfer-banner-container">
+          <button type="button" class="high-transfer-service-banner common-sub-banner" id="btn-open-fraud-prevention-banner">
+            <div class="sub-banner-left">
+              <div class="sub-banner-icon fraud-icon">
+                <i class="fa-solid fa-shield-virus"></i>
+              </div>
+              <div class="sub-banner-text-box">
+                <div class="sub-banner-subtitle-row">
+                  <span class="sub-banner-pill fraud-pill"><span class="fraud-live-dot"></span>500留뚯썝 ?댁긽 ?↔툑</span>
+                  <span class="sub-banner-desc fraud-desc">李쎄뎄 ?湲곗떆媛?80% ?⑥텞!</span>
+                </div>
+                <div class="sub-banner-title-row">
+                  <strong class="sub-banner-main-title fraud-title">湲덉쑖?ш린?덈갑吏꾨떒??/strong>
+                  <span class="sub-banner-action-text fraud-action">誘몃━ ?묒꽦?섍린</span>
+                </div>
+              </div>
+            </div>
+            <div class="sub-banner-right">
+              <span class="sub-banner-badge fraud-badge">?ъ쟾?묒꽦</span>
+              <i class="fa-solid fa-chevron-right sub-banner-arrow fraud-arrow"></i>
+            </div>
+          </button>
+        </div>
+
+        <!-- ?멸뎅???낅Т 踰덉뿭 ?쒕퉬??諛곕꼫 -->
+        <div class="service-sub-banner-container foreigner-banner-container">
+          <button type="button" class="foreigner-service-banner common-sub-banner" id="btn-foreigner-translator">
+            <div class="sub-banner-left">
+              <div class="sub-banner-icon foreigner-icon">
+                <svg viewBox="0 0 24 24" width="20" height="20" stroke="currentColor" stroke-width="2.2" fill="none" stroke-linecap="round" stroke-linejoin="round" class="foreigner-globe-svg">
+                  <circle cx="12" cy="12" r="10"></circle>
+                  <line x1="2" y1="12" x2="22" y2="12"></line>
+                  <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path>
+                </svg>
+              </div>
+              <div class="sub-banner-text-box">
+                <div class="sub-banner-subtitle-row">
+                  <span class="sub-banner-pill foreigner-pill">Foreigner</span>
+                  <span class="sub-banner-desc foreigner-desc foreigner-banner-greeting">Hello foreigner !</span>
+                </div>
+                <div class="sub-banner-title-row">
+                  <strong class="sub-banner-main-title foreigner-title foreigner-banner-action">Write your task</strong>
+                  <span class="sub-banner-tag foreigner-banner-tag">For Staff</span>
+                </div>
+              </div>
+            </div>
+            <div class="sub-banner-right">
+              <span class="sub-banner-badge foreigner-badge foreigner-btn-text">Write</span>
+              <i class="fa-solid fa-chevron-right sub-banner-arrow foreigner-arrow"></i>
+            </div>
+          </button>
+        </div>
+
+        <!-- ?湲곗떆媛?蹂댁“ ?쒗깮 諛곕꼫 (湲덉쑖?깊뼢 ?뚯븘蹂닿린 - 蹂댁“ ?쒕퉬?? -->
+        <div class="service-sub-banner-container quiz-banner-container">
+          <button type="button" class="service-sub-banner common-sub-banner quiz-service-banner" id="btn-easy-financial-test">
+            <div class="sub-banner-left">
+              <div class="sub-banner-icon quiz-icon">
+                <i class="fa-solid fa-lightbulb"></i>
+              </div>
+              <div class="sub-banner-text-box">
+                <div class="sub-banner-subtitle-row">
+                  <span class="sub-banner-pill quiz-pill">?湲곗떆媛?留욎땄</span>
+                  <span class="sub-banner-desc quiz-desc">?湲??쒓컙??吏猷⑦븯?쒕떎硫?</span>
+                </div>
+                <div class="sub-banner-title-row">
+                  <strong class="sub-banner-main-title quiz-title">?섏쓽 湲덉쑖?깊뼢 ?뚯븘蹂닿린</strong>
+                  <span class="sub-banner-action-text quiz-action">留욎땄 湲덉쑖 留ㅼ묶</span>
+                </div>
+              </div>
+            </div>
+            <div class="sub-banner-right">
+              <span class="sub-banner-badge quiz-badge sub-banner-btn-text">吏꾨떒?섍린</span>
+              <i class="fa-solid fa-chevron-right sub-banner-arrow quiz-arrow"></i>
+            </div>
+          </button>
+        </div>
+
+        <!-- 2x2 ??硫붾돱 洹몃━??(湲곕낯 ?④?) -->
+        <section class="quick-menu-grid animate-fade-in hidden" style="display: none;">
+          <button type="button" class="quick-card-btn" id="btn-quick-pre-writing">
+            <div class="quick-card-icon-wrapper paper-pencil">
+              <svg class="quick-svg-icon" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#00C7A9" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M12 20h9"></path>
+                <path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"></path>
+              </svg>
+            </div>
+            <span class="quick-card-text">
+              <span class="quick-card-title">誘몃━?묒꽦</span>
+              <span class="quick-card-desc">李쎄뎄 泥섎━ ?쒓컙 鍮좊Ⅸ ?⑥텞</span>
+            </span>
+          </button>
+          <button type="button" class="quick-card-btn" id="btn-quick-checklist">
+            <div class="quick-card-icon-wrapper checklist">
+              <svg class="quick-svg-icon" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#D1E834" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <polyline points="9 11 12 14 22 4"></polyline>
+                <path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"></path>
+              </svg>
+            </div>
+            <span class="quick-card-text">
+              <span class="quick-card-title">泥댄겕由ъ뒪??/span>
+              <span class="quick-card-desc">?꾩슂 ?쒕쪟 AI ?쇨큵 吏꾨떒</span>
+            </span>
+          </button>
+          <button type="button" class="quick-card-btn" id="btn-quick-scan">
+            <div class="quick-card-icon-wrapper scan">
+              <svg class="quick-svg-icon" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#4A90E2" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                <polyline points="14 2 14 8 20 8"></polyline>
+                <line x1="16" y1="13" x2="8" y2="13"></line>
+                <line x1="16" y1="17" x2="8" y2="17"></line>
+                <polyline points="10 9 9 9 8 9"></polyline>
+              </svg>
+            </div>
+            <span class="quick-card-text">
+              <span class="quick-card-title">?↔툑?꾪몴</span>
+              <span class="quick-card-desc">?꾪몴 珥ъ쁺?쇰줈 鍮좊Ⅸ ?묒닔</span>
+            </span>
+          </button>
+          <button type="button" class="quick-card-btn" id="btn-quick-doc-verify">
+            <div class="quick-card-icon-wrapper verify" style="background-color: #f5f3ff;">
+              <svg class="quick-svg-icon" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#7C3AED" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>
+                <path d="m9 12 2 2 4-4"></path>
+              </svg>
+            </div>
+            <span class="quick-card-text">
+              <span class="quick-card-title">吏꾩쐞?뺤씤</span>
+              <span class="quick-card-desc">?좊텇利씲룸벑蹂??먮낯 ?먮퀎</span>
+            </span>
+          </button>
+        </section>
+      </div>
+
+      <!-- ?댁슜 ?덈궡: 紐⑤뱺 湲곕뒫 踰꾪듉???섎떒???꾩튂 (PC?먯꽌???섎떒 ?꾩껜 ??諛곗튂) -->
+      <section class="notice-section">
+        <h4><i class="fa-solid fa-circle-info"></i> ?댁슜 ?덈궡 諛??좎쓽?ы빆</h4>
+        <ul>
+          <li>?湲곗씤?먯? 留ㅼ닚媛꾩쓽 ?곸뾽???쇱옟?꾩뿉 ?곕씪 ?ㅼ떆媛?蹂?숇맆 ???덉뒿?덈떎.</li>
+          <li>李쎄뎄?먯꽌 ?몄텧 ??遺?ъ쨷??寃쎌슦, ?먮룞 痍⑥냼泥섎━?섏뼱 ?ㅼ떆 踰덊샇?쒕? 諛쒓툒諛쏆쑝?붿빞 ?⑸땲??</li>
+          <li>?뚮━ 諛?吏꾨룞 ?뚮┝? 釉뚮씪?곗? ???쒖꽦???곹깭 諛?沅뚰븳 ?덉슜 ?щ????곕씪 ?먰솢?섏? ?딆쓣 ???덉쑝??二쇨린?곸쑝濡??붾㈃???뺤씤??二쇱꽭??</li>
+          <li>?쒕쾲 誘몃（湲곕뒗 1?뚯뿉 ?쒗빐 媛?ν븯硫?3紐??ㅻ줈 ?대룞?⑸땲?? ?湲??몄썝??3紐??댄븯???뚮뒗 誘몃０ ???놁뒿?덈떎.</li>
+        </ul>
+      </section>
+    </main>
+
+  <!-- ?섎떒 怨좎젙 CTA 踰꾪듉 諛?-->
+  <footer class="app-footer">
+    <div class="footer-btn-container">
+      <button class="footer-btn-refresh" id="refresh-bottom-btn-2" aria-label="?ㅼ떆媛??湲?媛깆떊">
+        <i class="fa-solid fa-arrows-rotate" id="refresh-icon-2"></i>
+      </button>
+      <button class="footer-btn-sms" id="sms-alert-btn">
+        <i class="fa-solid fa-sms"></i>
+        <span>臾몄옄 ?뚮┝諛쏄린</span>
+      </button>
+      <button class="footer-btn-primary" id="kakaotalk-btn">
+        <i class="fa-solid fa-comment"></i>
+        <span>移댄넚 ?뚮┝諛쏄린</span>
+      </button>
+    </div>
+  </footer>
+
+  <!-- ?좎뒪???뚮┝李?-->
+  <div id="toast" class="toast hidden">?湲??뺣낫媛 ?깃났?곸쑝濡?媛깆떊?섏뿀?듬땲??</div>
+
+
+  <!-- ?멸뎅???낅Т ?묒꽦 諛?踰덉뿭 紐⑤떖 (Write your task) -->
+  <div id="foreigner-translator-modal" class="modal-overlay hidden" style="z-index: 10050;">
+    <div class="modal-content foreigner-modal-content animate-slide-up">
+      <div class="foreigner-modal-header">
+        <div class="foreigner-modal-header-left">
+          <div class="foreigner-modal-icon-badge">
+            <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="#2563eb" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+              <polyline points="14 2 14 8 20 8"></polyline>
+              <line x1="16" y1="13" x2="8" y2="13"></line>
+              <line x1="16" y1="17" x2="8" y2="17"></line>
+              <polyline points="10 9 9 9 8 9"></polyline>
+            </svg>
+          </div>
+          <div class="foreigner-modal-header-titles">
+            <h3 class="foreigner-modal-title">Write your task</h3>
+            <p class="foreigner-modal-desc">
+              Enter your task in your native language.<br>
+              It will be translated for the staff.
+            </p>
+          </div>
+        </div>
+        <button type="button" class="foreigner-modal-close" id="close-foreigner-modal-btn" aria-label="Close modal">횞</button>
+      </div>
+
+      <!-- ?몄뼱 ?좏깮 踰꾪듉 諛?(Language Selector) -->
+      <div class="foreigner-lang-selector">
+        <span class="lang-selector-label"><i class="fa-solid fa-earth-americas"></i> Language:</span>
+        <div class="foreigner-scroll-wrapper">
+          <button type="button" class="foreigner-nav-arrow prev" id="btn-lang-prev" aria-label="?댁쟾 ?몄뼱">
+            <i class="fa-solid fa-chevron-left"></i>
+          </button>
+          <div class="lang-pill-group" id="lang-pill-group">
+            <button type="button" class="lang-pill active" data-lang="en">?눣?눡 English</button>
+            <button type="button" class="lang-pill" data-lang="zh">?눊?눛 訝?뻼</button>
+            <button type="button" class="lang-pill" data-lang="vi">?눤?눛 Ti梳퓆g Vi沼뇍</button>
+            <button type="button" class="lang-pill" data-lang="uz">?눣?눨 O'zbek</button>
+            <button type="button" class="lang-pill" data-lang="id">?눒?눍 Indonesia</button>
+            <button type="button" class="lang-pill" data-lang="tl">?눝?눑 Filipino</button>
+            <button type="button" class="lang-pill" data-lang="my">?눚?눚 ?쇹솽붳뷘쇹?/button>
+            <button type="button" class="lang-pill" data-lang="th">?눢?눑 仙꾝툠錫?/button>
+            <button type="button" class="lang-pill" data-lang="km">?눖?눑 ?곢윊?섂웴??/button>
+            <button type="button" class="lang-pill" data-lang="ru">?눟?눣 ????克龜橘</button>
+            <button type="button" class="lang-pill" data-lang="ja">?눓?눝 ?ζ쑍沃?/button>
+            <button type="button" class="lang-pill" data-lang="ne">?눛?눝 西ⓣ쪍西むㅎ西꿋?</button>
+          </div>
+          <button type="button" class="foreigner-nav-arrow next" id="btn-lang-next" aria-label="?ㅼ쓬 ?몄뼱">
+            <i class="fa-solid fa-chevron-right"></i>
+          </button>
+        </div>
+      </div>
+
+      <!-- ?ㅺ뎅?????쒗뵆由?移?-->
+      <div class="foreigner-quick-templates">
+        <span class="quick-chip-label">Quick select:</span>
+        <div class="foreigner-scroll-wrapper">
+          <button type="button" class="foreigner-nav-arrow prev" id="btn-chip-prev" aria-label="?댁쟾 ?쒗뵆由?>
+            <i class="fa-solid fa-chevron-left"></i>
+          </button>
+          <div class="quick-chip-list" id="foreigner-chip-container">
+            <button type="button" class="foreigner-chip" data-text="I would like to open a new bank account and get a debit card.">Open Account</button>
+            <button type="button" class="foreigner-chip" data-text="I need to send money overseas (international remittance).">Send Money</button>
+            <button type="button" class="foreigner-chip" data-text="I want to issue or reissue my debit card.">Debit Card</button>
+            <button type="button" class="foreigner-chip" data-text="I would like to exchange foreign currency.">Exchange</button>
+            <button type="button" class="foreigner-chip" data-text="I want to register for mobile banking service.">Mobile Banking</button>
+          </div>
+          <button type="button" class="foreigner-nav-arrow next" id="btn-chip-next" aria-label="?ㅼ쓬 ?쒗뵆由?>
+            <i class="fa-solid fa-chevron-right"></i>
+          </button>
+        </div>
+      </div>
+
+      <div class="foreigner-modal-body">
+        <div class="foreigner-input-box" id="foreigner-input-container">
+          <div class="foreigner-textarea-wrap">
+            <div class="foreigner-input-globe-icon">
+              <svg viewBox="0 0 24 24" width="18" height="18" stroke="#94a3b8" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                <circle cx="12" cy="12" r="10"></circle>
+                <line x1="2" y1="12" x2="22" y2="12"></line>
+                <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path>
+              </svg>
+            </div>
+            <textarea id="foreigner-task-textarea" class="foreigner-textarea" placeholder="Please enter your task here..." maxlength="1500"></textarea>
+          </div>
+          <div class="foreigner-char-counter">
+            <span id="foreigner-char-count">0</span>/1500
+          </div>
+        </div>
+      </div>
+
+      <div class="foreigner-modal-footer">
+        <button type="button" class="foreigner-send-btn" id="btn-foreigner-send">
+          <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" class="foreigner-send-svg">
+            <line x1="22" y1="2" x2="11" y2="13"></line>
+            <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
+          </svg>
+          <span id="foreigner-send-text">Send &amp; Translate</span>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ??됱썝 ?쒖떆??踰덉뿭 ?꾨즺 移대뱶 紐⑤떖 (Show to Bank Teller) -->
+  <div id="foreigner-result-modal" class="modal-overlay hidden" style="z-index: 10060;">
+    <div class="modal-content foreigner-result-modal-content animate-slide-up">
+      <div class="teller-modal-header">
+        <div class="teller-modal-badge">
+          <i class="fa-solid fa-hand-holding-hand"></i>
+          <span>??됱썝 ?쒖떆???붾㈃ / Show to Teller</span>
+        </div>
+        <button type="button" class="foreigner-modal-close" id="close-teller-modal-btn" aria-label="Close modal">횞</button>
+      </div>
+
+      <div class="teller-instruction-bar">
+        <i class="fa-solid fa-circle-info"></i>
+        <span>?쒕쾲???섏뿀???????붾㈃????됱썝?먭쾶 洹몃?濡?蹂댁뿬二쇱꽭??</span>
+      </div>
+
+      <div class="teller-translation-card">
+        <div class="teller-card-top">
+          <span class="teller-lang-tag kr">?눖?눟 李쎄뎄 ?꾨떖???쒓뎅??踰덉뿭</span>
+          <button type="button" class="teller-tts-btn" id="btn-teller-speak" title="?쒓뎅???뚯꽦?쇰줈 ?ㅻ젮二쇨린">
+            <i class="fa-solid fa-volume-high"></i>
+            <span>?뚯꽦 ?ｊ린</span>
+          </button>
+        </div>
+        
+        <div class="teller-kr-text" id="teller-translated-korean">
+          "?덈뀞?섏꽭?? <strong>?멸뎅??怨꾩쥖 媛쒖꽕 諛?泥댄겕移대뱶 諛쒓툒</strong>???좎껌?섍퀬???⑸땲??"
+        </div>
+
+        <div class="teller-card-divider"></div>
+
+        <div class="teller-card-bottom">
+          <span class="teller-lang-tag orig">?뙋 ?묒꽦?섏떊 ?먮Ц (Original)</span>
+          <div class="teller-orig-text" id="teller-original-text">
+            "I want to open a new bank account and get a debit card."
+          </div>
+        </div>
+      </div>
+
+      <div class="teller-ticket-info-pill">
+        <span>?꾩옱 ?湲곕쾲?? <strong>#<span class="wait-ticket-no">104</span></strong></span>
+        <span class="teller-dot">??/span>
+        <span class="teller-status-ready">踰덉뿭 以鍮??꾨즺 ??/span>
+      </div>
+
+      <div class="teller-modal-actions">
+        <button type="button" class="teller-btn-edit" id="btn-teller-edit">
+          <i class="fa-solid fa-pen"></i>
+          <span>?댁슜 ?섏젙 (Edit)</span>
+        </button>
+        <button type="button" class="teller-btn-confirm" id="btn-teller-done">
+          <span>?뺤씤 ?꾨즺 (Done)</span>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 移댁뭅?ㅽ넚 ?뚮┝?좎껌 紐⑤떖 -->
+  <div id="kakao-modal" class="modal-overlay hidden">
+    <div class="modal-content animate-slide-up">
+      <div class="modal-header">
+        <div class="modal-header-title">
+          <i class="fa-solid fa-comment kakao-icon"></i>
+          <h3>移댁뭅?ㅽ넚 ?湲??뚮┝ ?좎껌</h3>
+        </div>
+        <button class="close-btn" id="close-modal-btn">횞</button>
+      </div>
+      <div class="modal-body">
+        <p class="modal-desc">??李⑤?媛 ?ㅺ린 ??(?湲??몄썝 2紐??⑥븯???? 移댁뭅?ㅽ넚 ?뚮┝?≪쑝濡?誘몃━ 諛쒖넚???쒕┰?덈떎.</p>
+        <div class="input-phone-group">
+          <label for="phone-number" class="form-label">?대???踰덊샇</label>
+          <input type="tel" id="phone-number" class="form-input" placeholder="010-0000-0000" value="010-1004-5852" required="">
+        </div>
+        <p class="modal-note">* ?뚮┝???쒕퉬?ㅻ뒗 ?낅젰?섏떊 踰덊샇濡?1?뚯꽦 ?덈궡留??꾩넚?섎ŉ ?湲??꾨즺 ??利됱떆 ?먭린?⑸땲??</p>
+      </div>
+      <div class="modal-footer">
+        <button class="btn-cancel" id="cancel-modal-btn">痍⑥냼</button>
+        <button class="btn-confirm" id="confirm-modal-btn">?뚮┝ 諛쏄린 ?좎껌</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 臾몄옄(SMS) ?湲??뚮┝?좎껌 紐⑤떖 -->
+  <div id="sms-modal" class="modal-overlay hidden">
+    <div class="modal-content animate-slide-up">
+      <div class="modal-header">
+        <div class="modal-header-title">
+          <i class="fa-solid fa-sms sms-modal-icon"></i>
+          <h3>臾몄옄 ?湲??뚮┝ ?좎껌</h3>
+        </div>
+        <button class="close-btn" id="close-sms-modal-btn">횞</button>
+      </div>
+      <div class="modal-body">
+        <p class="modal-desc">??李⑤?媛 ?ㅺ린 ??(?湲??몄썝 2紐??⑥븯???? ?낅젰?섏떊 踰덊샇濡?臾몄옄 硫붿떆吏瑜?諛쒖넚???쒕┰?덈떎.</p>
+        <div class="input-phone-group">
+          <label for="sms-phone-number" class="form-label">?대???踰덊샇</label>
+          <input type="tel" id="sms-phone-number" class="form-input" placeholder="010-0000-0000" value="010-1004-5852" required="">
+        </div>
+        <p class="modal-note">* ?낅젰?섏떊 踰덊샇???湲??뚮┝ 諛쒖넚 ??利됱떆 ?먭린?⑸땲??</p>
+      </div>
+      <div class="modal-footer">
+        <button class="btn-cancel" id="cancel-sms-modal-btn">痍⑥냼</button>
+        <button class="btn-confirm" id="confirm-sms-modal-btn" style="background-color: var(--brand-mint);">?뚮┝ 諛쏄린 ?좎껌</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ?湲??쒕쾲 誘몃（湲?而ㅼ뒪? ?덈궡李?紐⑤떖 -->
+  <div id="delay-confirm-modal" class="modal-overlay hidden">
+    <div class="modal-content animate-slide-up">
+      <div class="modal-header">
+        <div class="modal-header-title">
+          <i class="fa-solid fa-circle-question delay-modal-icon"></i>
+          <h3>?湲??쒕쾲 誘몃（湲?/h3>
+        </div>
+        <button class="close-btn" id="close-delay-modal-btn">횞</button>
+      </div>
+      <div class="modal-body">
+        <p class="modal-desc" style="font-weight: 700; color: var(--dark-text); font-size: 14px;">?꾩옱 ?湲??쒕쾲????3紐??ㅻ줈 誘몃（?쒓쿋?듬땲源?</p>
+        <p class="modal-note" style="margin-top: 8px; color: var(--warning-red); font-weight: 500;">* ?쒕쾲 誘몃（湲곕뒗 1?뚯뿉 ?쒗빐?쒕쭔 媛?ν븯硫? ?湲??몄썝??3紐??댄븯???뚮뒗 誘몃０ ???놁뒿?덈떎.</p>
+      </div>
+      <div class="modal-footer" style="grid-template-columns: 1fr 1.5fr;">
+        <button class="btn-cancel" id="cancel-delay-modal-btn">?꾨땲??/button>
+        <button class="btn-confirm" id="confirm-delay-modal-btn" style="background-color: var(--brand-mint);">?? 誘몃（寃좎뒿?덈떎</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ?쒕쪟 吏꾩쐞?뺤씤 ?꾩슜 ?낅┰ 紐⑤떖 (Government / Court Verification System) -->
+  <div id="doc-verify-modal" class="modal-overlay hidden" style="z-index: 10100;">
+    <div class="modal-content doc-verify-modal-content animate-slide-up">
+      <div class="doc-verify-header">
+        <div class="doc-verify-header-left">
+          <div class="doc-verify-icon-badge">
+            <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="#7C3AED" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>
+              <path d="m9 12 2 2 4-4"></path>
+            </svg>
+          </div>
+          <div class="doc-verify-header-titles">
+            <h3 class="doc-verify-title">怨듦났湲곌? ?쒕쪟 吏꾩쐞?뺤씤</h3>
+            <p class="doc-verify-desc">?뺣?24 쨌 ?踰뺤썝 ?꾩궛留??ㅼ떆媛??곕룞 ?먮낯 寃利?/p>
+          </div>
+        </div>
+        <button type="button" class="close-btn" id="close-doc-verify-modal-btn">횞</button>
+      </div>
+
+      <!-- 寃利?????쒕쪟 ?낅Т 移댄뀒怨좊━ 諛??몃? ?쒕쪟 ?좏깮 ?곸뿭 -->
+      <div class="doc-verify-type-selector">
+        <!-- ?곷떒 移댄뀒怨좊━ ???섑띁 諛?醫뚯슦 ?ㅽ겕濡??붿궡??-->
+        <div class="verify-scroll-wrapper">
+          <button type="button" class="verify-scroll-arrow left" id="btn-verify-cat-left" aria-label="?댁쟾 移댄뀒怨좊━">
+            <i class="fa-solid fa-chevron-left"></i>
+          </button>
+          <div class="verify-category-tabs" id="verify-category-tabs-container">
+            <button type="button" class="verify-cat-btn active" data-cat="all">?꾩껜/二쇱슂?쒕쪟</button>
+            <button type="button" class="verify-cat-btn" data-cat="personal">媛쒖씤쨌?좉퇋</button>
+            <button type="button" class="verify-cat-btn" data-cat="loan">?꾩꽭쨌二쇰떞?</button>
+            <button type="button" class="verify-cat-btn" data-cat="corp">踰뺤씤쨌湲곗뾽</button>
+            <button type="button" class="verify-cat-btn" data-cat="inherit">?由?룹긽??/button>
+          </div>
+          <button type="button" class="verify-scroll-arrow right" id="btn-verify-cat-right" aria-label="?ㅼ쓬 移댄뀒怨좊━">
+            <i class="fa-solid fa-chevron-right"></i>
+          </button>
+        </div>
+        
+        <!-- ?섎떒 ?몃? ?쒕쪟 移??섑띁 諛?醫뚯슦 ?ㅽ겕濡??붿궡??-->
+        <div class="verify-scroll-wrapper">
+          <button type="button" class="verify-scroll-arrow left" id="btn-verify-pill-left" aria-label="?댁쟾 ?쒕쪟">
+            <i class="fa-solid fa-chevron-left"></i>
+          </button>
+          <div class="verify-type-pill-group" id="verify-doc-pill-container">
+            <!-- JS?먯꽌 ?낅Т蹂??쒕쪟 紐⑸줉 ?숈쟻 ?뚮뜑留?-->
+          </div>
+          <button type="button" class="verify-scroll-arrow right" id="btn-verify-pill-right" aria-label="?ㅼ쓬 ?쒕쪟">
+            <i class="fa-solid fa-chevron-right"></i>
+          </button>
+        </div>
+      </div>
+
+      <div class="doc-verify-body">
+        <!-- 1?④퀎: 移대찓???ㅼ틪 酉고뙆?몃뜑 -->
+        <div id="doc-verify-step-scan">
+          <div class="doc-viewfinder-box" id="doc-viewfinder-box">
+            <!-- ?ㅻ쭏?명룿 ?ㅼ떆媛??꾨㈃ 移대찓??鍮꾨뵒???ㅽ듃由?-->
+            <video id="doc-verify-camera-stream" autoplay="" playsinline="" style="width: 100%; height: 100%; object-fit: cover; display: none;"></video>
+            
+            <!-- 珥ъ쁺/?낅줈?쒕맂 ?대?吏 ?꾨━酉?-->
+            <img id="doc-captured-preview" style="width: 100%; height: 100%; object-fit: contain; display: none;" alt="珥ъ쁺???쒕쪟">
+
+            <!-- 媛???쒕쪟 寃щ낯 (移대찓??沅뚰븳 誘몄뿰寃????쒖떆) -->
+            <div class="doc-mock-preview" id="doc-mock-preview">
+              <div class="doc-mock-content" id="doc-mock-content">
+                <i class="fa-regular fa-id-card doc-preview-icon" id="doc-preview-icon"></i>
+                <span id="doc-preview-text">二쇰??깅줉利?/ ?댁쟾硫댄뿀利?/span>
+                <span class="doc-preview-sub">臾몄꽌???꾨?議?諛⑹? 2李⑥썝 諛붿퐫??諛??뺤씤踰덊샇瑜??ш컖???덉뿉 留욎떠二쇱꽭??/span>
+              </div>
+            </div>
+
+            <!-- 移대찓??釉뚮씪耳?媛?대뱶?쇱씤 -->
+            <div class="doc-guide-bracket">
+              <span class="bracket tl"></span>
+              <span class="bracket tr"></span>
+              <span class="bracket bl"></span>
+              <span class="bracket br"></span>
+              <div class="doc-laser-line" id="doc-verify-laser"></div>
+            </div>
+          </div>
+
+          <!-- ?ㅻ쭏?명룿 湲곕낯 移대찓????吏곸젒 ?ㅽ뻾 ?④? ?뚯씪 ?명뭼 -->
+          <input type="file" id="doc-camera-file-input" accept="image/*" capture="environment" style="display: none;">
+          <!-- 罹≪쿂 罹붾쾭??-->
+          <canvas id="doc-verify-canvas" style="display: none;"></canvas>
+
+          <div class="doc-verify-scan-actions">
+            <!-- 1. 酉고뙆?몃뜑 利됱떆 ?ㅼ틪 珥ъ쁺 踰꾪듉 -->
+            <button type="button" class="btn-doc-scan-action" id="btn-start-doc-verify">
+              <i class="fa-solid fa-camera"></i>
+              <span id="doc-scan-btn-text">?쒕쪟 珥ъ쁺 諛??먮룞 吏꾩쐞?뺤씤</span>
+            </button>
+            
+            <!-- 2. ?대???湲곕낯 移대찓???댄뵆 ?닿린 踰꾪듉 -->
+            <button type="button" class="btn-doc-app-camera" id="btn-open-camera-app">
+              <i class="fa-solid fa-mobile-screen-button"></i>
+              <span>?대???移대찓???깆쑝濡?珥ъ쁺?섍린</span>
+            </button>
+          </div>
+
+          <!-- 踰덊샇 吏곸젒 ?낅젰 吏꾩쐞議고쉶 媛꾪렪 ?곸뿭 (?ъ뾽?먮쾲??/ 16?먮━ 諛쒓툒踰덊샇) -->
+          <div class="doc-manual-input-box" id="doc-manual-input-box">
+            <div class="manual-input-header">
+              <span id="manual-input-title"><i class="fa-solid fa-keyboard"></i> ?뺤씤踰덊샇 吏곸젒 ?낅젰 吏꾩쐞?뺤씤</span>
+            </div>
+            <div class="manual-input-row">
+              <input type="text" id="doc-direct-input-val" class="doc-direct-input" placeholder="?ъ뾽?먮벑濡앸쾲??10?먮━ ?낅젰 (?? 504-85-12345)">
+              <button type="button" class="btn-direct-verify" id="btn-direct-verify">議고쉶</button>
+            </div>
+            <div class="manual-input-hint" id="manual-input-hint">
+              * 援?꽭泥??덊깮???ъ뾽??怨꾩냽?ъ뾽???뺤긽 媛?? ?щ? ?ㅼ떆媛?議고쉶
+            </div>
+          </div>
+        </div>
+
+        <!-- 2?④퀎: ?ㅼ떆媛?吏꾩쐞?뺤씤 寃곌낵 由ы룷??-->
+        <div id="doc-verify-step-result" class="doc-verify-result-box hidden">
+          <div class="verify-result-header success" id="res-header-badge">
+            <i class="fa-solid fa-circle-check" id="res-header-icon"></i>
+            <div class="verify-result-badge-text">
+              <strong id="res-header-title">吏꾩쐞 寃利??꾨즺 (?뺤긽 ?먮낯 ?쒕쪟)</strong>
+              <span id="res-header-sub">援?꽭泥?쨌 ?踰뺤썝 쨌 ?뺣?24 ?꾩궛 ?먯옣 ?ㅼ떆媛??쇱튂</span>
+            </div>
+          </div>
+
+          <!-- 3? ?듭떖 ?ъ씤??吏꾨떒 ?붿빟 移대뱶 -->
+          <div class="verify-key-highlight-grid" id="verify-key-highlight-grid">
+            <div class="highlight-item" id="hl-status-item">
+              <span class="hl-label">?ъ뾽??/ ?멸컧 ?곹깭</span>
+              <strong class="hl-val pass" id="hl-status-val">怨꾩냽?ъ뾽??(?뺤긽媛??</strong>
+            </div>
+            <div class="highlight-item" id="hl-date-item">
+              <span class="hl-label">諛쒓툒?쇱옄 ?좏슚??(3媛쒖썡 ?대궡)</span>
+              <strong class="hl-val pass" id="hl-date-val">3媛쒖썡 ?대궡 ?좏슚 (?곹빀)</strong>
+            </div>
+          </div>
+
+          <div class="verify-result-details">
+            <div class="verify-detail-row">
+              <span class="verify-label">?뺤씤 ?쒕쪟</span>
+              <strong class="verify-val" id="res-doc-name">?ъ뾽?먮벑濡앹쬆紐낆썝 (3媛쒖썡 ?대궡)</strong>
+            </div>
+            <div class="verify-detail-row">
+              <span class="verify-label">諛쒓툒 湲곌?</span>
+              <span class="verify-val" id="res-doc-issuer">援?꽭泥??덊깮??(Hometax)</span>
+            </div>
+            <div class="verify-detail-row">
+              <span class="verify-label" id="res-code-label">?ъ뾽??/ 諛쒓툒踰덊샇</span>
+              <span class="verify-val code" id="res-doc-code">504-85-12345</span>
+            </div>
+            <div class="verify-detail-row">
+              <span class="verify-label">諛쒓툒 ?쇱옄</span>
+              <span class="verify-val" id="res-doc-date">2026.08.20 (?좏슚湲곌컙 ?대궡 ?곹빀)</span>
+            </div>
+            <div class="verify-detail-row">
+              <span class="verify-label">吏꾩쐞 諛??곹깭 ?먯젙</span>
+              <span class="verify-val pass" id="res-doc-status-text"><i class="fa-solid fa-shield-check"></i> 怨꾩냽?ъ뾽??쨌 ?먮낯 ?좏슚 (PASS)</span>
+            </div>
+          </div>
+
+          <div class="verify-result-footer-actions">
+            <button type="button" class="btn-verify-retry" id="btn-doc-verify-retry">
+              <i class="fa-solid fa-rotate-left"></i>
+              <span>?ㅼ떆 議고쉶/?ㅼ틪</span>
+            </button>
+            <button type="button" class="btn-verify-submit" id="btn-doc-verify-submit">
+              <i class="fa-solid fa-check"></i>
+              <span>李쎄뎄 吏곸썝???꾨떖 ?묒닔</span>
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- AI ?쒕쪟 ?ㅼ틪 紐⑤떖 (?쇨큵 ?ㅼ틪 媛쒖젙) -->
+  <div id="ai-scan-modal" class="modal-overlay hidden" style="z-index: 10100;">
+    <div class="modal-content animate-slide-up">
+      <div class="modal-header">
+        <div class="modal-header-title">
+          <i class="fa-solid fa-wand-magic-sparkles ai-modal-icon" style="color: var(--brand-mint-dark); font-size: 16px;"></i>
+          <h3 style="font-size: 15px; font-weight: 700;">AI ?쒕쪟 ?곹빀??吏꾨떒</h3>
+        </div>
+        <button class="close-btn" id="close-ai-modal-btn">횞</button>
+      </div>
+      <div class="modal-body" style="padding: 16px;">
+        <!-- [1?④퀎] ?곗냽 移대찓???ㅼ틪 珥ъ쁺 ?붾㈃ -->
+        <div id="ai-scan-step-camera">
+          <div class="ai-scan-progress-header" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+            <span id="ai-batch-step-text" style="font-size: 11px; font-weight: bold; color: var(--brand-mint-dark);">?④퀎: 1 / 3</span>
+            <span id="ai-batch-step-percent" style="font-size: 11px; color: var(--cool-gray);">33%</span>
+          </div>
+          <p class="modal-desc" id="ai-scan-doc-target-name" style="font-weight: 700; color: var(--dark-text); font-size: 13px; text-align: center; margin-bottom: 12px; height: 18px;">?쒕쪟 紐낆묶</p>
+          
+          <!-- 紐⑥쓽 諛??ㅼ젣 ?쇱씠釉?移대찓???듯빀 酉고뙆?몃뜑 -->
+          <div class="camera-viewfinder" id="ai-camera-viewfinder" style="position: relative; overflow: hidden; background-color: #111; border-radius: 10px; display: flex; justify-content: center; align-items: center; aspect-ratio: 16 / 10; min-height: 200px; max-height: 52vh; margin-top: 4px; margin-bottom: 10px; box-shadow: inset 0 0 25px rgba(0,0,0,0.85);">
+            <!-- ?ㅼ떆媛??뱀틺/紐⑤컮???꾨㈃ 移대찓???ㅽ듃由щ컢 酉곗뼱 -->
+            <video id="ai-camera-stream" autoplay="" playsinline="" style="width: 100%; height: 100%; object-fit: cover; display: none;"></video>
+            
+            <!-- 媛???쒕쪟 寃щ낯 (移대찓??誘몄뿰?????대갚) -->
+            <div class="mock-document-view" id="ai-mock-document" style="width: 88%; height: 82%; background-size: contain; background-repeat: no-repeat; background-position: center;">
+              <!-- JS ?숈쟻 ?댁슜 -->
+            </div>
+            
+            <!-- ?쒕쪟 ?꾩튂 媛?대뱶?쇱씤 釉뚮씪耳?-->
+            <div class="camera-guide" style="
+              position: absolute;
+              width: 92%;
+              height: 86%;
+              border: none;
+              box-shadow: 0 0 0 9999px rgba(0,0,0,0.42);
+              pointer-events: none;
+              border-radius: 4px;
+            ">
+              <!-- ??醫뚯긽??爰얠뇿 -->
+              <span style="position:absolute; top:0; left:0; width:26px; height:20px; border-top:3px solid #00BAC6; border-left:3px solid #00BAC6; border-radius:3px 0 0 0;"></span>
+              <!-- ???곗긽??爰얠뇿 -->
+              <span style="position:absolute; top:0; right:0; width:26px; height:20px; border-top:3px solid #00BAC6; border-right:3px solid #00BAC6; border-radius:0 3px 0 0;"></span>
+              <!-- ??醫뚰븯??爰얠뇿 -->
+              <span style="position:absolute; bottom:0; left:0; width:26px; height:20px; border-bottom:3px solid #00BAC6; border-left:3px solid #00BAC6; border-radius:0 0 0 3px;"></span>
+              <!-- ???고븯??爰얠뇿 -->
+              <span style="position:absolute; bottom:0; right:0; width:26px; height:20px; border-bottom:3px solid #00BAC6; border-right:3px solid #00BAC6; border-radius:0 0 3px 0;"></span>
+              <!-- 媛?대뱶 以묒븰 ?덈궡 ?띿뒪??(移대찓??誘몄뿰寃??쒖뿉留??쒖떆) -->
+              <span id="ai-viewfinder-hint" style="position:absolute; top:50%; left:50%; transform:translate(-50%,-50%); color:rgba(255,255,255,0.65); font-size:11.5px; font-weight:600; white-space:nowrap; letter-spacing:-0.2px; text-shadow:0 1px 4px rgba(0,0,0,0.8);">?쒕쪟瑜???寃⑹옄 ?덉뿉 留욎떠 二쇱꽭??/span>
+            </div>
+            
+            <!-- ?덉씠? ?ㅼ틦??鍮??쇱씤 -->
+            <div class="scan-laser" id="ai-scan-laser-line" style="position: absolute; width: 92%; height: 2px; background-color: #00BAC6; box-shadow: 0 0 8px #00BAC6; display: none; animation: scanMove 2.2s infinite ease-in-out;"></div>
+          </div>
+          
+          <!-- ?ㅻ깄??珥ъ쁺???④? 罹붾쾭??-->
+          <canvas id="ai-camera-canvas" style="display: none;"></canvas>
+          
+          <button class="btn-scan-action btn-scan-primary" id="ai-start-scan-btn" style="margin-top: 10px; background-color: var(--brand-mint-dark); width: 100%; height: 44px; font-size: 14px; font-weight: 800;">
+            <i class="fa-solid fa-camera"></i>
+            <span>?쒕쪟 珥ъ쁺 諛?AI 吏꾨떒</span>
+          </button>
+
+          <!-- 媛쒕퀎 ?④퀎 ?섍린湲?(?ㅽ궢) 踰꾪듉 -->
+          <button class="btn-scan-action btn-scan-secondary" id="ai-skip-step-btn" style="margin-top: 8px; width: 100%; border: 1.5px solid #bdc3c7; color: var(--dark-gray); font-weight: 700; height: 38px;">
+            <i class="fa-solid fa-angles-right"></i>
+            <span>???쒕쪟 嫄대꼫?곌린 (?섍린湲?</span>
+          </button>
+        </div>
+
+        <!-- [2?④퀎] AI 醫낇빀 遺꾩꽍 寃곌낵 ?뺤씤 ?곸뿭 -->
+        <div class="ocr-result-container hidden" id="ai-result-container">
+          <div class="ocr-result-title" id="ai-result-status-title" style="justify-content: center; font-size: 15px; font-weight: 800; color: var(--brand-mint-dark); margin-bottom: 12px;">
+            <i class="fa-solid fa-chart-simple" style="margin-right: 6px;"></i>AI ?쇨큵 吏꾨떒 寃곌낵 由ы룷??
+          </div>
+          
+          <!-- 醫낇빀 ?듦퀎 諛뺤뒪 -->
+          <div class="ai-batch-summary-box" style="background: linear-gradient(135deg, var(--brand-mint-light) 0%, #FAFDFB 100%); border: 1px solid rgba(0, 199, 169, 0.2); padding: 12px; border-radius: 12px; text-align: center; margin-bottom: 14px;">
+            <span style="font-size: 11px; color: var(--cool-gray); font-weight: 500;">?쒕쪟 以鍮??꾪솴</span>
+            <h4 id="ai-batch-summary-text" style="font-size: 16px; font-weight: 800; color: var(--dark-text); margin: 4px 0;">3媛?以?2媛??쒕쪟 以鍮??꾨즺</h4>
+            <div style="font-size: 12px; color: var(--brand-mint-dark); font-weight: 700;" id="ai-batch-summary-pct">以鍮꾩쑉 66%</div>
+          </div>
+
+          <!-- 媛쒕퀎 ?쒕쪟 吏꾨떒 由ъ뒪??-->
+          <div class="ai-batch-result-list" id="ai-batch-result-list" style="display: flex; flex-direction: column; gap: 10px; margin-bottom: 14px; text-align: left; max-height: 250px; overflow-y: auto; padding: 2px 2px 6px 2px;">
+            <!-- JS ?숈쟻 ?앹꽦 (?곹빀/遺?곹빀 ??ぉ 由ъ뒪?? -->
+          </div>
+          
+          <div style="display: flex; gap: 8px; margin-top: 12px;">
+            <button class="btn-scan-action btn-scan-secondary" id="ai-retry-scan-btn" style="flex: 1;">?ъ눋??/button>
+            <button class="btn-scan-action btn-scan-primary" id="ai-confirm-btn" style="flex: 2; background-color: var(--brand-mint-dark);">寃곌낵 ?곸슜?섍린</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 理쒖큹 1??媛쒖씤?뺣낫 諛??쒕퉬???댁슜 ?숈쓽 紐⑤떖 (怨듯넻 - ?먯꽭??蹂닿린 ?곸꽭 UI) -->
+  <div id="common-consent-modal" class="modal-overlay hidden">
+    <div class="modal-content animate-slide-up" style="max-height: 82vh; display: flex; flex-direction: column; overflow: hidden; max-width: 440px;">
+      <div class="modal-header" style="background-color: var(--brand-mint-light); border-bottom: 1px solid rgba(0, 186, 174, 0.15); padding: 14px 16px;">
+        <div class="modal-header-title">
+          <i class="fa-solid fa-shield-halved" style="color: var(--brand-mint); font-size: 16px;"></i>
+          <h3 style="font-size: 13.5px; font-weight: 700; color: var(--brand-mint-dark);">iM SmartQ 媛쒖씤?뺣낫 泥섎━ ?덈궡</h3>
+        </div>
+        <button class="close-btn" id="close-common-consent-modal-btn">횞</button>
+      </div>
+      
+      <div class="modal-body" style="padding: 16px; overflow-y: auto; flex: 1;">
+        <p class="form-desc" style="margin-bottom: 14px; line-height: 1.5; color: var(--dark-gray); font-size: 12px;">
+          iM SmartQ??<strong>媛쒖씤?뺣낫 蹂댄샇踰???5議?諛?2026.4 媛쒖젙 吏移?/strong>???곕씪 ?쒕퉬???쒓났???꾩슂??理쒖냼?쒖쓽 媛쒖씤?뺣낫瑜?援щ텇?섏뿬 ?섏쭛?⑸땲??
+        </p>
+
+        <!-- ?쎄? 泥댄겕 諛??곸꽭蹂닿린 由ъ뒪??-->
+        <div class="consent-flow-wrapper" style="display: flex; flex-direction: column; gap: 10px; margin-bottom: 16px;">
+          
+          <!-- ?꾩껜 ?숈쓽 移?-->
+          <div class="consent-row-header" style="background-color: var(--brand-mint-light); padding: 12px; border-radius: 8px; border: 1px solid rgba(0, 186, 174, 0.2); display: flex; align-items: center; margin-bottom: 6px;">
+            <label class="checkbox-container" style="font-weight: 700; width: 100%; margin: 0;">
+              <input type="checkbox" id="agree-all-consents">
+              <span class="checkmark"></span>
+              <span class="checkbox-label" style="color: var(--brand-mint-dark); font-size: 13px;">?쎄? 諛??숈쓽???꾩껜 ?숈쓽?섍린</span>
+            </label>
+          </div>
+
+          <!-- 1. 泥섎━諛⑹묠 ?숈쓽 ??-->
+          <div class="consent-row-item" style="border: 1px solid var(--light-gray); border-radius: 8px; padding: 4px 12px; background-color: var(--white);">
+            <div class="consent-row-main" style="display: flex; justify-content: space-between; align-items: center; padding: 8px 0;">
+              <label class="checkbox-container" style="margin: 0;">
+                <input type="checkbox" class="individual-consent" id="agree-policy-check">
+                <span class="checkmark"></span>
+                <span class="checkbox-label" style="font-size: 12px; font-weight: 600;"><span style="color: var(--brand-mint); font-weight: 700;">[?꾩닔]</span> 媛쒖씤?뺣낫 泥섎━諛⑹묠 ?뺤씤</span>
+              </label>
+              <button type="button" class="btn-consent-detail" data-target="detail-policy" style="background: none; border: none; font-size: 11.5px; color: var(--cool-gray); cursor: pointer; display: flex; align-items: center; gap: 4px; font-weight: 600; padding: 4px 0;">
+                <span>?먯꽭??/span> <i class="fa-solid fa-chevron-down" style="font-size: 9px; transition: transform 0.2s;"></i>
+              </button>
+            </div>
+            <div id="detail-policy" class="consent-detail-panel hidden" style="border-top: 1px solid var(--light-gray); margin-top: 0; margin-bottom: 6px; overflow: hidden; background-color: var(--background-gray); border-radius: 4px;">
+              <div class="consent-text-box" style="padding: 10px; font-size: 10.5px; max-height: 150px; overflow-y: auto; color: var(--dark-gray); line-height: 1.5; font-family: inherit;">
+                <strong>[iM SmartQ 媛쒖씤?뺣낫 泥섎━諛⑹묠 ?꾨Ц]</strong><br><br>
+                iM SmartQ???댁슜?먯쓽 媛쒖씤?뺣낫瑜??덉쟾?섍쾶 蹂댄샇?섍퀬 愿??踰뺣졊??以?섑븯湲??꾪빐 ?ㅼ쓬怨?媛숈씠 媛쒖씤?뺣낫瑜?泥섎━?⑸땲??<br><br>
+                <strong>??議?(媛쒖씤?뺣낫??泥섎━ 紐⑹쟻)</strong><br>
+                ?섏쭛???뺣낫???ㅼ쓬 紐⑹쟻 ?댁쇅???⑸룄濡??ъ슜?섏? ?딆뒿?덈떎.<br>
+                - ?곸뾽??諛⑸Ц 怨좉컼???湲곕쾲??諛쒓툒 諛??湲??쒖꽌 ?ㅼ떆媛??덈궡<br>
+                - ?湲??곹깭 諛??몄텧 ?뚮┝ ?쒕퉬???쒓났<br>
+                - 紐⑤컮???ъ쟾 ?뺣낫 ?낅젰 諛?李쎄뎄 ?⑤쭚 ?곕룞 吏??br>
+                - ?쒕퉬???댁슜 湲곕줉 諛??쒖뒪??蹂댁븞 愿由?br><br>
+                <strong>??議?(泥섎━?섎뒗 媛쒖씤?뺣낫????ぉ)</strong><br>
+                - 踰덊샇??諛??뚮┝?? ?湲곕쾲?? 諛쒓텒?쒓컙, 吏?먮챸, ?곕씫泥??꾪솕踰덊샇)<br>
+                - ?ъ쟾?묒꽦 湲곕뒫: ?깅챸, ?앸뀈?붿씪, ?곕씫泥? 二쇱냼, 湲덉쑖嫄곕옒 ??ぉ ?뺣낫<br>
+                - ?먮룞 ?앹꽦 ??ぉ: ?묒냽 ?쇱떆, 荑좏궎, 湲곌린 諛?釉뚮씪?곗? 紐낆꽭, ?묒냽 濡쒓렇<br><br>
+                <strong>??議?(媛쒖씤?뺣낫??泥섎━ 諛?蹂댁쑀湲곌컙)</strong><br>
+                - <strong>?댁슜 紐⑹쟻???ъ꽦?섎㈃ 利됱떆(?뱀씪 ?곸뾽??醫낅즺 ?? ?뚭린?섎뒗 寃껋쓣 ?먯튃?쇰줈 ?⑸땲??</strong><br>
+                - ?ъ쟾 ?낅젰???꾪몴 ?뺣낫??怨좉컼??李쎄뎄?먯꽌 ?낅Т 泥섎━瑜??꾨즺?④낵 ?숈떆???⑤쭚 ?곸뿉??吏泥??놁씠 ?곴뎄 ?뚭린?⑸땲??<br><br>
+                <strong>??議?(媛쒖씤?뺣낫???????쒓났)</strong><br>
+                - ?먯튃?곸쑝濡????먯뿉寃??뺣낫瑜??쒓났?섏? ?딆쑝硫? ?뺣낫二쇱껜???ъ쟾 ?숈쓽??愿怨?踰뺣졊???밸퀎 洹쒖젙???덈뒗 寃쎌슦???쒗빐?쒕쭔 ?꾧꺽?섍쾶 ?쒗븳 ?쒓났?⑸땲??<br><br>
+                <strong>??議?(媛쒖씤?뺣낫 泥섎━???꾪긽)</strong><br>
+                - ?⑥쑉?곸씤 ?쒕퉬???쒓났???꾪빐 ?뚮┝??諛쒖넚 ?낅Т ?깆쓣 ?꾨Ц ??됱뾽泥댁뿉 ?쒗빐 ?덉쟾 議곗튂 怨꾩빟 ?섏뿉 ?꾪긽?⑸땲??<br><br>
+                <strong>??議?(媛쒖씤?뺣낫???뚭린 ?덉감 諛?諛⑸쾿)</strong><br>
+                - ?꾩옄???뚯씪? ?ъ깮 遺덇??ν븳 湲곗닠??諛⑸쾿?쇰줈 利됱떆 ?곴뎄 ??젣?섎ŉ, ?몄뇙臾??깆? 遺꾩뇙 ?먮뒗 ?뚭컖?⑸땲??<br><br>
+                <strong>??議?(媛쒖씤?뺣낫 蹂댄샇 議곗튂)</strong><br>
+                - ?묎렐 沅뚰븳 ?쒖뼱, 媛쒖씤?뺣낫 ?꾩넚 援ш컙 SSL ?뷀샇???곸슜, ?뺢린???쒖뒪???먭????댄뻾?⑸땲??<br><br>
+                <strong>??議?(?뺣낫二쇱껜??沅뚮━)</strong><br>
+                - ?댁슜?먮뒗 ?몄젣?좎? ?먯떊??媛쒖씤?뺣낫??????대엺, ?뺤젙, ??젣 諛?泥섎━ ?뺤?瑜??붿껌?????덉뒿?덈떎.<br><br>
+                <strong>??議?(媛쒖씤?뺣낫 蹂댄샇梨낆엫??</strong><br>
+                - iM諭낇겕 媛쒖씤?뺣낫 蹂댄샇梨낆엫??諛??뺣낫蹂댄샇遺 ?대떦 (怨듭떇 李쎄뎄 以??<br><br>
+                <strong>??0議?(蹂寃?怨좎?)</strong><br>
+                - 蹂?諛⑹묠? 2026??4??1?쇰????쒗뻾?섎ŉ, 媛쒖젙 ???쒕퉬??怨듭??ы빆???듯빐 ?곸꽭 怨좎??⑸땲??
+              </div>
+            </div>
+          </div>
+
+          <!-- 2. ?꾩닔 ?숈쓽????-->
+          <div class="consent-row-item" style="border: 1px solid var(--light-gray); border-radius: 8px; padding: 4px 12px; background-color: var(--white);">
+            <div class="consent-row-main" style="display: flex; justify-content: space-between; align-items: center; padding: 8px 0;">
+              <label class="checkbox-container" style="margin: 0;">
+                <input type="checkbox" class="individual-consent" id="agree-required-check">
+                <span class="checkmark"></span>
+                <span class="checkbox-label" style="font-size: 12px; font-weight: 600;"><span style="color: var(--brand-mint); font-weight: 700;">[?꾩닔]</span> 媛쒖씤?뺣낫 ?섏쭛쨌?댁슜 ?숈쓽</span>
+              </label>
+              <button type="button" class="btn-consent-detail" data-target="detail-required" style="background: none; border: none; font-size: 11.5px; color: var(--cool-gray); cursor: pointer; display: flex; align-items: center; gap: 4px; font-weight: 600; padding: 4px 0;">
+                <span>?먯꽭??/span> <i class="fa-solid fa-chevron-down" style="font-size: 9px; transition: transform 0.2s;"></i>
+              </button>
+            </div>
+            <div id="detail-required" class="consent-detail-panel hidden" style="border-top: 1px solid var(--light-gray); margin-top: 0; margin-bottom: 6px; overflow: hidden; background-color: var(--background-gray); border-radius: 4px;">
+              <div style="padding: 10px; font-size: 11px;">
+                <table style="width: 100%; border-collapse: collapse; background-color: var(--white); border: 1px solid var(--light-gray); margin-bottom: 0;">
+                  <tbody><tr>
+                    <td style="border: 1px solid var(--light-gray); padding: 6px 8px; background-color: var(--background-gray); font-weight: 700; width: 30%; font-size: 10.5px;">?섏쭛쨌?댁슜 紐⑹쟻</td>
+                    <td style="border: 1px solid var(--light-gray); padding: 6px 8px; line-height: 1.4; font-size: 10.5px;">?湲곕쾲??諛쒓텒, ?몄텧 ?뚮┝??諛쒖넚 諛??ъ쟾 紐⑤컮???쒕쪟 ?꾩넚 ?곕룞</td>
+                  </tr>
+                  <tr>
+                    <td style="border: 1px solid var(--light-gray); padding: 6px 8px; background-color: var(--background-gray); font-weight: 700; font-size: 10.5px;">?섏쭛 ??ぉ</td>
+                    <td style="border: 1px solid var(--light-gray); padding: 6px 8px; line-height: 1.4; font-size: 10.5px;">?깅챸, ?곕씫泥??꾪솕踰덊샇), 怨좉컼???낅젰??嫄곕옒 ?묒떇 ??ぉ ?뺣낫</td>
+                  </tr>
+                  <tr>
+                    <td style="border: 1px solid var(--light-gray); padding: 6px 8px; background-color: var(--background-gray); font-weight: 700; color: #D0021B; font-size: 10.5px;">蹂댁쑀쨌?댁슜 湲곌컙</td>
+                    <td style="border: 1px solid var(--light-gray); padding: 6px 8px; line-height: 1.4; font-weight: 700; color: #D0021B; font-size: 10.5px;">?곸뾽??諛⑸Ц 諛?李쎄뎄 嫄곕옒 ?꾨즺 ??利됱떆 ?곴뎄 ?뚭린 (?뱀씪 留덇컧 ??利됱떆 ?뚮㈇)</td>
+                  </tr>
+                  <tr>
+                    <td style="border: 1px solid var(--light-gray); padding: 6px 8px; background-color: var(--background-gray); font-weight: 700; font-size: 10.5px;">嫄곕? ??遺덉씠??/td>
+                    <td style="border: 1px solid var(--light-gray); padding: 6px 8px; line-height: 1.4; font-size: 10.5px;">?숈쓽瑜?嫄곕??섏떎 ???덉쑝?? 誘몃룞????SmartQ 紐⑤컮???ъ쟾 ?묒꽦 諛??湲??쒕퉬???댁슜???쒗븳?⑸땲??</td>
+                  </tr>
+                </tbody></table>
+              </div>
+            </div>
+          </div>
+
+          <!-- 3. ?좏깮 ?숈쓽????-->
+          <div class="consent-row-item" style="border: 1px solid var(--light-gray); border-radius: 8px; padding: 4px 12px; background-color: var(--white);">
+            <div class="consent-row-main" style="display: flex; justify-content: space-between; align-items: center; padding: 8px 0;">
+              <label class="checkbox-container" style="margin: 0;">
+                <input type="checkbox" class="individual-consent" id="agree-optional-check">
+                <span class="checkmark"></span>
+                <span class="checkbox-label" style="font-size: 12px; font-weight: 600;"><span style="color: var(--cool-gray); font-weight: 700;">[?좏깮]</span> 媛쒖씤?뺣낫 ?섏쭛쨌?댁슜 ?숈쓽</span>
+              </label>
+              <button type="button" class="btn-consent-detail" data-target="detail-optional" style="background: none; border: none; font-size: 11.5px; color: var(--cool-gray); cursor: pointer; display: flex; align-items: center; gap: 4px; font-weight: 600; padding: 4px 0;">
+                <span>?먯꽭??/span> <i class="fa-solid fa-chevron-down" style="font-size: 9px; transition: transform 0.2s;"></i>
+              </button>
+            </div>
+            <div id="detail-optional" class="consent-detail-panel hidden" style="border-top: 1px solid var(--light-gray); margin-top: 0; margin-bottom: 6px; overflow: hidden; background-color: var(--background-gray); border-radius: 4px;">
+              <div style="padding: 10px; font-size: 11px;">
+                <table style="width: 100%; border-collapse: collapse; background-color: var(--white); border: 1px solid var(--light-gray); margin-bottom: 0;">
+                  <tbody><tr>
+                    <td style="border: 1px solid var(--light-gray); padding: 6px 8px; background-color: var(--background-gray); font-weight: 700; width: 30%; font-size: 10.5px;">?섏쭛쨌?댁슜 紐⑹쟻</td>
+                    <td style="border: 1px solid var(--light-gray); padding: 6px 8px; line-height: 1.4; font-size: 10.5px;">iM SmartQ ?쒕퉬??遺꾩꽍 諛?媛쒖꽑, 怨좉컼 留욎땄???곕? ?쒗깮 諛?湲덉쑖?곹뭹 異붿쿇 ?쒕퉬???쒓났</td>
+                  </tr>
+                  <tr>
+                    <td style="border: 1px solid var(--light-gray); padding: 6px 8px; background-color: var(--background-gray); font-weight: 700; font-size: 10.5px;">?섏쭛 ??ぉ</td>
+                    <td style="border: 1px solid var(--light-gray); padding: 6px 8px; line-height: 1.4; font-size: 10.5px;">愿??湲덉쑖 移댄뀒怨좊━, ?쒕퉬???댁슜 湲곕줉, ?묒냽 ?듦퀎 諛?湲곌린 ?ъ뼇</td>
+                  </tr>
+                  <tr>
+                    <td style="border: 1px solid var(--light-gray); padding: 6px 8px; background-color: var(--background-gray); font-weight: 700; font-size: 10.5px;">蹂댁쑀쨌?댁슜 湲곌컙</td>
+                    <td style="border: 1px solid var(--light-gray); padding: 6px 8px; line-height: 1.4; font-weight: 700; font-size: 10.5px;">?숈쓽 泥좏쉶 ???먮뒗 ?뚯썝 ?덊눜 ??利됱떆 ?뚭린</td>
+                  </tr>
+                  <tr>
+                    <td style="border: 1px solid var(--light-gray); padding: 6px 8px; background-color: var(--background-gray); font-weight: 700; color: #008BA6; font-size: 10.5px;">嫄곕? ??遺덉씠??/td>
+                    <td style="border: 1px solid var(--light-gray); padding: 6px 8px; line-height: 1.4; font-weight: 700; color: #008BA6; font-size: 10.5px;"><strong>?숈쓽瑜?嫄곕??섏떆?붾씪??SmartQ???湲?諛쒓텒, ?ъ쟾 ?묒꽦 諛?湲곕낯 ?쒕퉬?ㅻ뒗 ?꾨Т??李⑤퀎 ?놁씠 ?꾨㈃ ?뺤긽 ?댁슜?섏떎 ???덉뒿?덈떎.</strong></td>
+                  </tr>
+                </tbody></table>
+              </div>
+            </div>
+          </div>
+
+        </div>
+
+      </div>
+      
+      <div class="modal-footer" style="padding: 12px 16px; border-top: 1px solid var(--light-gray); background-color: var(--white); display: flex; justify-content: center; align-items: center;">
+        <button id="submit-common-consent-btn" class="submit-form-btn" style="margin-top: 0; width: 100%;">
+          <span>?숈쓽?섍퀬 ?쒖옉?섍린</span>
+          <i class="fa-solid fa-chevron-right"></i>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 1. ?낅Т ?쒕쪟 誘몃━?묒꽦 紐⑤떖 -->
+  <div id="pre-writing-modal" class="modal-overlay hidden">
+    <div class="modal-content animate-slide-up" style="max-height: 85vh; display: flex; flex-direction: column; overflow: hidden;">
+      <div class="modal-header">
+        <div class="modal-header-title">
+          <i class="fa-solid fa-file-invoice-dollar" style="color: var(--brand-mint); font-size: 16px;"></i>
+          <h3 style="font-size: 15px; font-weight: 700;">?낅Т ?쒕쪟 誘몃━?묒꽦</h3>
+        </div>
+        <button class="close-btn" id="close-pre-writing-modal-btn">횞</button>
+      </div>
+      <div class="modal-body" style="padding: 16px; overflow-y: auto; flex: 1;">
+        <div class="pre-writing-content" id="pre-writing-form-container" style="border-top: none; padding: 0;">
+          <!-- 1. ?쒕쪟 吏곸젒 ?묒꽦 ?댁슜 -->
+          <div class="pre-tab-content" id="pre-tab-content-form">
+            <form id="pre-writing-form" onsubmit="event.preventDefault();">
+              <p class="form-desc">李쎄뎄 諛⑸Ц ?꾩뿉 誘몃━ ?묒꽦?섏떆硫??낅Т 泥섎━ ?쒓컙???ш쾶 以꾩씪 ???덉뼱??</p>
+              
+              <!-- ?낅Т ?遺꾨쪟 ?좏깮 (4? ?듭떖 ?낅Т 2x2 洹몃━?? -->
+              <div class="form-group" style="margin-bottom: 25px;">
+                <label class="form-label" style="position: relative; display: block; margin-top: 14px; font-size: 14px; font-weight: 800;">?묒꽦???낅Т ?좏깮</label>
+                <div class="form-radio-group-4way">
+                  <label class="radio-card cif-radio-card" style="position: relative;">
+                    <div class="tooltip-bubble">泥??댁슜 怨좉컼?대씪硫?/div>
+                    <input type="radio" name="pre-work-type" value="cif" checked="">
+                    <span class="radio-content-small">
+                      <i class="fa-solid fa-file-signature"></i>
+                      <span>?좉퇋 ?좎껌</span>
+                    </span>
+                  </label>
+                  <label class="radio-card">
+                    <input type="radio" name="pre-work-type" value="report">
+                    <span class="radio-content-small">
+                      <i class="fa-solid fa-pen-to-square"></i>
+                      <span>?쒖떊怨?&amp; 蹂寃?/span>
+                    </span>
+                  </label>
+                  <label class="radio-card">
+                    <input type="radio" name="pre-work-type" value="autodebit">
+                    <span class="radio-content-small">
+                      <i class="fa-solid fa-money-bill-transfer"></i>
+                      <span>?먮룞?댁껜 ?깅줉</span>
+                    </span>
+                  </label>
+                  <label class="radio-card">
+                    <input type="radio" name="pre-work-type" value="security">
+                    <span class="radio-content-small">
+                      <i class="fa-solid fa-key"></i>
+                      <span>李쎄뎄 蹂댁븞 ?낅Т</span>
+                    </span>
+                  </label>
+                </div>
+              </div>
+
+              <!-- 媛. ?쒖떊怨좎꽦/?숈쟻 ?낅Т ?꾨뱶 洹몃９ (珥덇린 ?몄텧) -->
+              <div id="report-fields-group">
+
+                <!-- 1. ?좉퇋 ?좎껌 ?몃???ぉ (cif) -->
+                <div class="form-group report-detail-group" id="detail-cif">
+                  <label class="form-label">?몃? ??ぉ</label>
+                  <div class="chip-group">
+                    <label class="chip-item"><input type="radio" name="detail-cif-val" value="???곴툑 ?좉퇋" checked=""><span>???곴툑 ?좉퇋</span></label>
+                    <label class="chip-item"><input type="radio" name="detail-cif-val" value="泥댄겕/?좎슜移대뱶 ?좉퇋"><span>泥댄겕/?좎슜移대뱶 ?좉퇋</span></label>
+                    <label class="chip-item"><input type="radio" name="detail-cif-val" value="?꾩옄湲덉쑖 ?좉퇋"><span>?꾩옄湲덉쑖 ?좉퇋</span></label>
+                  </div>
+                </div>
+
+                <!-- 2. ?쒖떊怨?& 蹂寃??몃???ぉ (report) -->
+                <div class="form-group report-detail-group hidden" id="detail-report">
+                  <label class="form-label">?몃? ??ぉ</label>
+                  <div class="chip-group">
+                    <label class="chip-item"><input type="radio" name="detail-report-val" value="怨좉컼?뺣낫 蹂寃? checked=""><span>怨좉컼?뺣낫 蹂寃?/span></label>
+                    <label class="chip-item"><input type="radio" name="detail-report-val" value="移대뱶 ?щ컻湲?><span>移대뱶 ?щ컻湲?/span></label>
+                    <label class="chip-item"><input type="radio" name="detail-report-val" value="寃곗젣怨꾩쥖/寃곗젣??蹂寃?><span>寃곗젣怨꾩쥖/寃곗젣??蹂寃?/span></label>
+                  </div>
+                </div>
+
+                <!-- 3. ?먮룞?댁껜 ?깅줉 ?몃???ぉ (autodebit) -->
+                <div class="form-group report-detail-group hidden" id="detail-autodebit">
+                  <label class="form-label">?몃? ??ぉ</label>
+                  <div class="chip-group">
+                    <label class="chip-item"><input type="radio" name="detail-autodebit-val" value="怨꾩쥖媛??먮룞?댁껜 ?좎껌" checked=""><span>怨꾩쥖媛??먮룞?댁껜 ?좎껌</span></label>
+                    <label class="chip-item"><input type="radio" name="detail-autodebit-val" value="怨듦낵湲??먮룞?댁껜 ?좎껌"><span>怨듦낵湲??먮룞?댁껜 ?좎껌</span></label>
+                  </div>
+                </div>
+
+                <!-- 4. 李쎄뎄 蹂댁븞 ?낅Т ?몃???ぉ (security) -->
+                <div class="form-group report-detail-group hidden" id="detail-security">
+                  <label class="form-label">?몃? ??ぉ</label>
+                  <div class="chip-group">
+                    <label class="chip-item"><input type="radio" name="detail-security-val" value="鍮꾨?踰덊샇 蹂寃?珥덇린?? checked=""><span>鍮꾨?踰덊샇 蹂寃?珥덇린??/span></label>
+                    <label class="chip-item"><input type="radio" name="detail-security-val" value="OTP/蹂댁븞留ㅼ껜 ?щ컻湲?><span>OTP/蹂댁븞留ㅼ껜 ?щ컻湲?/span></label>
+                  </div>
+                </div>
+
+                <!-- ?쒖떊怨????諛??몃???ぉ蹂??숈쟻 ?꾨뱶 援ъ뿭 -->
+                <div id="dynamic-report-fields" style="margin-top: 16px; margin-bottom: 8px;"></div>
+
+                <div class="form-group">
+                  <label for="report-user-name" class="form-label">怨좉컼 ?깅챸</label>
+                  <input type="text" id="report-user-name" class="form-input" placeholder="?깅챸???낅젰??二쇱꽭?? required="">
+                </div>
+              </div>
+
+              <!-- 媛쒖씤?뺣낫 ?덉쟾 怨좎? 諛곕꼫 -->
+              <div class="info-alert-box" style="background-color: #F4FBFB; border: 1px solid rgba(0, 186, 174, 0.2); border-radius: 8px; padding: 12px; font-size: 11.5px; color: var(--brand-mint-dark); line-height: 1.5; margin-top: 25px; margin-bottom: 12px; text-align: left; box-sizing: border-box;">
+                <div style="display: flex; align-items: center; gap: 6px; margin-bottom: 4px; font-weight: 700;">
+                  <i class="fa-solid fa-shield-halved" style="color: var(--brand-mint); font-size: 13px;"></i>
+                  <span>媛쒖씤?뺣낫 蹂댄샇 諛?蹂댁븞 ?덉떖 怨좎?</span>
+                </div>
+                蹂??쒕퉬?ㅻ뒗 二쇰??깅줉踰덊샇 ?꾩껜??怨꾩쥖 鍮꾨?踰덊샇 ??湲덉쑖 ?앸퀎?뺣낫 諛?蹂댁븞 留ㅼ껜 ?뺣낫瑜??ъ쟾???덈? ?섏쭛?섏? ?딆쑝誘濡??덉떖?섍퀬 ?묒꽦?섏뀛??醫뗭뒿?덈떎. ?대떦 ?ㅻ챸 寃利?諛??ㅻЪ ?議곕뒗 李쎄뎄?먯꽌 ?됱썝???듯빐 理쒖쥌 泥섎━?⑸땲??
+              </div>
+
+              <button type="submit" class="submit-form-btn">
+                <span>?쒕쪟 ?꾩떆 ?쒖텧 ?꾨즺</span>
+                <i class="fa-solid fa-arrow-right"></i>
+              </button>
+            </form>
+
+            <!-- ?쒕쪟 ?쒖텧 ?깃났 硫붿떆吏 -->
+            <div class="success-message-container hidden" id="success-message">
+              <div class="success-icon-wrapper">
+                <i class="fa-solid fa-circle-check"></i>
+              </div>
+              <h3>?쒕쪟 誘몃━?묒꽦 ?꾨즺!</h3>
+              <p>踰덊샇???몄텧 ??吏곸썝???뚮젮二쇱떆硫?<br>鍮좊Ⅴ寃?泥섎━媛 ?꾨즺?⑸땲??</p>
+              <div class="submitted-info">
+                <div class="info-row">
+                  <span>?묒꽦??/span>
+                  <span id="display-name">-</span>
+                </div>
+                <div class="info-row">
+                  <span>?좎껌 ?낅Т</span>
+                  <span id="display-job">?낃툑/異쒓툑</span>
+                </div>
+              </div>
+              <button type="button" class="btn-secondary" id="edit-form-btn">?섏젙?섍린</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ?↔툑?꾪몴 ?곸꽭 ?뺤씤??紐⑤떖 -->
+  <div id="sent-voucher-detail-modal" class="modal-overlay hidden" style="z-index: 10005;">
+    <div class="modal-content animate-slide-up" style="max-height: 80vh; display: flex; flex-direction: column; overflow: hidden; max-width: 440px; border-radius: 16px;">
+      <div class="modal-header" style="background-color: var(--brand-mint-light); border-bottom: 1px solid rgba(0, 186, 174, 0.15); padding: 14px 16px;">
+        <div class="modal-header-title">
+          <i class="fa-solid fa-file-invoice" style="color: var(--brand-mint); font-size: 16px;"></i>
+          <h3 style="font-size: 14px; font-weight: 700; color: var(--brand-mint-dark);">?꾩넚 ?꾪몴 ?곸꽭 ?댁뿭</h3>
+        </div>
+        <button class="close-btn" id="close-sent-voucher-detail-btn">횞</button>
+      </div>
+      <div class="modal-body" style="padding: 16px; overflow-y: auto; flex: 1;">
+        <div style="text-align: center; margin-bottom: 16px; padding: 12px; background-color: var(--background-gray); border-radius: 8px;">
+          <span style="font-size: 11px; color: var(--cool-gray);">?묒닔 踰덊샇</span>
+          <h4 id="detail-view-ticket-id" style="font-size: 18px; font-weight: 800; color: var(--dark-text); margin: 4px 0 0 0;">-</h4>
+        </div>
+        
+        <div class="detail-info-group" style="display: flex; flex-direction: column; gap: 12px; font-size: 13px;">
+          <div style="display: flex; justify-content: space-between; border-bottom: 1px dashed var(--light-gray); padding-bottom: 8px;">
+            <span style="color: var(--cool-gray);">?댁껜 ?좏삎</span>
+            <span id="detail-view-type" style="font-weight: 700; color: var(--dark-text);">-</span>
+          </div>
+          <div style="display: flex; justify-content: space-between; border-bottom: 1px dashed var(--light-gray); padding-bottom: 8px;">
+            <span style="color: var(--cool-gray);">?묒닔 ?쒓컖</span>
+            <span id="detail-view-time" style="color: var(--dark-text);">-</span>
+          </div>
+          <div style="display: flex; justify-content: space-between; border-bottom: 1px dashed var(--light-gray); padding-bottom: 8px;">
+            <span style="color: var(--cool-gray);">吏꾪뻾 ?곹깭</span>
+            <span id="detail-view-status" style="background-color:#e3fcef; color:#00a389; padding:2px 8px; border-radius:12px; font-size:11px; font-weight:700;">李쎄뎄 ?湲곗쨷</span>
+          </div>
+          <div style="display: flex; justify-content: space-between; border-bottom: 1px solid var(--light-gray); padding-bottom: 8px; margin-bottom: 8px;">
+            <span style="color: var(--cool-gray); font-weight:700;">珥??↔툑??/span>
+            <span id="detail-view-amount" style="font-weight: 800; color: var(--brand-mint-dark); font-size: 16px;">-</span>
+          </div>
+        </div>
+
+        <!-- ?몃? 嫄곕옒 紐⑸줉 ?뚯씠釉?-->
+        <div style="margin-top: 16px;">
+          <h5 style="font-size: 11.5px; font-weight: 800; color: var(--charcoal); margin: 0 0 8px 0;"><i class="fa-solid fa-list-ul"></i> ?몃? ?↔툑 ?댁뿭</h5>
+          <div style="border: 1px solid var(--light-gray); border-radius: 8px; overflow: hidden; background-color: var(--white);">
+            <table style="width: 100%; border-collapse: collapse; font-size: 11.5px; text-align: left;">
+              <thead>
+                <tr style="background-color: var(--background-gray); border-bottom: 1px solid var(--light-gray);">
+                  <th style="padding: 8px; width: 25%;">???/th>
+                  <th style="padding: 8px; width: 40%;">怨꾩쥖踰덊샇</th>
+                  <th style="padding: 8px; width: 20%;">?덇툑二?/th>
+                  <th style="padding: 8px; text-align: right; width: 15%;">湲덉븸</th>
+                </tr>
+              </thead>
+              <tbody id="detail-view-transactions-body">
+                <!-- JS ?숈쟻 留ㅽ븨 -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer" style="padding: 12px 16px; border-top: 1px solid var(--light-gray); background-color: var(--white);">
+        <button id="close-sent-voucher-detail-btn-bottom" class="btn-cancel" style="width: 100%; margin: 0; padding: 10px; background-color: #f1f2f6; border: none; border-radius: 8px; font-weight: 700; cursor: pointer;">?リ린</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 2. ?섍린 ?↔툑?꾪몴 ?ㅼ틪 ?쒖텧 紐⑤떖 (?낅┰ 遺꾨━ 諛?怨좊룄?? -->
+  <div id="transfer-voucher-modal" class="modal-overlay hidden">
+    <div class="modal-content animate-slide-up" style="max-height: 90vh; display: flex; flex-direction: column; overflow: hidden; max-width: 620px;">
+      <div class="modal-header" style="background-color: var(--brand-mint-light); border-bottom: 1px solid rgba(0, 186, 174, 0.15); padding: 14px 16px;">
+        <div class="modal-header-title">
+          <i class="fa-solid fa-wand-magic-sparkles" style="color: var(--brand-mint); font-size: 16px;"></i>
+          <h3 style="font-size: 14px; font-weight: 700; color: var(--brand-mint-dark);">?꾪몴 ?ㅼ틪 諛??ㅼ떆媛??뺣낫 ?꾩넚 <span style="font-size: 10px; font-weight: 400; padding: 2px 6px; background-color: var(--brand-mint); color: var(--white); border-radius: 10px; margin-left: 6px;">PROTOTYPE</span></h3>
+        </div>
+        <button class="close-btn" id="close-transfer-voucher-modal-btn">횞</button>
+      </div>
+
+      <!-- 吏꾪뻾 ?④퀎 ?몃뵒耳?댄꽣 -->
+      <div class="scan-flow-steps" style="display: flex; justify-content: space-around; background-color: var(--background-gray); padding: 8px 10px; border-bottom: 1px solid var(--light-gray); font-size: 10.5px; font-weight: 700; color: var(--cool-gray);">
+        <span id="step-ind-1" class="active-step" style="color: var(--brand-mint);">??嫄곕옒 ?좏삎 ?좏깮</span>
+        <span>&gt;</span>
+        <span id="step-ind-2">???꾪몴 珥ъ쁺</span>
+        <span>&gt;</span>
+        <span id="step-ind-3">??OCR 寃곌낵 ?뺤씤</span>
+        <span>&gt;</span>
+        <span id="step-ind-4">???꾩넚 ?꾨즺</span>
+      </div>
+
+      <div class="modal-body" style="padding: 16px; overflow-y: auto; flex: 1;">
+        
+        <!-- ?ъ슫 紐⑤뱶 ?꾩슜 嫄곕옒 ?좏삎 ?좏깮 ?먮꽟 (湲곕낯 ?④?) -->
+        <div id="easy-scan-step-select-view" class="scan-step-panel hidden" style="text-align: center; font-family: 'Pretendard', sans-serif;">
+          <!-- ?앹뾽 ?쒕ぉ -->
+          <h3 style="font-size: clamp(23px, 3.4cqh, 30px); font-weight: 900; color: #111111; margin: 8px 0 10px 0; letter-spacing: -0.5px;">?↔툑 ?꾪몴 ?ъ쭊李띻린 ?좏깮</h3>
+          
+          <!-- ?낅Т ?⑥텞 ?덈궡 ??諛뺤뒪 -->
+          <div style="background-color: var(--brand-mint-light); border: 1.5px solid var(--brand-mint); border-radius: 12px; padding: 10px 14px; margin-bottom: 16px; display: inline-flex; align-items: center; justify-content: center; gap: 8px; box-sizing: border-box; width: 100%;">
+            <i class="fa-solid fa-clock-rotate-left" style="color: var(--brand-mint-dark); font-size: 15px; flex-shrink: 0;"></i>
+            <span style="font-size: clamp(12.5px, 1.8cqh, 15px); font-weight: 800; color: var(--brand-mint-dark); letter-spacing: -0.3px; line-height: 1.35; word-break: keep-all;">?꾪몴瑜?珥ъ쁺?댁꽌 誘몃━ ?뺣낫瑜?蹂대궡?먮㈃ ?낅Т 泥섎━ ?쒓컙???ш쾶 ?⑥텞?쇱슂.</span>
+          </div>
+
+          <!-- 2遺꾪븷 ?꾪몴 移대뱶 洹몃━??(?낃툑?섏떎?? 鍮④컙??/ 李얠쑝?ㅻ븣: ?뚮??? -->
+          <div style="display: flex; gap: 14px; margin-bottom: 20px; width: 100%; box-sizing: border-box;">
+            <!-- ?낃툑?섏떎???꾪몴 (鍮④컙?? -->
+            <button class="easy-voucher-select-btn" data-vtype="SINGLE_TRANSFER" style="flex: 1; padding: 0; background-color: #ffffff; border: 3px solid #00baae; border-radius: 20px; overflow: hidden; display: flex; flex-direction: column; cursor: pointer; box-shadow: 0 4px 14px rgba(0,0,0,0.06); box-sizing: border-box;">
+              <!-- ?ㅻ뜑 -->
+              <div style="background-color: #d63031; color: #ffffff; font-size: clamp(16px, 2.3cqw, 20px); font-weight: 900; padding: 14px 10px; width: 100%; text-align: center; box-sizing: border-box; letter-spacing: -0.5px;">
+                ?낃툑?섏떎???꾪몴
+              </div>
+              <!-- 諛붾뵒 -->
+              <div style="padding: clamp(16px, 2.8cqh, 24px) 10px; display: flex; flex-direction: column; align-items: center; gap: 18px; width: 100%; box-sizing: border-box;">
+                <img src="easy_voucher_withdraw_illust.png" alt="?낃툑?섏떎???쇰윭?ㅽ듃 (鍮④컙???꾪몴)" style="width: 90%; height: auto; display: block; max-width: 160px; filter: drop-shadow(0 2px 6px rgba(0,0,0,0.05));">
+                <span style="font-size: clamp(21px, 2.9cqh, 27px); font-weight: 900; color: #111111; line-height: 1.25; font-family: 'Pretendard', sans-serif; letter-spacing: -0.5px;">
+                  ?낃툑?섏떎??br><span style="color: #d63031;">(鍮④컙??</span>
+                </span>
+              </div>
+            </button>
+
+            <!-- 李얠쑝?ㅻ븣 ?꾪몴 (?뚮??? -->
+            <button class="easy-voucher-select-btn" data-vtype="WITHDRAW_TRANSFER" style="flex: 1; padding: 0; background-color: #ffffff; border: 3px solid #00baae; border-radius: 20px; overflow: hidden; display: flex; flex-direction: column; cursor: pointer; box-shadow: 0 4px 14px rgba(0,0,0,0.06); box-sizing: border-box;">
+              <!-- ?ㅻ뜑 -->
+              <div style="background-color: #0984e3; color: #ffffff; font-size: clamp(16px, 2.3cqw, 20px); font-weight: 900; padding: 14px 10px; width: 100%; text-align: center; box-sizing: border-box; letter-spacing: -0.5px;">
+                李얠쑝?ㅻ븣 ?꾪몴
+              </div>
+              <!-- 諛붾뵒 -->
+              <div style="padding: clamp(16px, 2.8cqh, 24px) 10px; display: flex; flex-direction: column; align-items: center; gap: 18px; width: 100%; box-sizing: border-box;">
+                <img src="easy_voucher_deposit_illust.png" alt="李얠쑝?ㅻ븣 ?쇰윭?ㅽ듃 (?뚮????꾪몴)" style="width: 90%; height: auto; display: block; max-width: 160px; filter: drop-shadow(0 2px 6px rgba(0,0,0,0.05));">
+                <span style="font-size: clamp(21px, 2.9cqh, 27px); font-weight: 900; color: #111111; line-height: 1.25; font-family: 'Pretendard', sans-serif; letter-spacing: -0.5px;">
+                  李얠쑝?ㅻ븣<br><span style="color: #0984e3;">(?뚮???</span>
+                </span>
+              </div>
+            </button>
+          </div>
+
+          <!-- ??됱씠泥? 珥ъ쁺 vs 吏곸젒?낅젰 2遺꾪븷 踰꾪듉 -->
+          <div style="display: flex; gap: 8px; margin-bottom: 24px; width: 100%;">
+            <button class="easy-voucher-select-btn" data-vtype="MASS_TRANSFER" style="flex: 1.2; display: flex; flex-direction: row; align-items: center; justify-content: center; gap: 8px; padding: clamp(12px, 2cqh, 16px) 12px; background-color: #ffffff; border: 2.5px solid var(--brand-mint); border-radius: 14px; cursor: pointer; transition: all 0.2s; box-sizing: border-box; box-shadow: var(--shadow-sm);">
+              <i class="fa-solid fa-camera" style="font-size: 16px; color: var(--brand-mint);"></i>
+              <span style="font-size: clamp(16px, 2.2cqh, 20px); font-weight: 800; color: var(--brand-mint-dark);">??됱씠泥?珥ъ쁺</span>
+            </button>
+            <button type="button" id="btn-easy-manual-mass" style="flex: 1; display: flex; flex-direction: row; align-items: center; justify-content: center; gap: 6px; padding: clamp(12px, 2cqh, 16px) 10px; background-color: #f8fafc; border: 2px solid #94a3b8; border-radius: 14px; cursor: pointer; transition: all 0.2s; box-sizing: border-box;">
+              <i class="fa-solid fa-pen-to-square" style="font-size: 15px; color: #475569;"></i>
+              <span style="font-size: clamp(15px, 2cqh, 18px); font-weight: 800; color: #334155;">吏곸젒 ?낅젰</span>
+            </button>
+          </div>
+
+          <!-- 痍⑥냼 踰꾪듉 -->
+          <div style="border-top: 1px solid var(--light-gray); padding-top: 14px; width: 100%;">
+            <button type="button" id="easy-scan-cancel-btn" style="background: none; border: none; font-size: clamp(18px, 2.3cqh, 21px); font-weight: 800; color: #666666; cursor: pointer; width: 100%; padding: 4px 0;">痍⑥냼</button>
+          </div>
+        </div>
+
+        <!-- ?④퀎 1: 嫄곕옒 ?좏삎 ?좏깮 (?⑥씪 vs ??? -->
+        <div id="scan-step-select-view" class="scan-step-panel">
+          <div style="text-align: center; margin-bottom: 16px;">
+            <h4 style="font-size: 16px; font-weight: 800; color: var(--brand-mint-dark); margin: 0 0 8px 0;">?대뼡 ?낅Т瑜?以鍮꾪븯?쒕굹??</h4>
+            <div style="background-color: var(--brand-mint-light); border: 1px solid rgba(0, 186, 174, 0.25); border-radius: 10px; padding: 7px 12px; margin-bottom: 8px; display: inline-flex; align-items: center; justify-content: center; gap: 6px;">
+              <i class="fa-solid fa-clock-rotate-left" style="color: var(--brand-mint); font-size: 13px;"></i>
+              <span style="font-size: 12px; font-weight: 800; color: var(--brand-mint-dark); letter-spacing: -0.3px;">?꾪몴瑜?珥ъ쁺?댁꽌 誘몃━ ?뺣낫瑜?蹂대궡?먮㈃ ?낅Т 泥섎━ ?쒓컙???ш쾶 ?⑥텞?쇱슂.</span>
+            </div>
+            <p style="font-size: 11.5px; color: var(--cool-gray); margin: 0; line-height: 1.4;">李쎄뎄???쒖텧???댁껜 ?꾪몴瑜?珥ъ쁺?섎㈃ AI媛 ?꾪몴 ?댁슜??遺꾩꽍?섏뿬 誘몃━ ?낅젰???쒕젮??</p>
+          </div>
+
+          <div class="voucher-type-grid" style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; margin-bottom: 20px;">
+            <div class="v-type-card active" data-vtype="SINGLE_TRANSFER" style="border: 2px solid var(--brand-mint); border-radius: 12px; padding: 20px 14px; text-align: center; cursor: pointer; background-color: var(--brand-mint-light); transition: all 0.2s; box-shadow: var(--shadow-sm);">
+              <i class="fa-solid fa-receipt" style="font-size: 28px; color: var(--brand-mint); margin-bottom: 10px;"></i>
+              <div style="font-weight: 800; font-size: 14px; color: var(--brand-mint-dark);">?⑥씪 ?댁껜</div>
+              <div style="font-size: 10.5px; color: var(--dark-gray); margin-top: 6px; line-height: 1.3;">??紐낆쓽 ?섏랬?몄뿉寃?br>?↔툑?섎뒗 寃쎌슦 (?꾪몴 1??</div>
+            </div>
+            <div class="v-type-card" data-vtype="MASS_TRANSFER" style="border: 2px solid var(--light-gray); border-radius: 12px; padding: 20px 14px; text-align: center; cursor: pointer; background-color: var(--white); transition: all 0.2s; box-shadow: var(--shadow-sm);">
+              <i class="fa-solid fa-copy" style="font-size: 28px; color: var(--cool-gray); margin-bottom: 10px;"></i>
+              <div style="font-weight: 800; font-size: 14px; color: var(--charcoal);">????댁껜</div>
+              <div style="font-size: 10.5px; color: var(--cool-gray); margin-top: 6px; line-height: 1.3;">?щ윭 紐낆뿉寃??↔툑?섍굅??br>?꾪몴/紐낆꽭?쒕? ?щ윭 ???쒖텧</div>
+            </div>
+          </div>
+
+          <div style="display: flex; flex-direction: column; gap: 8px;">
+            <button type="button" class="submit-form-btn" id="go-to-capture-btn" style="margin-top: 0; width: 100%; height: 44px; font-size: 13.5px;">
+              <span>?좏깮???좏삎?쇰줈 珥ъ쁺 ?쒖옉</span>
+              <i class="fa-solid fa-chevron-right"></i>
+            </button>
+            <button type="button" id="go-to-manual-mass-btn" class="hidden" style="width: 100%; height: 42px; background-color: #f8fafc; border: 1.5px solid var(--brand-mint); border-radius: 8px; color: var(--brand-mint-dark); font-size: 13px; font-weight: 800; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 6px; transition: all 0.2s;">
+              <i class="fa-solid fa-pen-to-square"></i>
+              <span>?꾪몴 珥ъ쁺 ?놁씠 吏곸젒 ?낅젰?섍린</span>
+            </button>
+          </div>
+
+          <!-- 理쒓렐 ?꾩넚???꾪몴 ?댁뿭 紐⑸줉 異붽? -->
+          <div id="sent-vouchers-container" style="margin-top: 20px; border-top: 1px solid var(--light-gray); padding-top: 16px; text-align: left;">
+            <h5 style="font-size: 12.5px; font-weight: 800; color: var(--brand-mint-dark); margin: 0 0 10px 0; display: flex; align-items: center; gap: 6px;">
+              <i class="fa-solid fa-clock-rotate-left"></i> ?닿? 理쒓렐 ?꾩넚???꾪몴 <span id="sent-vouchers-count" style="font-size: 10px; font-weight: 700; background: var(--brand-mint-light); padding: 1px 6px; border-radius: 10px; color: var(--brand-mint-dark);">0嫄?/span>
+            </h5>
+            <div id="sent-vouchers-list" style="display: flex; flex-direction: column; gap: 8px; max-height: 160px; overflow-y: auto; padding-right: 4px;">
+              <div style="font-size: 11.5px; color: var(--cool-gray); text-align: center; padding: 12px 0;">理쒓렐 ?꾩넚???꾪몴 ?댁뿭???놁뒿?덈떎.</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- ?④퀎 2: 珥ъ쁺 諛??ㅼ쨷 ?꾪몴 ?깅줉 -->
+        <div id="scan-step-capture-view" class="scan-step-panel hidden">
+          <div style="text-align: center; margin-bottom: 10px;">
+            <h4 id="capture-title-text" style="font-size: 15px; font-weight: 800; margin: 0 0 4px 0;">?꾪몴瑜?移대찓?쇱뿉 留욎떠 二쇱꽭??</h4>
+            <p id="capture-guidance-text" style="font-size: 11.5px; color: var(--cool-gray); margin: 0;">?꾪몴 ?꾩껜媛 寃⑹옄 ?덉뿉 ?ㅼ뼱?ㅻ㈃ <strong style="color:var(--brand-mint-dark);">吏湲?諛붾줈 珥ъ쁺</strong> 踰꾪듉???뚮윭 二쇱꽭??</p>
+          </div>
+          
+          <!-- 紐⑥쓽 諛??ㅼ젣 ?쇱씠釉?移대찓???듯빀 酉고뙆?몃뜑 -->
+          <div class="camera-viewfinder">
+            <!-- ?ㅼ떆媛??뱀틺/紐⑤컮???꾨㈃ 移대찓???ㅽ듃由щ컢 酉곗뼱 -->
+            <video id="camera-stream" autoplay="" playsinline="" style="width: 100%; height: 100%; object-fit: cover; display: none;"></video>
+            
+            <div id="demo-voucher-preview" style="width: 88%; height: 80%; background-size: contain; background-repeat: no-repeat; background-position: center; opacity: 0.9;"></div>
+            
+            <!-- ?꾪몴 ?꾩튂 媛?대뱶 寃⑹옄 (?ㅻЪ 鍮꾩쑉 19:10 湲곕컲, ?щ갚 ?ы븿 94%횞84%) -->
+            <div class="camera-guide" style="
+              position: absolute;
+              width: 94%;
+              height: 84%;
+              border: none;
+              box-shadow: 0 0 0 9999px rgba(0,0,0,0.42);
+              pointer-events: none;
+              border-radius: 3px;
+            ">
+              <!-- ??醫뚯긽??爰얠뇿 -->
+              <span style="position:absolute; top:0; left:0; width:28px; height:18px; border-top:3px solid #00BAC6; border-left:3px solid #00BAC6; border-radius:3px 0 0 0;"></span>
+              <!-- ???곗긽??爰얠뇿 -->
+              <span style="position:absolute; top:0; right:0; width:28px; height:18px; border-top:3px solid #00BAC6; border-right:3px solid #00BAC6; border-radius:0 3px 0 0;"></span>
+              <!-- ??醫뚰븯??爰얠뇿 -->
+              <span style="position:absolute; bottom:0; left:0; width:28px; height:18px; border-bottom:3px solid #00BAC6; border-left:3px solid #00BAC6; border-radius:0 0 0 3px;"></span>
+              <!-- ???고븯??爰얠뇿 -->
+              <span style="position:absolute; bottom:0; right:0; width:28px; height:18px; border-bottom:3px solid #00BAC6; border-right:3px solid #00BAC6; border-radius:0 0 3px 0;"></span>
+              <!-- 媛?대뱶 以묒븰 ?덈궡 ?띿뒪??(移대찓??誘몄뿰寃??쒖뿉留??쒖떆) -->
+              <span id="viewfinder-hint" style="position:absolute; top:50%; left:50%; transform:translate(-50%,-50%); color:rgba(255,255,255,0.85); font-size:13.5px; font-weight:700; white-space:nowrap; letter-spacing:-0.3px; text-shadow:0 1px 4px rgba(0,0,0,0.8); text-align:center;">?꾪몴 ?욌㈃??寃⑹옄 ?덉뿉 ?꾩튂?쒖폒 二쇱꽭??/span>
+            </div>
+            <div class="scan-laser" id="laser-effect" style="position: absolute; width: 94%; height: 2px; background-color: #00BAC6; box-shadow: 0 0 8px #00BAC6; display: none; animation: scanMove 2.2s infinite ease-in-out;"></div>
+          </div>
+          
+          <!-- ?ㅻ깄??珥ъ쁺???④? 罹붾쾭??-->
+          <canvas id="camera-canvas" style="display: none;"></canvas>
+
+          <!-- ????댁껜 ?꾩슜 ?ㅼ쨷 ?꾪몴 ?깅줉 由ъ뒪??諛?-->
+          <div id="mass-image-slots-container" class="hidden" style="margin-bottom: 14px; background-color: #fafbfc; border: 1px solid var(--light-gray); border-radius: 8px; padding: 10px; box-sizing: border-box;">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:6px;">
+              <span style="font-size: 11px; font-weight:700; color:var(--dark-gray);"><i class="fa-solid fa-images"></i> ?깅줉???꾪몴 紐⑸줉</span>
+              <span id="mass-slots-count" style="font-size: 10.5px; font-weight:700; color:var(--brand-mint-dark);">0???깅줉??/span>
+            </div>
+            <div id="mass-image-thumbnails" style="display:flex; gap:8px; overflow-x:auto; padding:4px 0; min-height: 50px;">
+              <!-- ?숈쟻 ?앹꽦 ?몃꽕???덉떆: [?뼹 ?꾪몴 1 (??젣/?ъ눋??] -->
+            </div>
+          </div>
+
+          <div style="display: flex; gap: 8px;">
+            <button class="btn-scan-action btn-scan-secondary" id="btn-mock-gallery" style="flex: 1; margin: 0; background-color: var(--white); border: 1px solid var(--brand-mint); height: 42px;">
+              <i class="fa-solid fa-images"></i> ?뚯씪 ?좏깮
+            </button>
+            <button class="btn-scan-action btn-scan-primary" id="btn-mock-shoot" style="flex: 1.5; margin: 0; height: 42px; font-weight: 800; letter-spacing: -0.3px;">
+              <i class="fa-solid fa-circle-dot" style="color:#fff; font-size:16px;"></i>&nbsp;吏湲?諛붾줈 珥ъ쁺
+            </button>
+          </div>
+          
+          <div style="display:flex; gap:8px; margin-top:10px;">
+            <button class="btn-scan-action btn-scan-secondary" id="back-to-select-btn" style="flex: 1; margin: 0; height: 38px;">
+              <i class="fa-solid fa-chevron-left"></i> ?댁쟾 ?④퀎
+            </button>
+            <button class="btn-scan-action btn-scan-primary" id="finish-capture-btn" style="flex: 1.5; margin: 0; height: 38px; background-color: #2c3e50; color:#fff; box-shadow:none;">
+              <i class="fa-solid fa-circle-check"></i> 珥ъ쁺 ?꾨즺 (AI 遺꾩꽍)
+            </button>
+          </div>
+        </div>
+
+        <!-- ?④퀎 3: OCR 遺꾩꽍 諛?寃곌낵 ?뺤씤 (2遺꾪븷 媛뺤“) -->
+        <div id="scan-step-result-view" class="scan-step-panel hidden">
+          <div class="ocr-split-layout" style="display: flex; flex-direction: column; gap: 14px;">
+            
+            <!-- ?쇱そ: 珥ъ쁺 ?먮낯 ?꾨━酉?諛??섏씠?쇱씠???щ챸 諛뺤뒪 ?ㅻ쾭?덉씠 -->
+            <div class="ocr-split-left" style="width: 100%;">
+              <div style="font-size: 12px; font-weight: 700; color: var(--dark-gray); margin-bottom: 6px; display:flex; justify-content:space-between; align-items:center;">
+                <span><i class="fa-solid fa-image"></i> 珥ъ쁺???꾪몴 ?먮낯 (AI 由ы룷??</span>
+                <span id="display-preview-source-id" style="font-size: 11px; color:var(--brand-mint-dark); font-weight:800;">[?꾪몴 1]</span>
+              </div>
+              
+              <!-- ?먮낯 ?대?吏 諛뺤뒪 (100% ??媛??梨꾩?) -->
+              <div id="ocr-source-image-box" style="position: relative; width: 100%; min-height: 180px; background-color: #0f172a; border-radius: 12px; border: 1.5px solid var(--light-gray); overflow: hidden; box-shadow: 0 2px 8px rgba(0,0,0,0.08); display: flex; align-items: center; justify-content: center;">
+              </div>
+            </div>
+
+            <!-- ?ㅻⅨ履? 援ъ“?붾맂 ??諛????寃利?-->
+            <div class="ocr-split-right" style="width: 100%;">
+              
+              <!-- ?꾩닔 ?뺣낫 ?좏슚??寃???먮윭 諛곕꼫 -->
+              <div id="ocr-integrity-error-banner" class="hidden" style="background-color: #FFF2F4; border: 1px solid #FFCCD3; border-radius: 6px; padding: 8px 10px; font-size: 11px; color: #D0021B; font-weight: 700; margin-bottom: 10px;">
+                <i class="fa-solid fa-triangle-exclamation"></i> <span>???뺤씤???꾩슂??嫄곕옒媛 ?덉뒿?덈떎. ?꾩닔 ??ぉ??蹂댁젙??二쇱꽭??</span>
+              </div>
+
+              <!-- 以묐났 嫄곕옒 媛먯? ?먮윭 諛곕꼫 -->
+              <div id="ocr-duplicate-warning-banner" class="hidden" style="background-color: #FFF9E6; border: 1px solid #FFEAA7; border-radius: 6px; padding: 10px; font-size: 11px; color: #B37D00; margin-bottom: 10px; box-sizing: border-box;">
+                <div style="font-weight: 800; margin-bottom: 4px;"><i class="fa-solid fa-triangle-exclamation"></i> ??以묐났 媛?μ꽦???덈뒗 嫄곕옒 媛먯?</div>
+                <div style="font-size: 10px; margin-bottom: 6px; color:#666;" id="duplicate-warning-text">?숈씪 怨꾩쥖 諛?湲덉븸?쇰줈 以묐났 ?낅젰??嫄곕옒媛 議댁옱?⑸땲??</div>
+                <div style="display:flex; gap:6px;">
+                  <button type="button" id="btn-resolve-dup-delete" style="background-color:#ffeaa7; border:1px solid #B37D00; color:#B37D00; padding:2px 8px; border-radius:4px; font-size:9.5px; font-weight:700; cursor:pointer;">以묐났 嫄???젣</button>
+                  <button type="button" id="btn-resolve-dup-keep" style="background-color:#fff; border:1px solid #bdc3c7; color:#555; padding:2px 8px; border-radius:4px; font-size:9.5px; font-weight:700; cursor:pointer;">洹몃?濡??좎?</button>
+                </div>
+              </div>
+
+              <div id="ocr-form-title-label" style="font-size: 11px; font-weight: 700; color: var(--dark-gray); margin-bottom: 6px;"><i class="fa-solid fa-square-poll-horizontal"></i> AI 異붿텧 援ъ“???뺣낫 諛??좊ː??寃利?/div>
+              
+              <!-- 1. ?⑥씪 ?댁껜 ??-->
+              <div id="ocr-form-standard" class="hidden">
+                <!-- ?숈쟻 鍮뚮뱶 -->
+              </div>
+
+              <!-- 2. ????댁껜 ?뚯씠釉???-->
+              <div id="ocr-form-multi" class="hidden">
+                <div class="multi-summary-bar" style="background-color: var(--brand-mint-light); border: 1px solid rgba(0, 186, 174, 0.2); border-radius: 6px; padding: 8px 10px; font-size: 11.5px; font-weight: 700; display: flex; justify-content: space-between; margin-bottom: 8px; color: var(--brand-mint-dark);">
+                  <span id="multi-total-count-label">珥?0嫄?/span>
+                  <span id="multi-total-amount-label">珥?湲덉븸 0??/span>
+                </div>
+                
+                <div style="overflow-x: auto; border: 1px solid var(--light-gray); border-radius: 8px; margin-bottom: 8px;">
+                  <table class="ocr-table" style="width: 100%; border-collapse: collapse; font-size: 10.5px; text-align: left; min-width: 320px;">
+                    <thead>
+                      <tr style="background-color: var(--background-gray); border-bottom: 1px solid var(--light-gray);">
+                        <th style="padding: 6px; width: 7%;">No</th>
+                        <th style="padding: 6px; width: 14%;">異쒖쿂</th>
+                        <th style="padding: 6px; width: 18%;">???/th>
+                        <th style="padding: 6px; width: 23%;">怨꾩쥖踰덊샇</th>
+                        <th style="padding: 6px; width: 15%;">?덇툑二?/th>
+                        <th style="padding: 6px; width: 16%;">湲덉븸</th>
+                        <th style="padding: 6px; width: 7%; text-align:center;">??젣</th>
+                      </tr>
+                    </thead>
+                    <tbody id="ocr-multi-table-body">
+                      <!-- ?숈쟻 鍮뚮뱶 -->
+                    </tbody>
+                  </table>
+                </div>
+                <!-- 異붽? 珥ъ쁺 諛??댁뿭 吏곸젒 異붽? 2遺꾪븷 踰꾪듉 -->
+                <div style="display: flex; gap: 8px; margin-top: 2px; margin-bottom: 10px;">
+                  <button type="button" class="btn-scan-action btn-scan-secondary" id="ocr-add-more-shoot-btn" style="flex: 1; height: 34px; font-size: 11px; margin: 0;">
+                    <i class="fa-solid fa-camera"></i> ?꾪몴 異붽? 珥ъ쁺
+                  </button>
+                  <button type="button" class="btn-scan-action btn-scan-secondary" id="ocr-add-manual-row-btn" style="flex: 1; height: 34px; font-size: 11px; margin: 0; background-color: var(--brand-mint-light); border: 1.5px solid var(--brand-mint); color: var(--brand-mint-dark); font-weight: 700;">
+                    <i class="fa-solid fa-plus"></i> ?댁뿭 吏곸젒 異붽?
+                  </button>
+                </div>
+              </div>
+
+              <!-- 3. ????댁껜 吏곸젒 ?낅젰 ?꾩슜 紐⑤컮??移대뱶 ??(媛濡??ㅽ겕濡??꾩쟾 諛곗젣) -->
+              <div id="manual-mass-container" class="hidden">
+                <div class="multi-summary-bar" style="background-color: var(--brand-mint-light); border: 1.5px solid var(--brand-mint); border-radius: 8px; padding: 9px 12px; font-size: 12px; font-weight: 800; display: flex; justify-content: space-between; margin-bottom: 10px; color: var(--brand-mint-dark);">
+                  <span id="manual-total-count-label">珥?1嫄?/span>
+                  <span id="manual-total-amount-label">珥?湲덉븸 0??/span>
+                </div>
+
+                <!-- 移대뱶 由ъ뒪??而⑦뀒?대꼫 -->
+                <div id="manual-tx-cards-list" style="display: flex; flex-direction: column; gap: 10px;">
+                  <!-- JS ?숈쟻 紐⑤컮??移대뱶 ?뚮뜑留?-->
+                </div>
+
+                <!-- 移대뱶 異붽? 踰꾪듉 -->
+                <button type="button" id="btn-add-manual-card" style="width: 100%; height: 42px; background-color: var(--white); border: 1.5px dashed var(--brand-mint); border-radius: 10px; color: var(--brand-mint-dark); font-size: 12.5px; font-weight: 800; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 6px; margin-top: 8px; margin-bottom: 6px; transition: all 0.2s;">
+                  <i class="fa-solid fa-plus-circle" style="font-size: 14px;"></i> ?↔툑 ?댁뿭 異붽??섍린
+                </button>
+              </div>
+
+            </div>
+          </div>
+
+          <div style="display: flex; gap: 8px; margin-top: 14px;">
+            <button class="btn-scan-action btn-scan-secondary" id="ocr-retry-btn" style="flex: 1; margin: 0; background-color: var(--white); border: 1px solid var(--brand-mint); height:40px;">?ㅼ떆 珥ъ쁺</button>
+            <button class="btn-scan-action btn-scan-primary" id="ocr-send-btn" style="flex: 2; margin: 0; height:40px;">?뺤씤?섍퀬 李쎄뎄濡??꾩넚</button>
+          </div>
+        </div>
+
+        <!-- ?④퀎 4: ?꾩넚 ?곹깭 濡쒕뵫 諛?理쒖쥌 怨좎? -->
+        <div id="scan-step-success-view" class="scan-step-panel hidden">
+          
+          <!-- 紐⑥쓽 遺꾩꽍 諛??꾩넚 濡쒕뜑 -->
+          <div id="scan-sending-loader" style="text-align: center; padding: 25px 10px;">
+            <!-- ?쒖감??OCR 遺꾩꽍 泥댄겕由ъ뒪??吏꾪뻾 ?④낵 (????댁껜?????쒖텧) -->
+            <div id="mass-analysis-progress-checklist" class="hidden" style="margin: 0 auto 15px auto; max-width: 250px; text-align: left; background-color: #fafbfc; border: 1px solid var(--light-gray); border-radius: 8px; padding: 10px; font-size:11px; font-weight:700;">
+              <!-- ?숈쟻 ?앹꽦 -->
+            </div>
+            
+            <div class="sending-progress-bar" style="width: 100%; height: 6px; background-color: var(--light-gray); border-radius: 10px; overflow: hidden; margin: 10px auto; max-width: 300px;">
+              <div id="sending-bar-fill" style="width: 0%; height: 100%; background-color: var(--brand-mint); transition: width 0.3s;"></div>
+            </div>
+            <div id="sending-status-text" style="font-size: 12.5px; font-weight: 700; color: var(--brand-mint-dark);">?꾩넚 以鍮?..</div>
+            <p style="font-size: 10.5px; color: var(--cool-gray); margin-top: 6px;">李쎄뎄 ?됱썝 ?⑤쭚濡??꾪몴 ?뷀샇???⑦궎吏瑜??ㅼ떆媛??꾩넚 以묒엯?덈떎.</p>
+          </div>
+
+          <!-- 濡쒕뜑 ?꾨즺 ???깃났 諛뺤뒪 -->
+          <div id="scan-send-success-box" class="hidden" style="text-align: center; padding: 5px 0;">
+            <div class="success-icon-wrapper" style="margin-bottom: 12px;">
+              <i class="fa-solid fa-cloud-arrow-up" style="color: var(--brand-mint); font-size: 42px;"></i>
+            </div>
+            <h3 style="font-size: 15px; font-weight: 700; color: var(--brand-mint-dark); margin-bottom: 6px;">?꾪몴 ?뺣낫 李쎄뎄 ?꾩넚 ?꾨즺</h3>
+            <div style="background-color: var(--background-gray); border: 1px solid var(--light-gray); border-radius: 8px; padding: 10px 12px; font-size: 11.5px; color: var(--charcoal); line-height: 1.6; margin-bottom: 14px; text-align: left; box-sizing: border-box;">
+              <p style="margin: 0 0 6px 0; font-weight: 700; color: var(--brand-mint-dark); text-align: center; border-bottom: 1px solid var(--light-gray); padding-bottom: 4px;">
+                ?곸뾽???묒닔 ?댁뿭
+              </p>
+              <div style="display: flex; justify-content: space-between; margin-bottom: 4px;">
+                <span>?묒닔 踰덊샇:</span>
+                <strong id="display-staff-ticket-id">T2026...</strong>
+              </div>
+              <div style="display: flex; justify-content: space-between; margin-bottom: 4px;">
+                <span>?댁껜 ?좏삎:</span>
+                <strong id="display-staff-voucher-type">-</strong>
+              </div>
+              <div style="display: flex; justify-content: space-between;">
+                <span>?댁껜 洹쒕え:</span>
+                <strong id="display-staff-total-amount">-</strong>
+              </div>
+            </div>
+            
+            <div class="info-alert-box" style="background-color: #F4FBFB; border: 1px solid rgba(0, 186, 174, 0.2); border-radius: 8px; padding: 10px; font-size: 11px; color: var(--brand-mint-dark); line-height: 1.5; margin-bottom: 14px; text-align: left; box-sizing: border-box;">
+              <i class="fa-solid fa-circle-info" style="color: var(--brand-mint); margin-right: 4px;"></i>
+              AI媛 遺꾩꽍???꾪몴 ?뺣낫瑜?理쒖쥌 ?뺤씤?덉뒿?덈떎. ?ㅼ젣 異쒓툑 諛??댁껜 泥섎━??李쎄뎄 李⑤? ?몄텧 ???됱썝??理쒖쥌 ?ㅻ챸/?쒕챸 ?뺤씤 ???덉쟾?섍쾶 泥닿껐?⑸땲??
+            </div>
+
+            <button type="button" class="submit-form-btn" id="finish-scan-flow-btn" style="margin-top: 0; width: 100%;">
+              <span>李쎄뎄 ?湲고솕硫댁쑝濡??뚯븘媛湲?/span>
+            </button>
+          </div>
+
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <!-- ?꾪몴 ?꾩넚 理쒖쥌 ?뺤씤 而ㅼ뒪? 紐⑤컮??紐⑤떖 -->
+  <div id="voucher-confirm-modal" class="modal-overlay hidden" style="z-index: 10250;">
+    <div class="modal-content animate-slide-up" style="max-width: 360px; border-radius: 16px; overflow: hidden;">
+      <div class="modal-header" style="background-color: var(--brand-mint-light); border-bottom: 1px solid rgba(0, 186, 174, 0.15); padding: 14px 16px;">
+        <div class="modal-header-title">
+          <i class="fa-solid fa-paper-plane" style="color: var(--brand-mint); font-size: 15px;"></i>
+          <h3 id="voucher-confirm-title" style="font-size: 14px; font-weight: 700; color: var(--brand-mint-dark);">?꾪몴 ?뺣낫 ?꾩넚 ?뺤씤</h3>
+        </div>
+        <button class="close-btn" id="close-voucher-confirm-btn">횞</button>
+      </div>
+      <div class="modal-body" style="padding: 20px 16px 16px 16px; text-align: center;">
+        <div style="width: 48px; height: 48px; border-radius: 50%; background-color: var(--brand-mint-light); color: var(--brand-mint); display: flex; align-items: center; justify-content: center; font-size: 22px; margin: 0 auto 12px auto;">
+          <i class="fa-solid fa-file-invoice-dollar"></i>
+        </div>
+        <p id="voucher-confirm-msg" style="font-weight: 700; color: var(--dark-text); font-size: 14px; line-height: 1.5; margin: 0 0 10px 0;">
+          ?묒꽦?섏떊 ?꾪몴 ?뺣낫瑜?李쎄뎄濡??꾩넚?섏떆寃좎뒿?덇퉴?
+        </p>
+        <p style="margin: 0; color: #718096; font-size: 11.5px; line-height: 1.4; background-color: #f8fafc; border-radius: 8px; padding: 8px 10px; border: 1px solid #edf2f7; text-align: left;">
+          <i class="fa-solid fa-circle-info" style="color: var(--brand-mint); margin-right: 4px;"></i>
+          ?ㅼ젣 異쒓툑 諛??댁껜 泥섎━??李쎄뎄 踰덊샇???몄텧 ???됱썝??理쒖쥌 ?ㅻ챸/?쒕챸 ?뺤씤 ???덉쟾?섍쾶 泥닿껐?⑸땲??
+        </p>
+      </div>
+      <div class="modal-footer" style="display: grid; grid-template-columns: 1fr 1.3fr; gap: 8px; padding: 12px 16px; background-color: #fafbfc; border-top: 1px solid #edf2f7;">
+        <button type="button" class="btn-cancel" id="cancel-voucher-confirm-btn" style="margin: 0; height: 42px; font-size: 13px; font-weight: 700; border-radius: 8px;">痍⑥냼</button>
+        <button type="button" class="btn-confirm" id="ok-voucher-confirm-btn" style="margin: 0; height: 42px; font-size: 13px; font-weight: 700; background-color: var(--brand-mint); color: #ffffff; border: none; border-radius: 8px; cursor: pointer;">?뺤씤?섍퀬 ?꾩넚</button>
+      </div>
+    </div>
+  </div>
+
+
+
+
+
+  <!-- [怨좎븸?↔툑 ?뱁솕] 湲덉쑖?ш린?덈갑吏꾨떒??(紐⑤컮???ъ쟾 ?꾩옄吏꾨떒) 紐⑤떖 -->
+  <div id="fraud-prevention-modal" class="modal-overlay hidden" style="z-index: 10300;">
+    <div class="modal-content fraud-modal-content animate-slide-up" style="max-width: 440px; max-height: 88vh; display: flex; flex-direction: column; overflow: hidden; border-radius: 18px;">
+      <div class="modal-header" style="background: linear-gradient(135deg, #FFF1F2 0%, #FFE4E6 100%); border-bottom: 1.5px solid #FECDD3; padding: 14px 16px;">
+        <div class="modal-header-title">
+          <i class="fa-solid fa-shield-virus" style="color: #E11D48; font-size: 18px;"></i>
+          <div>
+            <h3 style="font-size: 14.5px; font-weight: 800; color: #9F1239; margin: 0;">湲덉쑖?ш린?덈갑吏꾨떒??(?ъ쟾 ?꾩옄?묒꽦)</h3>
+            <p style="font-size: 10.5px; color: #BE123C; margin: 2px 0 0 0;">蹂댁씠?ㅽ뵾???쇳빐 ?덈갑 諛?李쎄뎄 ?湲곗떆媛?80% ?⑥텞</p>
+          </div>
+        </div>
+        <button type="button" class="close-btn" id="close-fraud-modal-btn">횞</button>
+      </div>
+
+      <div class="modal-body" style="padding: 16px; overflow-y: auto; flex: 1;">
+        <!-- ?↔툑 湲덉븸 諛??ъ쟾 ?뚯븙 ?덈궡 諛곕꼫 -->
+        <div style="background-color: #FFF1F2; border: 1px solid #FECDD3; border-radius: 10px; padding: 10px 12px; margin-bottom: 14px;">
+          <div style="font-size: 11.5px; font-weight: 700; color: #9F1239; display: flex; align-items: center; justify-content: space-between;">
+            <span><i class="fa-solid fa-triangle-exclamation"></i> 怨좎븸 ?↔툑 ?뺤씤</span>
+            <span id="fraud-amount-tag" style="background: #E11D48; color: #fff; padding: 2px 8px; border-radius: 12px; font-size: 10.5px; font-weight: 800;">怨좎븸 ?↔툑 ???/span>
+          </div>
+          <p style="font-size: 11px; color: #BE123C; margin: 4px 0 0 0; line-height: 1.4;">
+            ?곸뾽??李쎄뎄 ?꾩닔 ?섍린 ?묒꽦 ?쒖떇??<strong>'湲덉쑖?ш린?덈갑吏꾨떒??</strong>瑜?紐⑤컮?쇱뿉??誘몃━ ?묒꽦?섏떆硫?李쎄뎄?먯꽌 ?湲?諛?泥섎━ ?쒓컙??????⑥텞?⑸땲??
+          </p>
+        </div>
+
+        <!-- 1. ?↔툑 紐⑹쟻 吏곸젒 ??댄븨 / ???좏깮 -->
+        <div class="fraud-section-group" style="margin-bottom: 16px;">
+          <label class="fraud-label" style="display: block; font-size: 12.5px; font-weight: 800; color: #1E293B; margin-bottom: 6px;">
+            1. ?↔툑(?몄텧) 紐⑹쟻??臾댁뾿?멸??? <span style="color: #E11D48;">*</span>
+          </label>
+          <div class="fraud-purpose-chips" style="display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 8px;">
+            <button type="button" class="fraud-chip-btn active" data-purpose="?꾨뱾/媛議??ъ뾽?먭툑 吏??>?꾨뱾/媛議??ъ뾽?먭툑</button>
+            <button type="button" class="fraud-chip-btn" data-purpose="遺?숈궛 留ㅻℓ 諛??꾩썡???붽툑">遺?숈궛 ?붽툑 寃곗젣</button>
+            <button type="button" class="fraud-chip-btn" data-purpose="李⑤웾 援щℓ 諛?臾쇳뭹 ?湲?>李⑤웾/臾쇳뭹 ?湲?/button>
+            <button type="button" class="fraud-chip-btn" data-purpose="湲곗〈 ????異쒓툑 吏곸젒 ?곹솚">????異쒓툑 ?곹솚</button>
+            <button type="button" class="fraud-chip-btn" data-purpose="湲고? 吏곸젒?낅젰">吏곸젒 ?낅젰</button>
+          </div>
+          <input type="text" id="fraud-purpose-input" class="doc-direct-input" style="width: 100%; height: 38px; box-sizing: border-box;" value="?꾨뱾/媛議??ъ뾽?먭툑 吏?? placeholder="?↔툑 紐⑹쟻???곸꽭???낅젰??二쇱꽭??>
+        </div>
+
+        <!-- 2. 蹂댁씠?ㅽ뵾???덈갑 4? 泥댄겕由ъ뒪??(???꾨땲?? -->
+        <div class="fraud-section-group" style="margin-bottom: 16px;">
+          <label class="fraud-label" style="display: block; font-size: 12.5px; font-weight: 800; color: #1E293B; margin-bottom: 8px;">
+            2. 湲덉쑖?ш린 ?덈갑 泥댄겕由ъ뒪??<span style="font-size: 11px; font-weight: 500; color: #64748B;">(紐⑤몢 ?대떦 ?놁뼱???뺤긽)</span>
+          </label>
+          
+          <div class="fraud-check-list" style="display: flex; flex-direction: column; gap: 8px;">
+            <!-- 臾명빆 1 -->
+            <div class="fraud-check-card" style="background: #F8FAFC; border: 1px solid #E2E8F0; border-radius: 10px; padding: 10px 12px;">
+              <p style="font-size: 11.5px; font-weight: 700; color: #334155; margin: 0 0 6px 0; line-height: 1.4;">
+                ??寃李걔룰꼍李걔룰툑媛먯썝?대씪硫??덇툑??蹂댄샇??以?ㅺ퀬 ?↔툑???붽뎄諛쏆쑝?⑤굹??
+              </p>
+              <div class="fraud-yn-toggle" style="display: flex; gap: 6px;">
+                <label class="fraud-radio-label"><input type="radio" name="fraud-q1" value="no" checked=""><span>?꾨땲??(?뺤긽)</span></label>
+                <label class="fraud-radio-label danger"><input type="radio" name="fraud-q1" value="yes"><span>??(?꾪뿕)</span></label>
+              </div>
+            </div>
+
+            <!-- 臾명빆 2 -->
+            <div class="fraud-check-card" style="background: #F8FAFC; border: 1px solid #E2E8F0; border-radius: 10px; padding: 10px 12px;">
+              <p style="font-size: 11.5px; font-weight: 700; color: #334155; margin: 0 0 6px 0; line-height: 1.4;">
+                ???異?吏꾪뻾???꾪빐 湲곗〈 ?異쒖쓣 ???怨꾩쥖濡?癒쇱? ?곹솚?섎씪怨??붽뎄諛쏆쑝?⑤굹??
+              </p>
+              <div class="fraud-yn-toggle" style="display: flex; gap: 6px;">
+                <label class="fraud-radio-label"><input type="radio" name="fraud-q2" value="no" checked=""><span>?꾨땲??(?뺤긽)</span></label>
+                <label class="fraud-radio-label danger"><input type="radio" name="fraud-q2" value="yes"><span>??(?꾪뿕)</span></label>
+              </div>
+            </div>
+
+            <!-- 臾명빆 3 -->
+            <div class="fraud-check-card" style="background: #F8FAFC; border: 1px solid #E2E8F0; border-radius: 10px; padding: 10px 12px;">
+              <p style="font-size: 11.5px; font-weight: 700; color: #334155; margin: 0 0 6px 0; line-height: 1.4;">
+                ??紐⑤Ⅴ???щ엺??蹂대궦 臾몄옄 留곹겕(URL)????App)???ㅼ튂?섏떊 ?곸씠 ?덈굹??
+              </p>
+              <div class="fraud-yn-toggle" style="display: flex; gap: 6px;">
+                <label class="fraud-radio-label"><input type="radio" name="fraud-q3" value="no" checked=""><span>?꾨땲??(?뺤긽)</span></label>
+                <label class="fraud-radio-label danger"><input type="radio" name="fraud-q3" value="yes"><span>??(?꾪뿕)</span></label>
+              </div>
+            </div>
+
+            <!-- 臾명빆 4 -->
+            <div class="fraud-check-card" style="background: #F8FAFC; border: 1px solid #E2E8F0; border-radius: 10px; padding: 10px 12px;">
+              <p style="font-size: 11.5px; font-weight: 700; color: #334155; margin: 0 0 6px 0; line-height: 1.4;">
+                ??媛議굿룹??몄씠 ?⑹튂?섏뿀?ㅺ굅???대??곗씠 怨좎옣 ?щ떎硫?湲됲엳 ?덉쓣 ?붽뎄諛쏆쑝?⑤굹??
+              </p>
+              <div class="fraud-yn-toggle" style="display: flex; gap: 6px;">
+                <label class="fraud-radio-label"><input type="radio" name="fraud-q4" value="no" checked=""><span>?꾨땲??(?뺤긽)</span></label>
+                <label class="fraud-radio-label danger"><input type="radio" name="fraud-q4" value="yes"><span>??(?꾪뿕)</span></label>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- 3. 李쎄뎄 ?먰븘 ?㏃튌 臾멸뎄 ??댄븨 (?먰븘?뺤씤 紐⑤컮???ъ쟾 ?숈쓽) -->
+        <div class="fraud-section-group" style="background-color: #FFFBEB; border: 1px solid #FDE68A; border-radius: 10px; padding: 12px;">
+          <label class="fraud-label" style="display: block; font-size: 12px; font-weight: 800; color: #92400E; margin-bottom: 4px;">
+            3. ?먰븘 湲곗옱 ?뺤빟 臾멸뎄 (李쎄뎄 ?먰븘?쒕챸 ?ъ쟾 ?泥?
+          </label>
+          <p style="font-size: 11px; color: #B45309; margin: 0 0 8px 0; line-height: 1.4;">
+            "蹂몄씤? 蹂댁씠?ㅽ뵾???ш린 ?꾪뿕?????異⑸텇???덈궡諛쏆븯?뚯쓣 ?뺤씤?⑸땲??"
+          </p>
+          <div style="display: flex; align-items: center; gap: 6px;">
+            <input type="text" id="fraud-confirm-type-input" class="doc-direct-input" style="flex: 1; height: 36px; background:#fff; font-size: 12px;" placeholder="'?뺤씤?섏??듬땲?? ?낅젰" value="?뺤씤?섏??듬땲??>
+          </div>
+        </div>
+      </div>
+
+      <div class="modal-footer" style="display: grid; grid-template-columns: 1fr 1.8fr; gap: 8px; padding: 12px 16px; background: #FAFBFC; border-top: 1px solid #E2E8F0;">
+        <button type="button" class="btn-cancel" id="cancel-fraud-modal-btn" style="margin: 0; height: 44px; font-size: 13.5px; font-weight: 700;">痍⑥냼</button>
+        <button type="button" class="btn-confirm" id="submit-fraud-modal-btn" style="margin: 0; height: 44px; font-size: 13.5px; font-weight: 800; background: linear-gradient(135deg, #F43F5E 0%, #E11D48 100%); color: #fff; border: none; border-radius: 10px; cursor: pointer; box-shadow: 0 3px 10px rgba(225, 29, 72, 0.25); display: flex; align-items: center; justify-content: center; gap: 6px;">
+          <span>吏꾨떒???쒖텧?섍린</span>
+          <i class="fa-solid fa-check" style="font-size: 12px;"></i>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- [怨좎븸?↔툑 ?뱁솕] 湲덉쑖?ш린?덈갑吏꾨떒???쒖텧 ?꾨즺 ???↔툑 吏꾪뻾 ?щ? ?앹뾽 ?뺤씤 紐⑤떖 -->
+  <div id="fraud-post-submit-modal" class="modal-overlay hidden" style="z-index: 10350;">
+    <div class="modal-content animate-slide-up" style="max-width: 380px; border-radius: 20px; overflow: hidden; box-shadow: 0 20px 40px rgba(0,0,0,0.18);">
+      <div class="modal-header" style="background: linear-gradient(135deg, #E6FAF6 0%, #D0F7F0 100%); border-bottom: 1.5px solid rgba(0, 199, 169, 0.25); padding: 14px 16px;">
+        <div class="modal-header-title">
+          <i class="fa-solid fa-circle-check" style="color: #00C7A9; font-size: 17px;"></i>
+          <h3 style="font-size: 14.5px; font-weight: 800; color: #007A68; margin: 0;">吏꾨떒???묒닔 ?꾨즺</h3>
+        </div>
+        <button type="button" class="close-btn" id="close-fraud-post-modal-btn">횞</button>
+      </div>
+      <div class="modal-body" style="padding: 22px 18px 16px 18px; text-align: center;">
+        <div style="width: 52px; height: 52px; border-radius: 50%; background: #E6FAF6; color: #00C7A9; display: flex; align-items: center; justify-content: center; font-size: 24px; margin: 0 auto 14px auto; box-shadow: 0 4px 14px rgba(0, 199, 169, 0.2);">
+          <i class="fa-solid fa-money-bill-transfer"></i>
+        </div>
+        <h4 style="font-size: 15.5px; font-weight: 800; color: #0F172A; margin: 0 0 8px 0; letter-spacing: -0.3px;">
+          湲덉쑖?ш린?덈갑吏꾨떒?쒓? ?묒닔?섏뿀?듬땲??
+        </h4>
+        <p style="font-size: 13px; color: #475569; line-height: 1.5; margin: 0 0 12px 0; letter-spacing: -0.2px;">
+          ?댁뼱??<strong>?↔툑 ?꾪몴瑜??묒꽦(珥ъ쁺)</strong>?섏떆寃좎뒿?덇퉴?<br>
+          <span style="font-size: 11.5px; color: #00A990; font-weight: 700;">(誘몃━ 珥ъ쁺???먯떆硫?李쎄뎄 ?湲곗떆媛꾩씠 80% ?⑥텞?⑸땲??</span>
+        </p>
+      </div>
+      <div class="modal-footer" style="display: grid; grid-template-columns: 1fr 1.5fr; gap: 8px; padding: 12px 16px; background-color: #FAFBFC; border-top: 1px solid #EDF2F7;">
+        <button type="button" class="btn-cancel" id="btn-fraud-post-later" style="margin: 0; height: 44px; font-size: 13.5px; font-weight: 700; border-radius: 10px;">?ㅼ쓬???섍린</button>
+        <button type="button" class="btn-confirm" id="btn-fraud-post-transfer" style="margin: 0; height: 44px; font-size: 13.5px; font-weight: 800; background: linear-gradient(135deg, #00DDBB 0%, #00C7A9 60%, #00A990 100%); color: #ffffff; border: none; border-radius: 10px; cursor: pointer; box-shadow: 0 3px 12px rgba(0, 199, 169, 0.3); display: flex; align-items: center; justify-content: center; gap: 6px;">
+          <span>?↔툑?섍린 (?꾪몴珥ъ쁺)</span>
+          <i class="fa-solid fa-chevron-right" style="font-size: 11px;"></i>
+        </button>
+      </div>
+    </div>
+  </div>
+  <div id="checklist-modal" class="modal-overlay hidden">
+    <div class="modal-content animate-slide-up" style="max-width: 480px; width: 100%; max-height: min(85vh, 85dvh); border-radius: 24px; display: flex; flex-direction: column; overflow: hidden; margin: auto;">
+      <div class="modal-header">
+        <div class="modal-header-title">
+          <i class="fa-solid fa-clipboard-check" style="color: var(--brand-mint); font-size: 18px;"></i>
+          <h3 style="font-size: 16px; font-weight: 800;">?낅Т蹂??꾩슂 ?쒕쪟 泥댄겕由ъ뒪??/h3>
+        </div>
+        <button class="close-btn" id="close-checklist-modal-btn">횞</button>
+      </div>
+      <div class="modal-body" style="padding: 16px 18px; overflow-y: auto; flex: 1; -webkit-overflow-scrolling: touch;">
+        <div class="checklist-content" id="checklist-container" style="border-top: none; padding: 0;">
+          <p class="form-desc" style="font-size: 13.5px; margin-bottom: 14px;">諛⑸Ц?섏떆???낅Т???꾩슂???쒕쪟媛 以鍮꾨릺?덈뒗吏 ?뺤씤??蹂댁꽭??</p>
+          
+          <!-- ?쒖븞 留욎땄???낅Т 寃?됱갹 諛??좏깮吏 紐⑸줉 (湲곗〈 ??硫붾돱???④? 泥섎━?섏뿬 ?꾨꼍 ?명솚) -->
+          <div class="checklist-search-wrapper" style="position: relative; margin-bottom: 14px;">
+            <div style="position: relative; display: flex; align-items: center;">
+              <i class="fa-solid fa-magnifying-glass" style="position: absolute; left: 14px; color: var(--cool-gray); font-size: 15px;"></i>
+              <input type="text" id="checklist-search-input" placeholder="?낅Т紐낆쓣 寃?됲빐 蹂댁꽭??.." style="width: 100%; padding: 12px 14px 12px 40px; border: 1.5px solid var(--light-gray); border-radius: 12px; font-size: 16px; font-weight: 600; outline: none; background-color: #f5f6f8; transition: all 0.2s; box-sizing: border-box; cursor: pointer;" autocomplete="off">
+            </div>
+            
+            <!-- ?좏깮吏 ?쒕∼?ㅼ슫 諛뺤뒪 (理쒕? ?믪씠 ?쒗븳 諛??대? 遺?쒕윭???ㅽ겕濡??곸슜?쇰줈 ?ㅻ낫???묒? ?붾㈃ ?쎌갹 諛⑹?) -->
+            <div id="checklist-dropdown-results" style="display: none; position: relative; width: 100%; background: #ffffff; border: 1.5px solid var(--brand-mint); border-radius: 14px; box-shadow: 0 4px 16px rgba(0,0,0,0.06); max-height: 195px; overflow-y: auto; -webkit-overflow-scrolling: touch; margin-top: 8px; box-sizing: border-box; padding: 2px 0;">
+              <div class="checklist-opt-item" data-val="none" style="padding: 11px 16px; font-size: 14px; font-weight: 700; color: #1e293b; cursor: pointer; transition: all 0.15s; border-bottom: 1px solid #f1f5f9;">?좏깮?덊븿</div>
+              <div class="checklist-opt-item" data-val="personal_new" style="padding: 11px 16px; font-size: 14px; font-weight: 700; color: #1e293b; cursor: pointer; transition: all 0.15s; border-bottom: 1px solid #f1f5f9;">媛쒖씤 ?좉퇋 怨꾩쥖 媛쒖꽕</div>
+              <div class="checklist-opt-item" data-val="rent_loan" style="padding: 11px 16px; font-size: 14px; font-weight: 700; color: #1e293b; cursor: pointer; transition: all 0.15s; border-bottom: 1px solid #f1f5f9;">?꾩꽭?먭툑?異?/div>
+              <div class="checklist-opt-item" data-val="home_loan" style="padding: 11px 16px; font-size: 14px; font-weight: 700; color: #1e293b; cursor: pointer; transition: all 0.15s; border-bottom: 1px solid #f1f5f9;">二쇳깮?대낫?異?/div>
+              <div class="checklist-opt-item" data-val="corporate_new" style="padding: 11px 16px; font-size: 14px; font-weight: 700; color: #1e293b; cursor: pointer; transition: all 0.15s; border-bottom: 1px solid #f1f5f9;">踰뺤씤 ?좉퇋</div>
+              <div class="checklist-opt-item" data-val="corporate_loan" style="padding: 11px 16px; font-size: 14px; font-weight: 700; color: #1e293b; cursor: pointer; transition: all 0.15s; border-bottom: 1px solid #f1f5f9;">踰뺤씤 ?異?/div>
+              <div class="checklist-opt-item" data-val="proxy_work" style="padding: 11px 16px; font-size: 14px; font-weight: 700; color: #1e293b; cursor: pointer; transition: all 0.15s; border-bottom: 1px solid #f1f5f9;">?由ъ씤 ?낅Т</div>
+              <div class="checklist-opt-item" data-val="inheritance_work" style="padding: 11px 16px; font-size: 14px; font-weight: 700; color: #1e293b; cursor: pointer; transition: all 0.15s;">?곸냽 ?낅Т</div>
+            </div>
+          </div>
+
+          <!-- ?곹솴 吏덈Ц ?좏깮 而⑦뀒?대꼫 (?숈쟻 ?쒕쪟 ?꾪꽣留곸슜 臾몄쭊 ?곸뿭) -->
+          <div id="checklist-questions-container" style="background-color: #f8f9fa; border: 1px solid var(--light-gray); border-radius: 12px; padding: 14px; margin-bottom: 20px; display: none; text-align: left; box-sizing: border-box;">
+            <!-- JS ?숈쟻 ?앹꽦 -->
+          </div>
+
+          <!-- 湲곗〈 ??硫붾돱 (?명솚?깆쓣 ?꾪빐 display: none 泥섎━ 諛?7? ?낅Т 留ㅽ븨) -->
+          <div class="tab-menu" style="margin-top: 0; display: none !important;">
+            <button class="tab-btn active" data-tab="personal_new">媛쒖씤 ?좉퇋</button>
+            <button class="tab-btn" data-tab="rent_loan">?꾩꽭?먭툑?異?/button>
+            <button class="tab-btn" data-tab="home_loan">二쇳깮?대낫?異?/button>
+            <button class="tab-btn" data-tab="corporate_new">踰뺤씤 ?좉퇋</button>
+            <button class="tab-btn" data-tab="corporate_loan">踰뺤씤 ?異?/button>
+            <button class="tab-btn" data-tab="proxy_work">?由ъ씤 ?낅Т</button>
+            <button class="tab-btn" data-tab="inheritance_work">?곸냽 ?낅Т</button>
+          </div>
+
+          <!-- 以鍮??곹깭 吏꾩쿃??諛?-->
+          <div class="progress-wrapper">
+            <div class="progress-info">
+              <span>?쒕쪟 以鍮??곹깭</span>
+              <span class="progress-pct" id="checklist-progress-pct">0%</span>
+            </div>
+            <div class="progress-bar-bg">
+              <div class="progress-bar-fill" id="checklist-progress-bar"></div>
+            </div>
+          </div>
+
+          <!-- 泥댄겕由ъ뒪???댁슜 ?곸뿭 -->
+          <div class="check-list" id="checklist-items">
+            <!-- JavaScript?먯꽌 ?숈쟻?쇰줈 ?앹꽦 ?덉젙 -->
+          </div>
+
+          <!-- 泥댄겕由ъ뒪???섎떒 ?덈궡 諛??꾨즺/吏꾩쐞?뺤씤 ?≪뀡 諛?-->
+          <div class="checklist-action-footer-box" style="margin-top: 16px; display: flex; flex-direction: column; gap: 8px;">
+            <div style="display: grid; grid-template-columns: 1fr 1.25fr; gap: 8px;">
+              <button type="button" class="btn-checklist-finish" id="btn-checklist-finish" style="background: var(--brand-mint); color: #ffffff; border: none; border-radius: 12px; padding: 13px; font-size: 14px; font-weight: 700; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 6px;">
+                <i class="fa-solid fa-check"></i>
+                <span>以鍮??뺤씤 ?꾨즺</span>
+              </button>
+              <button type="button" class="btn-checklist-to-verify" id="btn-checklist-to-verify" style="background: #f5f3ff; color: #7c3aed; border: 1.5px solid #c4b5fd; border-radius: 12px; padding: 13px; font-size: 13.5px; font-weight: 700; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 6px;">
+                <i class="fa-solid fa-file-shield"></i>
+                <span>?쒕쪟 吏꾩쐞?뺤씤 ?섍린</span>
+              </button>
+            </div>
+            <p style="font-size: 11px; color: #64748b; text-align: center; margin: 4px 0 0 0;">* ???李쎄뎄 諛⑸Ц ???꾩슂 ?쒕쪟瑜?誘몃━ 梨숆꺼 鍮좊Ⅸ 泥섎━瑜?諛쏆븘蹂댁꽭??</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ?앹뾽 紐⑤떖: ?섏쓽 留욎땄 湲덉쑖 ?깊뼢 ?뚯뒪??-->
+  <div id="financial-test-modal" class="modal-overlay hidden">
+    <div class="modal-content animate-slide-up" style="max-height: 85vh; display: flex; flex-direction: column; overflow: hidden;">
+      <div class="modal-header">
+        <div class="modal-header-title">
+          <i class="fa-solid fa-wand-magic-sparkles" style="color: #F5A623; font-size: 16px;"></i>
+          <h3 style="font-size: 15px; font-weight: 700;">?섏쓽 留욎땄 湲덉쑖 ?깊뼢 ?뚯뒪??/h3>
+        </div>
+        <button class="close-btn" id="close-financial-test-modal-btn">횞</button>
+      </div>
+      <div class="modal-body" style="padding: 16px; overflow-y: auto; flex: 1;">
+        <div class="game-body-inline" style="padding: 0;">
+          <!-- ?명듃濡??붾㈃ (3? 移댄뀒怨좊━ ?좏깮 由ъ뒪?? -->
+          <div class="quiz-intro" id="quiz-intro-box" style="padding: 0 0 16px;">
+            <div class="quiz-intro-header">
+              <i class="fa-solid fa-lightbulb quiz-intro-icon"></i>
+              <h4>?섏뿉寃?留욌뒗 ?ㅻ쭏?명븳 ?곹뭹 異붿쿇 吏꾨떒</h4>
+              <p class="quiz-intro-desc">?꾨옒??移댄뀒怨좊━ 以?吏꾨떒諛쏄퀬 ?띠? 湲덉쑖 ?깊뼢???좏깮??二쇱꽭??</p>
+            </div>
+            
+            <div class="quiz-category-grid">
+              <div class="category-card" data-category="card">
+                <div class="category-icon-box">
+                  <i class="fa-solid fa-credit-card"></i>
+                </div>
+                <div class="category-info">
+                  <span class="category-title">移대뱶 ?깊뼢 吏꾨떒</span>
+                  <span class="category-desc">?섏쓽 ?쇱긽 ?뚮퉬 ?곸뿭??留욎텣 ?먰뵿 移대뱶 留ㅼ묶</span>
+                </div>
+                <i class="fa-solid fa-chevron-right category-arrow"></i>
+              </div>
+                              
+              <div class="category-card" data-category="deposit">
+                <div class="category-icon-box" style="background-color: #FFF9E6; color: #E2A300;">
+                  <i class="fa-solid fa-piggy-bank"></i>
+                </div>
+                <div class="category-info">
+                  <span class="category-title">?덉쟻湲??깊뼢 吏꾨떒</span>
+                  <span class="category-desc">怨꾪쉷 vs ?먯쑀, ?먭툑 ?곷┰ ?듦?蹂??곹뭹 吏꾨떒</span>
+                </div>
+                <i class="fa-solid fa-chevron-right category-arrow"></i>
+              </div>
+                                
+              <div class="category-card" data-category="invest">
+                <div class="category-icon-box" style="background-color: #EBF3FF; color: #1B74E4;">
+                  <i class="fa-solid fa-chart-line"></i>
+                </div>
+                <div class="category-info">
+                  <span class="category-title">?ъ옄 ?깊뼢 吏꾨떒</span>
+                  <span class="category-desc">怨듦꺽?ъ옄??vs ?덉젙?? ?ъ옄 ?ㅽ???留욎땄 ???吏꾨떒</span>
+                </div>
+                <i class="fa-solid fa-chevron-right category-arrow"></i>
+              </div>
+            </div>
+          </div>
+
+          <!-- ?댁쫰 ?④퀎 ?붾㈃ -->
+          <div class="quiz-card hidden" id="quiz-card-box">
+            <div class="quiz-progress">
+              <span id="quiz-step-indicator">吏덈Ц 1 of 5</span>
+              <span id="quiz-progress-percent">20%</span>
+            </div>
+            <h3 class="quiz-question" id="quiz-question-text">吏덈Ц ?댁슜</h3>
+            <div class="quiz-options" id="quiz-options-box">
+              <!-- ?듭뀡 踰꾪듉 ?숈쟻 ?앹꽦 -->
+            </div>
+          </div>
+
+          <!-- ?뚯뒪??寃곌낵 ?붾㈃ -->
+          <div class="result-card hidden" id="quiz-result-box">
+            <span class="result-badge">?뚯뒪??寃곌낵</span>
+            <h3 class="result-type" id="result-type-name">?깊뼢 遺꾩꽍 寃곌낵</h3>
+            <p class="result-desc" id="result-type-desc">?깊뼢 ?ㅻ챸???ㅼ뼱媛??遺遺꾩엯?덈떎.</p>
+            
+            <h4 class="recommended-title"><i class="fa-solid fa-gift"></i> 異붿쿇 湲덉쑖 ?곹뭹</h4>
+            
+            <!-- 異붿쿇 ?곹뭹 紐⑸줉 而⑦뀒?대꼫 -->
+            <div class="recommended-products-container" id="recommended-products-container">
+              <!-- ?숈쟻?쇰줈 ?앹꽦??product-card ?붿냼?ㅼ씠 ?쎌엯?⑸땲??-->
+            </div>
+
+            <button class="btn-scan-action btn-scan-secondary" id="restart-quiz-btn" style="margin-top: 12px;">?뚯뒪???ㅼ떆 ?섍린</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ?앹뾽 紐⑤떖: ??李⑤? 利됱떆 ?몄텧 (湲대컯??湲닿툒 ?뚮┝ & 李쎄뎄 ?덈궡 ?댄럺?? -->
+  <div id="queue-called-modal" class="modal-overlay hidden" style="z-index: 9999;">
+    <div class="modal-content called-modal-content animate-shake">
+      <div class="called-header">
+        <div class="called-bell-icon-pulse">
+          <i class="fa-solid fa-bell-concierge"></i>
+        </div>
+        <span class="called-urgent-badge animate-blink">?뱼 吏湲?怨좉컼?섏쓽 李⑤??낅땲??</span>
+      </div>
+      <div class="called-body">
+        <div class="called-ticket-banner">
+          <span class="called-ticket-label">??踰덊샇??/span>
+          <span class="called-ticket-num" id="called-modal-ticket-num">1004踰?/span>
+        </div>
+        <div class="called-counter-card">
+          <div class="counter-number-badge">3踰?李쎄뎄</div>
+          <h3 class="counter-name">?섏떊 / ?좉퇋 ?곷떞 李쎄뎄</h3>
+          <p class="counter-staff-info">?대떦 ?됱썝: <strong>源?곸뾽 ?由?/strong></p>
+        </div>
+        <div class="called-sync-info">
+          <i class="fa-solid fa-circle-check" style="color: var(--brand-mint); font-size: 16px;"></i>
+          <span>?묒꽦?섏떊 <strong>?ㅻ쭏???꾪몴 / ?쒖떇</strong>??3踰?李쎄뎄 ?됱썝 ?⑤쭚濡??ㅼ떆媛??꾩넚?섏뿀?듬땲??</span>
+        </div>
+        <div class="called-warning-timer">
+          <i class="fa-solid fa-clock"></i>
+          <span>?몄텧 ??3遺??대궡 誘몃갑臾????먮룞 痍⑥냼?????덉뒿?덈떎.</span>
+        </div>
+        <button type="button" class="btn-called-confirm" id="btn-called-modal-close">
+          <i class="fa-solid fa-person-walking-arrow-right"></i>
+          <span>?뺤씤?덉뒿?덈떎 (李쎄뎄濡??대룞)</span>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  </div> <!-- Ends .mobile-web-container (?명꽣/?좎뒪??紐⑤떖源뚯? 紐⑤몢 ?ы븿?섏뿬 PC ???꾨젅???덉뿉 媛뉙엳?꾨줉 ?? -->
+
+  <!-- 諛쒗몴???꾩슜 ?쒖뿰 由щえ而?(PC/?명듃遺??붾㈃ ?≪텧?? 紐⑤컮?쇱뿉?쒕뒗 100% ?먮룞 ?④?) -->
+  <aside id="presenter-control-panel" class="presenter-panel">
+    <div class="presenter-panel-header">
+      <div class="presenter-title">
+        <i class="fa-solid fa-microphone-lines" style="color: var(--brand-mint);"></i>
+        <span>諛쒗몴???쒖뿰 由щえ而?/span>
+      </div>
+      <span class="presenter-badge">PC ?≪텧 ?꾩슜</span>
+    </div>
+    <p class="presenter-desc">?명듃遺??붾㈃ ?≪텧 以??湲곗뿴??異뺤냼?섏뿬 ?몄텧 ?댄럺?몃? ?ㅼ떆媛꾩쑝濡??쒖뿰?섏꽭??</p>
+    <div class="presenter-btn-group">
+      <button type="button" class="btn-presenter btn-presenter-dec" id="btn-presenter-reduce" title="?⑥텞?? [ ?먮뒗 -">
+        <span><i class="fa-solid fa-user-minus"></i> ?湲?1紐??몄텧 (-1紐?</span>
+        <kbd class="presenter-kbd">[</kbd>
+      </button>
+      <button type="button" class="btn-presenter btn-presenter-call" id="btn-presenter-call-now" title="?⑥텞?? ] ?먮뒗 0">
+        <span><i class="fa-solid fa-bullhorn"></i> ?슚 利됱떆 ??李⑤? ?몄텧! (0紐?</span>
+        <kbd class="presenter-kbd">]</kbd>
+      </button>
+      <button type="button" class="btn-presenter btn-presenter-reset" id="btn-presenter-reset" title="?⑥텞?? \ ?먮뒗 r">
+        <span><i class="fa-solid fa-rotate-left"></i> ?湲?5紐?由ъ뀑</span>
+        <kbd class="presenter-kbd">\</kbd>
+      </button>
+    </div>
+  </aside>
+
+  <!-- 紐⑤컮???ㅼ젣 移대찓???댄뵆 ?곕룞???ㅼ떆媛??뚯씪 ?낅줈??-->
+  <input type="file" id="real-camera-input" accept="image/*" capture="environment" style="display: none;">
+
+<script src="app.js?v=20260910_real_ocr_engine"></script> 
+
+
+</body></html>
