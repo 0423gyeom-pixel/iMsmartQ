@@ -12,7 +12,7 @@
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.css" />
   <!-- FontAwesome for icons -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-  <link rel="stylesheet" href="style.css?v=20260910_foreigner_overlap_fix">
+  <link rel="stylesheet" href="style.css?v=20260910_checklist_zoom_fix">
 </head>
 <body>
   <div class="mobile-web-container">
@@ -1744,7 +1744,7 @@
     </div>
   </div>
   <div id="checklist-modal" class="modal-overlay hidden">
-    <div class="modal-content animate-slide-up" style="max-width: 480px; width: 100%; max-height: 90vh; border-radius: 24px; display: flex; flex-direction: column; overflow: hidden;">
+    <div class="modal-content animate-slide-up" style="max-width: 480px; width: 100%; max-height: min(85vh, 85dvh); border-radius: 24px; display: flex; flex-direction: column; overflow: hidden; margin: auto;">
       <div class="modal-header">
         <div class="modal-header-title">
           <i class="fa-solid fa-clipboard-check" style="color: var(--brand-mint); font-size: 18px;"></i>
@@ -1752,27 +1752,27 @@
         </div>
         <button class="close-btn" id="close-checklist-modal-btn">&times;</button>
       </div>
-      <div class="modal-body" style="padding: 18px 20px; overflow-y: auto; flex: 1;">
+      <div class="modal-body" style="padding: 16px 18px; overflow-y: auto; flex: 1; -webkit-overflow-scrolling: touch;">
         <div class="checklist-content" id="checklist-container" style="border-top: none; padding: 0;">
           <p class="form-desc" style="font-size: 13.5px; margin-bottom: 14px;">방문하시는 업무에 필요한 서류가 준비되었는지 확인해 보세요.</p>
           
           <!-- 시안 맞춤형 업무 검색창 및 선택지 목록 (기존 탭 메뉴는 숨김 처리하여 완벽 호환) -->
-          <div class="checklist-search-wrapper" style="position: relative; margin-bottom: 16px;">
+          <div class="checklist-search-wrapper" style="position: relative; margin-bottom: 14px;">
             <div style="position: relative; display: flex; align-items: center;">
               <i class="fa-solid fa-magnifying-glass" style="position: absolute; left: 14px; color: var(--cool-gray); font-size: 15px;"></i>
-              <input type="text" id="checklist-search-input" placeholder="업무명을 검색해 보세요..." style="width: 100%; padding: 13px 14px 13px 40px; border: 1.5px solid var(--light-gray); border-radius: 12px; font-size: 14.5px; font-weight: 600; outline: none; background-color: #f5f6f8; transition: all 0.2s; box-sizing: border-box; cursor: pointer;" autocomplete="off">
+              <input type="text" id="checklist-search-input" placeholder="업무명을 검색해 보세요..." style="width: 100%; padding: 12px 14px 12px 40px; border: 1.5px solid var(--light-gray); border-radius: 12px; font-size: 16px; font-weight: 600; outline: none; background-color: #f5f6f8; transition: all 0.2s; box-sizing: border-box; cursor: pointer;" autocomplete="off">
             </div>
             
-            <!-- 선택지 드롭다운 박스 (하향 전개 방식으로 8개 전체 항목 잘림 없이 온전히 노출) -->
-            <div id="checklist-dropdown-results" style="display: none; position: relative; width: 100%; background: #ffffff; border: 1.5px solid var(--brand-mint); border-radius: 14px; box-shadow: 0 4px 16px rgba(0,0,0,0.06); max-height: none; overflow: visible; margin-top: 8px; box-sizing: border-box; padding: 4px 0;">
-              <div class="checklist-opt-item" data-val="none" style="padding: 12px 18px; font-size: 14.5px; font-weight: 700; color: #1e293b; cursor: pointer; transition: all 0.15s; border-bottom: 1px solid #f1f5f9;">선택안함</div>
-              <div class="checklist-opt-item" data-val="personal_new" style="padding: 12px 18px; font-size: 14.5px; font-weight: 700; color: #1e293b; cursor: pointer; transition: all 0.15s; border-bottom: 1px solid #f1f5f9;">개인 신규 계좌 개설</div>
-              <div class="checklist-opt-item" data-val="rent_loan" style="padding: 12px 18px; font-size: 14.5px; font-weight: 700; color: #1e293b; cursor: pointer; transition: all 0.15s; border-bottom: 1px solid #f1f5f9;">전세자금대출</div>
-              <div class="checklist-opt-item" data-val="home_loan" style="padding: 12px 18px; font-size: 14.5px; font-weight: 700; color: #1e293b; cursor: pointer; transition: all 0.15s; border-bottom: 1px solid #f1f5f9;">주택담보대출</div>
-              <div class="checklist-opt-item" data-val="corporate_new" style="padding: 12px 18px; font-size: 14.5px; font-weight: 700; color: #1e293b; cursor: pointer; transition: all 0.15s; border-bottom: 1px solid #f1f5f9;">법인 신규</div>
-              <div class="checklist-opt-item" data-val="corporate_loan" style="padding: 12px 18px; font-size: 14.5px; font-weight: 700; color: #1e293b; cursor: pointer; transition: all 0.15s; border-bottom: 1px solid #f1f5f9;">법인 대출</div>
-              <div class="checklist-opt-item" data-val="proxy_work" style="padding: 12px 18px; font-size: 14.5px; font-weight: 700; color: #1e293b; cursor: pointer; transition: all 0.15s; border-bottom: 1px solid #f1f5f9;">대리인 업무</div>
-              <div class="checklist-opt-item" data-val="inheritance_work" style="padding: 12px 18px; font-size: 14.5px; font-weight: 700; color: #1e293b; cursor: pointer; transition: all 0.15s;">상속 업무</div>
+            <!-- 선택지 드롭다운 박스 (최대 높이 제한 및 내부 부드러운 스크롤 적용으로 키보드/작은 화면 팽창 방지) -->
+            <div id="checklist-dropdown-results" style="display: none; position: relative; width: 100%; background: #ffffff; border: 1.5px solid var(--brand-mint); border-radius: 14px; box-shadow: 0 4px 16px rgba(0,0,0,0.06); max-height: 195px; overflow-y: auto; -webkit-overflow-scrolling: touch; margin-top: 8px; box-sizing: border-box; padding: 2px 0;">
+              <div class="checklist-opt-item" data-val="none" style="padding: 11px 16px; font-size: 14px; font-weight: 700; color: #1e293b; cursor: pointer; transition: all 0.15s; border-bottom: 1px solid #f1f5f9;">선택안함</div>
+              <div class="checklist-opt-item" data-val="personal_new" style="padding: 11px 16px; font-size: 14px; font-weight: 700; color: #1e293b; cursor: pointer; transition: all 0.15s; border-bottom: 1px solid #f1f5f9;">개인 신규 계좌 개설</div>
+              <div class="checklist-opt-item" data-val="rent_loan" style="padding: 11px 16px; font-size: 14px; font-weight: 700; color: #1e293b; cursor: pointer; transition: all 0.15s; border-bottom: 1px solid #f1f5f9;">전세자금대출</div>
+              <div class="checklist-opt-item" data-val="home_loan" style="padding: 11px 16px; font-size: 14px; font-weight: 700; color: #1e293b; cursor: pointer; transition: all 0.15s; border-bottom: 1px solid #f1f5f9;">주택담보대출</div>
+              <div class="checklist-opt-item" data-val="corporate_new" style="padding: 11px 16px; font-size: 14px; font-weight: 700; color: #1e293b; cursor: pointer; transition: all 0.15s; border-bottom: 1px solid #f1f5f9;">법인 신규</div>
+              <div class="checklist-opt-item" data-val="corporate_loan" style="padding: 11px 16px; font-size: 14px; font-weight: 700; color: #1e293b; cursor: pointer; transition: all 0.15s; border-bottom: 1px solid #f1f5f9;">법인 대출</div>
+              <div class="checklist-opt-item" data-val="proxy_work" style="padding: 11px 16px; font-size: 14px; font-weight: 700; color: #1e293b; cursor: pointer; transition: all 0.15s; border-bottom: 1px solid #f1f5f9;">대리인 업무</div>
+              <div class="checklist-opt-item" data-val="inheritance_work" style="padding: 11px 16px; font-size: 14px; font-weight: 700; color: #1e293b; cursor: pointer; transition: all 0.15s;">상속 업무</div>
             </div>
           </div>
 
@@ -1981,6 +1981,6 @@
   <!-- 모바일 실제 카메라 어플 연동용 실시간 파일 업로더 -->
   <input type="file" id="real-camera-input" accept="image/*" capture="environment" style="display: none;">
 
-<script src="app.js?v=20260910_foreigner_overlap_fix"></script> 
+<script src="app.js?v=20260910_checklist_zoom_fix"></script> 
 </body>
 </html>

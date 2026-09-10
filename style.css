@@ -2129,7 +2129,9 @@ input:checked + .slider:before {
   align-items: center;
   z-index: 9000;
   transition: opacity 0.3s;
-  padding: 8px 10px;
+  padding: max(16px, env(safe-area-inset-top, 16px)) 14px max(16px, env(safe-area-inset-bottom, 16px));
+  overflow-y: auto;
+  box-sizing: border-box;
 }
 
 .modal-overlay.hidden {
@@ -2147,8 +2149,11 @@ input:checked + .slider:before {
   display: flex;
   flex-direction: column;
   gap: 10px;
-  max-height: 95vh;
+  max-height: 85vh;
+  max-height: 85dvh;
   overflow-y: auto;
+  margin: auto;
+  box-sizing: border-box;
 }
 
 .modal-header {
@@ -3902,22 +3907,29 @@ body {
 #checklist-modal .modal-content {
   max-width: 480px !important;
   width: 100% !important;
-  max-height: 90vh !important;
+  max-height: 85vh !important;
+  max-height: 85dvh !important;
   border-radius: 24px !important;
   display: flex !important;
   flex-direction: column !important;
   overflow: hidden !important;
+  margin: auto !important;
 }
 
 #checklist-modal .modal-body {
-  padding: 18px 20px !important;
+  padding: 16px 18px !important;
   overflow-y: auto !important;
+  -webkit-overflow-scrolling: touch !important;
   flex: 1 1 auto !important;
 }
 
 .checklist-search-wrapper {
   position: relative !important;
-  margin-bottom: 16px !important;
+  margin-bottom: 14px !important;
+}
+
+#checklist-search-input {
+  font-size: 16px !important; /* iOS Safari 자동 줌 방지 (16px 이상 필수) */
 }
 
 #checklist-dropdown-results {
@@ -3928,15 +3940,25 @@ body {
   border: 1.5px solid var(--brand-mint) !important;
   border-radius: 14px !important;
   box-shadow: 0 4px 16px rgba(0, 0, 0, 0.06) !important;
-  max-height: none !important;
-  overflow: visible !important;
+  max-height: 195px !important;
+  overflow-y: auto !important;
+  -webkit-overflow-scrolling: touch !important;
   box-sizing: border-box !important;
-  padding: 4px 0 !important;
+  padding: 2px 0 !important;
+}
+
+#checklist-dropdown-results::-webkit-scrollbar {
+  width: 5px;
+}
+
+#checklist-dropdown-results::-webkit-scrollbar-thumb {
+  background: #cbd5e1;
+  border-radius: 10px;
 }
 
 .checklist-opt-item {
-  padding: 12px 18px !important;
-  font-size: 14.5px !important;
+  padding: 11px 16px !important;
+  font-size: 14px !important;
   font-weight: 700 !important;
   color: #1e293b !important;
   cursor: pointer !important;
@@ -3951,11 +3973,12 @@ body {
   border-bottom: none !important;
 }
 
-.checklist-opt-item:hover {
+.checklist-opt-item:hover,
+.checklist-opt-item:active {
   background-color: #f0fdfa !important;
   color: var(--brand-mint-dark) !important;
   font-weight: 800 !important;
-  padding-left: 22px !important;
+  padding-left: 20px !important;
 }
 
 /* ==========================================================================
