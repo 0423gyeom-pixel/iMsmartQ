@@ -6247,7 +6247,6 @@ document.addEventListener('DOMContentLoaded', async () => {
         if (foreignerTextarea) {
           foreignerTextarea.value = item.text;
           if (foreignerCharCount) foreignerCharCount.textContent = item.text.length;
-          foreignerTextarea.focus();
         }
       });
       foreignerChipContainer.appendChild(btn);
@@ -6453,9 +6452,6 @@ document.addEventListener('DOMContentLoaded', async () => {
     foreignerModal.classList.remove('hidden');
     if (foreignerSendText) foreignerSendText.textContent = "Translate";
     if (btnForeignerSend) btnForeignerSend.disabled = false;
-    setTimeout(() => {
-      if (foreignerTextarea) foreignerTextarea.focus();
-    }, 150);
   }
 
   function closeForeignerModal() {
@@ -6552,7 +6548,6 @@ document.addEventListener('DOMContentLoaded', async () => {
         if (foreignerTextarea) {
           foreignerTextarea.value = textToRestore;
           if (foreignerCharCount) foreignerCharCount.textContent = textToRestore.length;
-          foreignerTextarea.focus();
         }
       }
     });

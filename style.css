@@ -5306,30 +5306,38 @@ body {
 /* 외국인 번역기 모달 */
 .foreigner-modal-content {
   max-width: 440px !important;
-  border-radius: 24px !important;
-  padding: 22px 20px !important;
+  width: 100% !important;
+  max-height: 90vh !important;
+  max-height: 90dvh !important;
+  border-radius: 22px !important;
+  padding: 16px 18px !important;
   box-shadow: 0 20px 40px rgba(15, 23, 42, 0.16) !important;
   background: #ffffff !important;
-  display: flex;
-  flex-direction: column;
-  gap: 16px;
+  display: flex !important;
+  flex-direction: column !important;
+  gap: 10px !important;
+  overflow-y: auto !important;
+  -webkit-overflow-scrolling: touch;
+  margin: auto !important;
+  box-sizing: border-box !important;
 }
 
 .foreigner-modal-header {
   display: flex;
   justify-content: space-between;
   align-items: flex-start;
+  flex-shrink: 0;
 }
 
 .foreigner-modal-header-left {
   display: flex;
   align-items: flex-start;
-  gap: 12px;
+  gap: 10px;
 }
 
 .foreigner-modal-icon-badge {
-  width: 44px;
-  height: 44px;
+  width: 40px;
+  height: 40px;
   border-radius: 12px;
   background: #eff6ff;
   display: flex;
@@ -5341,11 +5349,11 @@ body {
 .foreigner-modal-header-titles {
   display: flex;
   flex-direction: column;
-  gap: 3px;
+  gap: 2px;
 }
 
 .foreigner-modal-title {
-  font-size: 19px;
+  font-size: 18px;
   font-weight: 800;
   color: #0f172a;
   margin: 0;
@@ -5353,9 +5361,9 @@ body {
 }
 
 .foreigner-modal-desc {
-  font-size: 12.5px;
+  font-size: 12px;
   color: #64748b;
-  line-height: 1.45;
+  line-height: 1.4;
   margin: 0;
   font-weight: 500;
 }
@@ -5369,6 +5377,7 @@ body {
   padding: 0;
   line-height: 1;
   transition: color 0.2s;
+  flex-shrink: 0;
 }
 
 .foreigner-modal-close:hover {
@@ -5378,19 +5387,22 @@ body {
 .foreigner-modal-body {
   display: flex;
   flex-direction: column;
-  gap: 12px;
+  gap: 8px;
+  flex: 1 1 auto;
+  min-height: 0;
 }
 
 .foreigner-input-box {
   border: 1.5px solid #cbd5e1;
-  border-radius: 16px;
-  padding: 14px 16px;
+  border-radius: 14px;
+  padding: 12px 14px;
   background: #ffffff;
-  min-height: 170px;
+  min-height: 110px;
   display: flex;
   flex-direction: column;
   justify-content: space-between;
   transition: border-color 0.2s, box-shadow 0.2s;
+  flex: 1 1 auto;
 }
 
 .foreigner-input-box:focus-within {
@@ -5414,11 +5426,11 @@ body {
   width: 100%;
   border: none;
   outline: none;
-  font-size: 14.5px;
-  line-height: 1.55;
+  font-size: 14px;
+  line-height: 1.5;
   color: #1e293b;
   resize: none;
-  min-height: 110px;
+  min-height: 70px;
   font-family: inherit;
   background: transparent;
 }
@@ -5430,10 +5442,10 @@ body {
 
 .foreigner-char-counter {
   text-align: right;
-  font-size: 12px;
+  font-size: 11.5px;
   color: #94a3b8;
   font-weight: 500;
-  margin-top: 6px;
+  margin-top: 4px;
 }
 
 /* 전송 완료 피드백 박스 */
@@ -5441,10 +5453,10 @@ body {
   background: #f0fdf4;
   border: 1px solid #bbf7d0;
   border-radius: 12px;
-  padding: 12px 14px;
+  padding: 10px 12px;
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: 8px;
   animation: fadeIn 0.3s ease;
 }
 
@@ -5473,17 +5485,18 @@ body {
 }
 
 .foreigner-modal-footer {
-  margin-top: 4px;
+  margin-top: 2px;
+  flex-shrink: 0;
 }
 
 .foreigner-send-btn {
   width: 100%;
-  height: 50px;
+  height: 46px;
   background: #3b82f6;
   color: #ffffff;
   border: none;
-  border-radius: 14px;
-  font-size: 16px;
+  border-radius: 12px;
+  font-size: 15px;
   font-weight: 700;
   display: flex;
   align-items: center;
@@ -5492,6 +5505,7 @@ body {
   cursor: pointer;
   transition: all 0.2s ease;
   box-shadow: 0 4px 14px rgba(59, 130, 246, 0.3);
+  flex-shrink: 0;
 }
 
 .foreigner-send-btn:hover {
@@ -5523,9 +5537,10 @@ body {
   align-items: center;
   gap: 8px;
   background: #f8fafc;
-  padding: 8px 10px;
-  border-radius: 14px;
+  padding: 6px 10px;
+  border-radius: 12px;
   border: 1px solid #e2e8f0;
+  flex-shrink: 0;
 }
 
 .lang-selector-label {
@@ -5536,6 +5551,7 @@ body {
   align-items: center;
   gap: 4px;
   white-space: nowrap;
+  flex-shrink: 0;
 }
 
 .lang-selector-label i {
@@ -5591,6 +5607,7 @@ body {
   scroll-behavior: smooth;
   -webkit-overflow-scrolling: touch;
   scrollbar-width: none;
+  min-width: 0;
 }
 .lang-pill-group::-webkit-scrollbar {
   display: none;
@@ -5602,13 +5619,14 @@ body {
   color: #475569;
   font-size: 11.5px;
   font-weight: 600;
-  padding: 5px 9px;
+  padding: 4px 9px;
   border-radius: 16px;
   cursor: pointer;
   white-space: nowrap;
   transition: all 0.15s ease;
   font-family: inherit;
   box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04);
+  flex-shrink: 0;
 }
 
 .lang-pill:hover {
@@ -5634,8 +5652,9 @@ body {
   display: flex;
   align-items: center;
   gap: 8px;
-  overflow: hidden;
-  padding: 2px 0 4px;
+  padding: 2px 0;
+  flex-shrink: 0;
+  min-height: 32px;
 }
 
 .quick-chip-label {
@@ -5643,6 +5662,7 @@ body {
   font-weight: 700;
   color: #64748b;
   white-space: nowrap;
+  flex-shrink: 0;
 }
 
 .quick-chip-list {
@@ -5652,9 +5672,10 @@ body {
   overflow-x: auto;
   flex: 1;
   scroll-behavior: smooth;
-  padding-bottom: 2px;
+  padding: 2px 0;
   -webkit-overflow-scrolling: touch;
   scrollbar-width: none;
+  min-width: 0;
 }
 .quick-chip-list::-webkit-scrollbar {
   display: none;
@@ -5666,7 +5687,7 @@ body {
   color: #334155;
   font-size: 11.5px;
   font-weight: 600;
-  padding: 5px 10px;
+  padding: 4px 10px;
   border-radius: 20px;
   cursor: pointer;
   white-space: nowrap;
@@ -5685,16 +5706,85 @@ body {
   transform: scale(0.95);
 }
 
+/* 모바일 키보드 / 작은 화면 반응형 최적화 */
+@media (max-height: 660px) {
+  .modal-overlay {
+    align-items: flex-start !important;
+    padding-top: max(8px, env(safe-area-inset-top, 8px)) !important;
+    padding-bottom: max(8px, env(safe-area-inset-bottom, 8px)) !important;
+  }
+  .foreigner-modal-content {
+    margin: 0 auto !important;
+    padding: 10px 12px !important;
+    gap: 6px !important;
+    border-radius: 16px !important;
+    max-height: calc(100vh - 16px) !important;
+    max-height: calc(100dvh - 16px) !important;
+  }
+  .foreigner-modal-icon-badge {
+    width: 32px !important;
+    height: 32px !important;
+  }
+  .foreigner-modal-icon-badge svg {
+    width: 16px !important;
+    height: 16px !important;
+  }
+  .foreigner-modal-title {
+    font-size: 15px !important;
+  }
+  .foreigner-modal-desc {
+    font-size: 10.5px !important;
+  }
+  .foreigner-lang-selector {
+    padding: 4px 8px !important;
+  }
+  .lang-pill {
+    padding: 3px 7px !important;
+    font-size: 10.5px !important;
+  }
+  .foreigner-chip {
+    padding: 3px 8px !important;
+    font-size: 10.5px !important;
+  }
+  .foreigner-input-box {
+    min-height: 75px !important;
+    padding: 8px 10px !important;
+  }
+  .foreigner-textarea {
+    min-height: 45px !important;
+    font-size: 13px !important;
+  }
+  .foreigner-send-btn {
+    height: 38px !important;
+    font-size: 13.5px !important;
+  }
+  .foreigner-result-modal-content {
+    margin: 0 auto !important;
+    padding: 12px 14px !important;
+    gap: 8px !important;
+    border-radius: 16px !important;
+    max-height: calc(100vh - 16px) !important;
+    max-height: calc(100dvh - 16px) !important;
+  }
+}
+
 /* --- 은행원 제시용 번역 카드 모달 (Show to Teller Modal) --- */
 .foreigner-result-modal-content {
   max-width: 440px !important;
-  border-radius: 24px !important;
-  padding: 20px !important;
+  width: 100% !important;
+  max-height: 90vh !important;
+  max-height: 90dvh !important;
+  border-radius: 22px !important;
+  padding: 18px !important;
   box-shadow: 0 24px 48px rgba(15, 23, 42, 0.2) !important;
   background: #ffffff !important;
-  display: flex;
-  flex-direction: column;
-  gap: 14px;
+  display: flex !important;
+  flex-direction: column !important;
+  gap: 12px !important;
+  overflow-y: auto !important;
+  -webkit-overflow-scrolling: touch;
+  margin: auto !important;
+  box-sizing: border-box !important;
 }
 
 .teller-modal-header {
