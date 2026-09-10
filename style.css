@@ -1503,6 +1503,12 @@ input:checked + .slider:before {
   pointer-events: none;
 }
 
+#voucher-camera-guide::before,
+#voucher-camera-guide::after {
+  display: none !important;
+  content: none !important;
+}
+
 .camera-guide::before,
 .camera-guide::after {
   content: "";

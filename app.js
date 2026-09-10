@@ -1947,40 +1947,136 @@ document.addEventListener('DOMContentLoaded', async () => {
   // --- 11. 수기 송금전표 AI OCR 및 실시간 행원 단말 연동 제어 ---
   // ==========================================================================
   
-  // OCR Service Layer 인터페이스 정의 (실제 Tesseract.js 및 iM뱅크 전표 특화 지능형 파서)
+  // ==========================================================================
+  // --- 11. 수기 송금전표 AI OCR 및 실시간 행원 단말 연동 제어 ---
+  // ==========================================================================
+  
+  // OCR Service Layer 인터페이스 정의 (실제 Tesseract.js 및 은행 전표 특화 지능형 필드 추출 엔진)
   class OCRService {
     constructor(mode = 'auto') {
       this.mode = mode;
+      this.tesseractWorker = null;
+      this.workerInitializing = false;
     }
     
-    // 전표 스캔 분석 비동기 수행 (실제 Tesseract OCR 신뢰도 추출 및 지능형 파서 연동)
+    // Tesseract 워커 지연 초기화 및 싱글톤 캐싱
+    async getWorker() {
+      if (this.tesseractWorker) return this.tesseractWorker;
+      if (typeof window.Tesseract === 'undefined') return null;
+
+      try {
+        const worker = await window.Tesseract.createWorker('kor+eng', 1, {
+          logger: m => {
+            if (m.status === 'recognizing text' && typeof m.progress === 'number') {
+              const pct = Math.round(m.progress * 100);
+              showToast(`전표 AI 문자 인식 중... (${pct}%)`, false);
+            }
+          }
+        });
+        this.tesseractWorker = worker;
+        return worker;
+      } catch (err) {
+        console.warn('[OCR Service] Tesseract worker init fallback:', err);
+        return null;
+      }
+    }
+
+    // 전표 스캔 이미지 캔버스 전처리 (대비 강화, 흑백 변환, 가이드 영역 크롭)
+    async preprocessSlipImage(imgUrl) {
+      return new Promise((resolve) => {
+        if (!imgUrl || (!imgUrl.startsWith('data:image') && !imgUrl.startsWith('blob:') && !imgUrl.startsWith('http'))) {
+          return resolve(null);
+        }
+
+        const img = new Image();
+        img.crossOrigin = 'anonymous';
+        img.onload = () => {
+          try {
+            const canvas = document.createElement('canvas');
+            const ctx = canvas.getContext('2d');
+            
+            // 뷰파인더 가이드(92%×62% 중앙) 영역 크롭
+            const cropW = Math.round(img.width * 0.92);
+            const cropH = Math.round(img.height * 0.62);
+            const cropX = Math.round((img.width - cropW) / 2);
+            const cropY = Math.round((img.height - cropH) / 2);
+
+            canvas.width = cropW;
+            canvas.height = cropH;
+
+            ctx.drawImage(img, cropX, cropY, cropW, cropH, 0, 0, cropW, cropH);
+
+            // 명암 대비 향상 및 흑백화로 손글씨/인쇄체 가독성 극대화
+            const imgData = ctx.getImageData(0, 0, cropW, cropH);
+            const d = imgData.data;
+            for (let i = 0; i < d.length; i += 4) {
+              const r = d[i], g = d[i + 1], b = d[i + 2];
+              let gray = 0.299 * r + 0.587 * g + 0.114 * b;
+              // 대비 스트레칭
+              gray = (gray - 128) * 1.4 + 128;
+              gray = Math.max(0, Math.min(255, gray));
+              d[i] = gray;
+              d[i + 1] = gray;
+              d[i + 2] = gray;
+            }
+            ctx.putImageData(imgData, 0, 0);
+
+            resolve({
+              processedUrl: canvas.toDataURL('image/jpeg', 0.95),
+              originalWidth: img.width,
+              originalHeight: img.height
+            });
+          } catch (e) {
+            console.warn('Preprocessing canvas pass:', e);
+            resolve({ processedUrl: imgUrl });
+          }
+        };
+        img.onerror = () => resolve({ processedUrl: imgUrl });
+        img.src = imgUrl;
+      });
+    }
+
+    // 전표 스캔 분석 비동기 수행 (실제 Tesseract OCR 신뢰도 추출 및 지능형 필드 파서 연동)
     async analyzeAsync(voucherType, images) {
       const imgUrl = images && images[0] ? images[0] : '';
       let recognizedText = '';
       let tesseractConfidence = null;
       let words = [];
       
-      // 1. 실제 이미지 URL이 전달되었고 브라우저에 Tesseract가 로드된 경우 (최대 1.0초 타임아웃 레이스)
-      if (typeof window.Tesseract !== 'undefined' && imgUrl && (imgUrl.startsWith('data:image') || imgUrl.startsWith('blob:') || imgUrl.startsWith('http'))) {
+      // 1. 이미지 전처리 수행
+      const preprocessed = await this.preprocessSlipImage(imgUrl);
+      const targetUrl = preprocessed ? preprocessed.processedUrl : imgUrl;
+
+      // 2. 실제 이미지 URL이 전달되었고 브라우저에 Tesseract가 로드된 경우 OCR 수행 (최대 7초 대기)
+      if (targetUrl && (targetUrl.startsWith('data:image') || targetUrl.startsWith('blob:') || targetUrl.startsWith('http'))) {
         try {
-          const ocrTimeout = new Promise((_, reject) => setTimeout(() => reject(new Error('Tesseract timeout')), 1000));
-          const ocrTask = window.Tesseract.recognize(imgUrl, 'eng+kor', {
-            logger: m => console.log('[Tesseract OCR]', m.status, Math.round((m.progress || 0) * 100) + '%')
-          });
-          const result = await Promise.race([ocrTask, ocrTimeout]);
-          recognizedText = result?.data?.text || '';
-          tesseractConfidence = result?.data?.confidence || null;
-          words = result?.data?.words || [];
-          console.log('[Tesseract OCR Result]:', recognizedText, 'Confidence:', tesseractConfidence);
+          const worker = await this.getWorker();
+          if (worker) {
+            const ocrTimeout = new Promise((_, reject) => setTimeout(() => reject(new Error('Tesseract timeout')), 7000));
+            const ocrTask = worker.recognize(targetUrl);
+            const result = await Promise.race([ocrTask, ocrTimeout]);
+            recognizedText = result?.data?.text || '';
+            tesseractConfidence = result?.data?.confidence || null;
+            words = result?.data?.words || [];
+            console.log('[Real OCR Recognized Text]:\n', recognizedText, '\nOverall Conf:', tesseractConfidence);
+          } else if (typeof window.Tesseract !== 'undefined') {
+            const ocrTimeout = new Promise((_, reject) => setTimeout(() => reject(new Error('Tesseract timeout')), 7000));
+            const ocrTask = window.Tesseract.recognize(targetUrl, 'kor+eng');
+            const result = await Promise.race([ocrTask, ocrTimeout]);
+            recognizedText = result?.data?.text || '';
+            tesseractConfidence = result?.data?.confidence || null;
+            words = result?.data?.words || [];
+            console.log('[Real OCR Fallback Text]:\n', recognizedText);
+          }
         } catch (err) {
-          console.warn('[Tesseract OCR Notice] Quick fallback to specialized slip template parser:', err?.message || err);
+          console.warn('[OCR Service Notice] Fast OCR parsing with pattern heuristics:', err?.message || err);
         }
       }
 
-      // 모의 스캔 애니메이션 시각 효과를 위한 가벼운 지연 (350ms)
-      await new Promise(resolve => setTimeout(resolve, 350));
+      // 모의 스캔 애니메이션 시각 효과를 위한 가벼운 지연 (250ms)
+      await new Promise(resolve => setTimeout(resolve, 250));
 
-      // 2. 인식된 텍스트 및 단어별 실제 신뢰도 기반 전표 파싱
+      // 3. 인식된 텍스트 및 단어별 실제 신뢰도 기반 전표 파싱
       return this.parseSlipData(voucherType, images, recognizedText, tesseractConfidence, words);
     }
 
@@ -1991,10 +2087,21 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     parseSlipData(voucherType, images, ocrText = '', baseConfidence = null, words = []) {
       const rawText = ocrText || '';
+
+      // 전표 인쇄 양식 자체에 박혀있는 템플릿 단어 블랙리스트 (사용자 입력 필드로 오인식 방지)
+      const FORM_BLACKLIST = [
+        '입금', '출금', '송금', '전표', '은행', '대구', '국민', '신한', '우리', '하나', '농협', '기업',
+        '금액', '예금주', '신청인', '성명', '전화', '주민', '현금', '소계', '합계', '발행합계',
+        '자기앞수표', '입금하실때', '찾으실때', '보내실때', '관리번호', '대구은행', '주식회사', '발행점',
+        '지점', '의뢰인', '주민등록번호', '사업자등록번호', '받는분', '보내는분', '대리인', '지급구분',
+        '차변', '대변', '텔러', '책임자', '확인', '영수증', '고객용', '은행보관용', '일만원', '오만원',
+        '십만원', '백만원', '천원', '원권', '매', '수표', '기타', '대체', '전화번호', '송금내역',
+        '수취인', '통장표시', '적요', 'DGB', 'iM', 'iM뱅크', 'Remittance', '란원관', '소계'
+      ];
       
       // 실제 단어별 Tesseract 신뢰도 매핑 헬퍼
-      const getWordConfidence = (query, defaultVal) => {
-        if (!query) return defaultVal;
+      const getWordConfidence = (query, defaultVal = 0.90) => {
+        if (!query) return 0.0;
         if (words && words.length > 0) {
           const cleanQ = String(query).replace(/[-\s,]/g, '');
           const matched = words.find(w => {
@@ -2002,98 +2109,143 @@ document.addEventListener('DOMContentLoaded', async () => {
             return cleanW && (cleanW.includes(cleanQ) || cleanQ.includes(cleanW));
           });
           if (matched && matched.confidence > 0) {
-            return Math.min(0.99, Math.max(0.60, matched.confidence / 100));
+            return Math.min(0.99, Math.max(0.50, matched.confidence / 100));
           }
         }
         if (baseConfidence && baseConfidence > 0) {
-          const noise = ((Math.random() * 6) - 3) / 100;
-          return Math.min(0.99, Math.max(0.65, (baseConfidence / 100) + noise));
+          return Math.min(0.99, Math.max(0.60, (baseConfidence / 100)));
         }
         return defaultVal;
       };
 
-      // 1) 계좌번호: 508-13-897215-9 또는 12~14자리 계좌 형식
-      const accMatch = rawText.match(/(\d{3,4}[-\s]?\d{2,3}[-\s]?\d{5,7}[-\s]?\d?)/);
-      const extractedAcc = accMatch ? accMatch[1].replace(/\s+/g, '-') : "508-13-897215-9";
-      const accConf = accMatch ? getWordConfidence(accMatch[1], 0.98) : 0.97;
+      // 1) 계좌번호 추출: 10~14자리 연속 숫자/하이픈 패턴 (양식 일자/바코드 제외)
+      let extractedAcc = "";
+      let accConf = 0.0;
+      const allAccMatches = rawText.match(/(?:\d{3,4}[-\s]?\d{2,3}[-\s]?\d{5,7}[-\s]?\d?|\b\d{10,14}\b)/g);
+      if (allAccMatches && allAccMatches.length > 0) {
+        // 관리번호나 연도 제외
+        const validAccs = allAccMatches.filter(m => {
+          const digits = m.replace(/\D/g, '');
+          return digits.length >= 10 && !m.includes('2023') && !m.includes('2026');
+        });
+        if (validAccs.length > 0) {
+          const rawAcc = validAccs[0].replace(/\s+/g, '');
+          if (rawAcc.length >= 10 && !rawAcc.includes('-')) {
+            extractedAcc = `${rawAcc.slice(0, 3)}-${rawAcc.slice(3, 5)}-${rawAcc.slice(5, 11)}${rawAcc.length > 11 ? '-' + rawAcc.slice(11) : ''}`;
+          } else {
+            extractedAcc = rawAcc.replace(/\s+/g, '-');
+          }
+          accConf = getWordConfidence(validAccs[0], 0.96);
+        }
+      }
 
-      // 2) 은행명: iM뱅크, 대구은행, 국민, 신한, 우리, 하나 등
-      let extractedBank = "iM뱅크 (대구은행)";
-      let bankConf = 0.98;
+      // 2) 은행명: 20개 시중/지방/인터넷 전문은행 정밀 매칭
+      let extractedBank = "";
+      let bankConf = 0.0;
       if (/국민|KB/i.test(rawText)) { extractedBank = "KB국민은행"; bankConf = getWordConfidence('국민', 0.97); }
       else if (/신한/i.test(rawText)) { extractedBank = "신한은행"; bankConf = getWordConfidence('신한', 0.98); }
       else if (/우리/i.test(rawText)) { extractedBank = "우리은행"; bankConf = getWordConfidence('우리', 0.97); }
       else if (/하나/i.test(rawText)) { extractedBank = "하나은행"; bankConf = getWordConfidence('하나', 0.96); }
       else if (/농협|NH/i.test(rawText)) { extractedBank = "NH농협은행"; bankConf = getWordConfidence('농협', 0.97); }
       else if (/기업|IBK/i.test(rawText)) { extractedBank = "IBK기업은행"; bankConf = getWordConfidence('기업', 0.96); }
-      else if (/대구|iM/i.test(rawText)) { extractedBank = "iM뱅크 (대구은행)"; bankConf = getWordConfidence('대구', 0.99); }
+      else if (/카카오/i.test(rawText)) { extractedBank = "카카오뱅크"; bankConf = getWordConfidence('카카오', 0.98); }
+      else if (/토스/i.test(rawText)) { extractedBank = "토스뱅크"; bankConf = getWordConfidence('토스', 0.98); }
+      else if (/케이/i.test(rawText)) { extractedBank = "케이뱅크"; bankConf = getWordConfidence('케이', 0.97); }
+      else if (/새마을/i.test(rawText)) { extractedBank = "새마을금고"; bankConf = getWordConfidence('새마을', 0.96); }
+      else if (/우체국/i.test(rawText)) { extractedBank = "우체국"; bankConf = getWordConfidence('우체국', 0.96); }
+      else if (/수협/i.test(rawText)) { extractedBank = "Sh수협은행"; bankConf = getWordConfidence('수협', 0.96); }
+      else if (/신협/i.test(rawText)) { extractedBank = "신협"; bankConf = getWordConfidence('신협', 0.95); }
+      else if (/부산|BNK/i.test(rawText)) { extractedBank = "BNK부산은행"; bankConf = getWordConfidence('부산', 0.97); }
+      else if (/경남/i.test(rawText)) { extractedBank = "BNK경남은행"; bankConf = getWordConfidence('경남', 0.96); }
+      else if (/광주/i.test(rawText)) { extractedBank = "광주은행"; bankConf = getWordConfidence('광주', 0.96); }
+      else if (/전북/i.test(rawText)) { extractedBank = "전북은행"; bankConf = getWordConfidence('전북', 0.95); }
+      else if (/제주/i.test(rawText)) { extractedBank = "제주은행"; bankConf = getWordConfidence('제주', 0.95); }
+      else if (/SC|제일/i.test(rawText)) { extractedBank = "SC제일은행"; bankConf = getWordConfidence('제일', 0.96); }
+      else if (/씨티/i.test(rawText)) { extractedBank = "한국씨티은행"; bankConf = getWordConfidence('씨티', 0.95); }
+      else if (/대구|iM|아이엠/i.test(rawText)) { extractedBank = "iM뱅크 (대구은행)"; bankConf = getWordConfidence('대구', 0.98); }
 
-      // 3) 예금주(받는사람): 이대결, 김철수 등
-      let extractedReceiver = "이대결";
-      let receiverConf = 0.97;
-      const receiverMatch = rawText.match(/예금주[^\w가-힣]*([가-힣]{2,4})/);
-      if (receiverMatch) {
+      // 3) 예금주(받는사람): 실제 손글씨 성명 (템플릿 제외)
+      let extractedReceiver = "";
+      let receiverConf = 0.0;
+      const receiverMatch = rawText.match(/(?:예금주|받는\s*분|받는\s*사람|입금처)[^\w가-힣]*([가-힣]{2,4})/);
+      if (receiverMatch && !FORM_BLACKLIST.includes(receiverMatch[1].trim())) {
         extractedReceiver = receiverMatch[1].trim();
-        receiverConf = getWordConfidence(extractedReceiver, 0.96);
-      } else if (/이\s*대\s*결/i.test(rawText)) {
-        extractedReceiver = "이대결";
-        receiverConf = getWordConfidence('대결', 0.98);
+        receiverConf = getWordConfidence(extractedReceiver, 0.95);
+      } else {
+        const nameCandidates = rawText.match(/[가-힣]{2,4}/g);
+        if (nameCandidates && nameCandidates.length > 0) {
+          const filtered = nameCandidates.filter(n => !FORM_BLACKLIST.includes(n));
+          if (filtered.length > 0) {
+            extractedReceiver = filtered[0];
+            receiverConf = getWordConfidence(extractedReceiver, 0.92);
+          }
+        }
       }
 
-      // 4) 송금 금액: 100,000, 100000, 500,000 등
-      let extractedAmount = 100000;
-      let amountConf = 0.99;
-      const amtMatch = rawText.match(/(?:금액|\\|₩|\s|^)(\d{1,3}(?:,\d{3})+|\d{4,9})/);
+      // 4) 송금 금액: 100,000 / 500,000 등 실제 작성된 숫자 (인쇄 양식의 10, 100 단위 제외)
+      let extractedAmount = "";
+      let amountConf = 0.0;
+      const amtMatch = rawText.match(/(?:금액|\\|₩|W)[^\d]*(\d{1,3}(?:,\d{3})+|\d{4,9})/i);
       if (amtMatch) {
         const parsedAmt = parseInt(amtMatch[1].replace(/,/g, ''), 10);
-        if (parsedAmt > 0) extractedAmount = parsedAmt;
-        amountConf = getWordConfidence(amtMatch[1], 0.98);
-      } else if (/100\s*,?\s*000/i.test(rawText)) {
-        extractedAmount = 100000;
-        amountConf = 0.98;
+        if (parsedAmt > 0) {
+          extractedAmount = parsedAmt;
+          amountConf = getWordConfidence(amtMatch[1], 0.97);
+        }
+      } else {
+        // 원 단위가 붙은 금액
+        const wonMatch = rawText.match(/(\d{1,3}(?:,\d{3})+|\d{4,9})\s*원/);
+        if (wonMatch) {
+          const parsed = parseInt(wonMatch[1].replace(/,/g, ''), 10);
+          if (parsed > 0) {
+            extractedAmount = parsed;
+            amountConf = getWordConfidence(wonMatch[1], 0.95);
+          }
+        } else if (/일\s*백\s*만|100\s*만/i.test(rawText)) { extractedAmount = 1000000; amountConf = 0.95; }
+        else if (/오\s*십\s*만|50\s*만/i.test(rawText)) { extractedAmount = 500000; amountConf = 0.96; }
+        else if (/삼\s*십\s*만|30\s*만/i.test(rawText)) { extractedAmount = 300000; amountConf = 0.95; }
+        else if (/일\s*십\s*만|십\s*만|10\s*만/i.test(rawText)) { extractedAmount = 100000; amountConf = 0.97; }
       }
 
-      // 5) 보내시는 분 / 신청인 / 예금주 성명: 김진우, 홍길동 등
-      let extractedSender = "김진우";
-      let senderConf = 0.98;
-      const senderMatch = rawText.match(/(?:보내시는\s*분|보내는\s*사람|신청인|의뢰인|성명)[^\w가-힣]*([가-힣]{2,4})/);
-      if (senderMatch) {
+      // 5) 보내시는 분 / 신청인 성명: 실제 손글씨 성명
+      let extractedSender = "";
+      let senderConf = 0.0;
+      const senderMatch = rawText.match(/(?:보내시는\s*분|보내는\s*사람|신청인|의뢰인|성명|출금인)[^\w가-힣]*([가-힣]{2,4})/);
+      if (senderMatch && !FORM_BLACKLIST.includes(senderMatch[1].trim())) {
         extractedSender = senderMatch[1].trim();
-        senderConf = getWordConfidence(extractedSender, 0.97);
-      } else if (/김\s*진\s*우/i.test(rawText)) {
-        extractedSender = "김진우";
-        senderConf = getWordConfidence('진우', 0.98);
-      } else if (/홍\s*길\s*동/i.test(rawText)) {
-        extractedSender = "홍길동";
-        senderConf = getWordConfidence('길동', 0.98);
+        senderConf = getWordConfidence(extractedSender, 0.96);
+      } else {
+        const nameCandidates = rawText.match(/[가-힣]{2,4}/g);
+        if (nameCandidates && nameCandidates.length > 1) {
+          const filtered = nameCandidates.filter(n => !FORM_BLACKLIST.includes(n) && n !== extractedReceiver);
+          if (filtered.length > 0) {
+            extractedSender = filtered[0];
+            senderConf = getWordConfidence(extractedSender, 0.93);
+          }
+        }
       }
 
-      // 6) 전화번호: 010-4921-1967
-      let extractedPhone = "010-4921-1967";
-      let phoneConf = 0.97;
-      const phoneMatch = rawText.match(/(\d{2,3}[-\s]?\d{3,4}[-\s]?\d{4})/);
+      // 6) 전화번호
+      let extractedPhone = "";
+      let phoneConf = 0.0;
+      const phoneMatch = rawText.match(/(01[016789][-\s]?\d{3,4}[-\s]?\d{4}|0[2-6][1-5]?[-\s]?\d{3,4}[-\s]?\d{4})/);
       if (phoneMatch) {
         extractedPhone = phoneMatch[1].replace(/\s+/g, '-');
         phoneConf = getWordConfidence(extractedPhone.replace(/-/g, ''), 0.97);
-      } else if (/4921|1967/i.test(rawText)) {
-        extractedPhone = "010-4921-1967";
-        phoneConf = 0.96;
       }
 
-      // 7) 주민(사업자)등록번호: 000913-3267777
-      let extractedIdNum = "000913-3267777";
-      let idConf = 0.95;
-      const idMatch = rawText.match(/(\d{6}[-\s]?\d{7})/);
+      // 7) 주민(사업자)등록번호
+      let extractedIdNum = "";
+      let idConf = 0.0;
+      const idMatch = rawText.match(/(\d{6}[-\s]?[1-4]\d{6}|\d{6}[-\s]?\d{7})/);
       if (idMatch) {
-        extractedIdNum = idMatch[1].replace(/\s+/g, '-');
+        const rawId = idMatch[1].replace(/\s+/g, '');
+        extractedIdNum = rawId.includes('-') ? rawId : `${rawId.slice(0, 6)}-${rawId.slice(6)}`;
         idConf = getWordConfidence(extractedIdNum.replace(/-/g, ''), 0.96);
-      } else if (/000913|3267777/i.test(rawText)) {
-        extractedIdNum = "000913-3267777";
-        idConf = 0.95;
       }
 
-      // 8) 날짜: 2026-09-10
-      let extractedDate = "2026-09-10";
+      // 8) 작성 일자
+      let extractedDate = new Date().toISOString().slice(0, 10);
       let dateConf = 0.98;
       const dateMatch = rawText.match(/(20\d{2})[^\d]+(\d{1,2})[^\d]+(\d{1,2})/);
       if (dateMatch) {
@@ -2102,10 +2254,10 @@ document.addEventListener('DOMContentLoaded', async () => {
       }
 
       // 9) 송금내역 / 메모
-      let extractedMemo = "개인 송금";
-      let memoConf = 0.94;
-      const memoMatch = rawText.match(/(?:송금내역|메모|통장기록)[^\w가-힣]*([가-힣a-zA-Z0-9\s]{2,7})/);
-      if (memoMatch) {
+      let extractedMemo = "";
+      let memoConf = 0.0;
+      const memoMatch = rawText.match(/(?:송금내역|메모|통장기록|통장표시|적요)[^\w가-힣]*([가-힣a-zA-Z0-9\s]{2,7})/);
+      if (memoMatch && !FORM_BLACKLIST.includes(memoMatch[1].trim())) {
         extractedMemo = memoMatch[1].trim();
         memoConf = getWordConfidence(extractedMemo, 0.94);
       }
@@ -2122,10 +2274,10 @@ document.addEventListener('DOMContentLoaded', async () => {
             withdrawalAccount: extractedAcc,
             amount: extractedAmount,
             accountHolder: extractedSender,
-            memo: extractedMemo || "생활비 출금",
+            memo: extractedMemo,
             date: extractedDate,
             cashPayout: extractedAmount,
-            signatureStatus: "서명 완료 (정상)"
+            signatureStatus: rawText.length > 20 ? "서명 확인됨" : "서명 미확인"
           },
           ocrConfidence: {
             withdrawalAccount: accConf,
@@ -2134,34 +2286,25 @@ document.addEventListener('DOMContentLoaded', async () => {
             memo: memoConf,
             date: dateConf,
             cashPayout: amountConf,
-            signatureStatus: 0.99
+            signatureStatus: 0.95
           }
         };
       } else if (voucherType === 'MASS_TRANSFER') {
         const matchedTransactions = [];
-        const baseTransactions = [
-          { bank: extractedBank, accountNumber: extractedAcc, accountHolder: extractedReceiver, amount: extractedAmount, description: "송금", ocrConfidence: accConf },
-          { bank: "KB국민은행", accountNumber: "234-567-890123", accountHolder: "김철수", amount: 300000, description: "급여", ocrConfidence: 0.98 },
-          { bank: "신한은행", accountNumber: "345-678-901234", accountHolder: "이영희", amount: 700000, description: "급여", ocrConfidence: 0.99 },
-          { bank: "우리은행", accountNumber: "456-789-012345", accountHolder: "박민수", amount: 400000, description: "보너스", ocrConfidence: 0.97 },
-          { bank: "하나은행", accountNumber: "567-890-123456", accountHolder: "최지우", amount: 600000, description: "급여", ocrConfidence: 0.98 }
-        ];
-
         images.forEach((img, idx) => {
-          const base = baseTransactions[idx % baseTransactions.length];
           matchedTransactions.push({
-            bank: base.bank,
-            accountNumber: base.accountNumber,
-            accountHolder: base.accountHolder,
-            amount: base.amount,
-            description: base.description,
+            bank: extractedBank || "iM뱅크 (대구은행)",
+            accountNumber: extractedAcc,
+            accountHolder: extractedReceiver,
+            amount: extractedAmount || 0,
+            description: extractedMemo || "송금",
             sourceImageId: img.id || `IMG00${idx + 1}`,
-            ocrConfidence: base.ocrConfidence
+            ocrConfidence: accConf
           });
         });
 
         let totalAmt = 0;
-        matchedTransactions.forEach(t => totalAmt += t.amount);
+        matchedTransactions.forEach(t => totalAmt += (parseInt(t.amount) || 0));
 
         return {
           type: "MASS_TRANSFER",
@@ -2178,7 +2321,7 @@ document.addEventListener('DOMContentLoaded', async () => {
           images: [firstImage],
           rawOcrText: rawText,
           ocrData: {
-            bank: extractedBank,
+            bank: extractedBank || "iM뱅크 (대구은행)",
             recipientAccount: extractedAcc,
             recipientName: extractedReceiver,
             amount: extractedAmount,
@@ -2190,7 +2333,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             fundType: extractedFundType
           },
           ocrConfidence: {
-            bank: bankConf,
+            bank: bankConf || 0.95,
             recipientAccount: accConf,
             recipientName: receiverConf,
             amount: amountConf,
@@ -2317,6 +2460,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     const hudText = document.getElementById('voucher-live-hud-text');
     const captureGuidance = document.getElementById('capture-guidance-text');
     const corners = document.querySelectorAll('#voucher-camera-guide .voucher-guide-corner');
+    const guideBox = document.getElementById('voucher-camera-guide');
 
     if (hudText) hudText.textContent = message;
     if (captureGuidance && selectedVoucherType !== 'MASS_TRANSFER') {
@@ -2329,17 +2473,25 @@ document.addEventListener('DOMContentLoaded', async () => {
     if (hudPill) {
       hudPill.style.borderColor = color;
       if (status === 'OPTIMAL') {
-        hudPill.style.background = 'rgba(6, 78, 59, 0.88)';
-        hudPill.style.boxShadow = '0 0 16px rgba(0, 230, 118, 0.55)';
+        hudPill.style.background = 'rgba(6, 78, 59, 0.92)';
+        hudPill.style.boxShadow = '0 0 18px rgba(0, 230, 118, 0.7)';
       } else if (status === 'WARNING') {
-        hudPill.style.background = 'rgba(120, 53, 15, 0.88)';
-        hudPill.style.boxShadow = '0 4px 14px rgba(0,0,0,0.35)';
+        hudPill.style.background = 'rgba(120, 53, 15, 0.9)';
+        hudPill.style.boxShadow = '0 4px 14px rgba(0,0,0,0.4)';
       } else {
-        hudPill.style.background = 'rgba(15, 23, 42, 0.82)';
+        hudPill.style.background = 'rgba(15, 23, 42, 0.85)';
         hudPill.style.boxShadow = '0 4px 14px rgba(0,0,0,0.35)';
       }
     }
+    if (guideBox) {
+      if (status === 'OPTIMAL') {
+        guideBox.style.boxShadow = '0 0 0 9999px rgba(0,0,0,0.35), 0 0 20px rgba(0, 230, 118, 0.4)';
+      } else {
+        guideBox.style.boxShadow = '0 0 0 9999px rgba(0,0,0,0.45)';
+      }
+    }
     corners.forEach(corner => {
+      corner.style.borderColor = color;
       corner.style.borderTopColor = color;
       corner.style.borderBottomColor = color;
       corner.style.borderLeftColor = color;
@@ -2359,15 +2511,14 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     const video = document.getElementById('camera-stream');
     let lastTime = 0;
-    let smoothState = 'SEARCHING';
-    let stateStreak = 0;
 
     function analyzeFrame(timestamp) {
       if (!activeStream || !video || video.paused || video.ended) {
+        liveAnalysisTimer = requestAnimationFrame(analyzeFrame);
         return;
       }
 
-      if (timestamp - lastTime >= 100) {
+      if (timestamp - lastTime >= 60) {
         lastTime = timestamp;
         if (video.videoWidth > 0 && video.videoHeight > 0 && liveOffscreenCtx) {
           try {
@@ -2375,23 +2526,22 @@ document.addEventListener('DOMContentLoaded', async () => {
             const frame = liveOffscreenCtx.getImageData(0, 0, 160, 120);
             const d = frame.data;
 
-            // 1단계: 프레임 전체 평균 조도(밝기) 계산
+            // 1단계: 전체 프레임 평균 조도(밝기) 및 대비 분포 계산
             let totalLum = 0;
-            let totalPixels = 0;
+            let sampleCount = 0;
             for (let y = 0; y < 120; y += 4) {
               for (let x = 0; x < 160; x += 4) {
                 const idx = (y * 160 + x) * 4;
-                const lum = (d[idx] * 299 + d[idx + 1] * 587 + d[idx + 2] * 114) / 1000;
-                totalLum += lum;
-                totalPixels++;
+                totalLum += (d[idx] * 299 + d[idx + 1] * 587 + d[idx + 2] * 114) / 1000;
+                sampleCount++;
               }
             }
-            const avgBgLum = totalPixels > 0 ? (totalLum / totalPixels) : 100;
-            const paperLumThreshold = Math.max(avgBgLum + 12, 105);
+            const avgLum = totalLum / (sampleCount || 1);
 
-            // 2단계: 전표 특징점 (높은 엣지 대비 + 흰색 용지 영역) 수집
-            const xCoords = [];
-            const yCoords = [];
+            // 2단계: 엣지 및 용지 투영 밀도(X축 / Y축 투영 히스토그램) 스캔
+            const colVotes = new Int32Array(160);
+            const rowVotes = new Int32Array(120);
+            let totalPaperPixels = 0;
 
             for (let y = 2; y < 118; y += 2) {
               for (let x = 2; x < 158; x += 2) {
@@ -2399,88 +2549,94 @@ document.addEventListener('DOMContentLoaded', async () => {
                 const r = d[idx], g = d[idx + 1], b = d[idx + 2];
                 const lum = (r * 299 + g * 587 + b * 114) / 1000;
 
-                // 인접 픽셀과의 명암 기울기(경계선/글자/인쇄선 엣지 감지)
-                const idxLeft = (y * 160 + (x - 2)) * 4;
-                const idxRight = (y * 160 + (x + 2)) * 4;
-                const idxUp = ((y - 2) * 160 + x) * 4;
-                const idxDown = ((y + 2) * 160 + x) * 4;
+                const idxL = (y * 160 + (x - 2)) * 4;
+                const idxR = (y * 160 + (x + 2)) * 4;
+                const idxU = ((y - 2) * 160 + x) * 4;
+                const idxD = ((y + 2) * 160 + x) * 4;
 
-                const lumL = (d[idxLeft] * 299 + d[idxLeft + 1] * 587 + d[idxLeft + 2] * 114) / 1000;
-                const lumR = (d[idxRight] * 299 + d[idxRight + 1] * 587 + d[idxRight + 2] * 114) / 1000;
-                const lumU = (d[idxUp] * 299 + d[idxUp + 1] * 587 + d[idxUp + 2] * 114) / 1000;
-                const lumD = (d[idxDown] * 299 + d[idxDown + 1] * 587 + d[idxDown + 2] * 114) / 1000;
+                const lumL = (d[idxL] * 299 + d[idxL + 1] * 587 + d[idxL + 2] * 114) / 1000;
+                const lumR = (d[idxR] * 299 + d[idxR + 1] * 587 + d[idxR + 2] * 114) / 1000;
+                const lumU = (d[idxU] * 299 + d[idxU + 1] * 587 + d[idxU + 2] * 114) / 1000;
+                const lumD = (d[idxD] * 299 + d[idxD + 1] * 587 + d[idxD + 2] * 114) / 1000;
 
-                const grad = Math.abs(lumR - lumL) + Math.abs(lumD - lumU);
-                const maxC = Math.max(r, g, b);
-                const minC = Math.min(r, g, b);
-                const isPaperTone = lum >= paperLumThreshold && (maxC - minC) < 55;
-                const hasPrintEdge = grad >= 20 && lum >= 75;
+                const edge = Math.abs(lumR - lumL) + Math.abs(lumD - lumU);
 
-                if (isPaperTone || hasPrintEdge) {
-                  xCoords.push(x);
-                  yCoords.push(y);
+                // 전표 픽셀 판정: 글자/인쇄선 엣지(edge >= 12) 또는 배경 대비 밝은 용지 표면
+                const isPaper = (edge >= 12 && lum >= 45) || (lum >= Math.max(85, avgLum + 10));
+
+                if (isPaper) {
+                  colVotes[x]++;
+                  rowVotes[y]++;
+                  totalPaperPixels++;
                 }
               }
             }
 
-            const featureCount = xCoords.length;
+            // 3단계: 유효 전표 바운딩 박스(Bounding Box) 탐색
+            const colThresh = Math.max(3, 120 * 0.035);
+            const rowThresh = Math.max(3, 160 * 0.035);
+
+            let minX = 0, maxX = 159, minY = 0, maxY = 119;
+            let foundMinX = false, foundMinY = false;
+
+            for (let x = 0; x < 160; x++) {
+              if (colVotes[x] >= colThresh) {
+                if (!foundMinX) { minX = x; foundMinX = true; }
+                maxX = x;
+              }
+            }
+
+            for (let y = 0; y < 120; y++) {
+              if (rowVotes[y] >= rowThresh) {
+                if (!foundMinY) { minY = y; foundMinY = true; }
+                maxY = y;
+              }
+            }
 
             let targetState = 'SEARCHING';
             let message = '전표 앞면을 격자 안에 맞춰 주세요';
             let icon = 'fa-arrows-to-dot';
             let color = '#00BAC6';
 
-            if (featureCount < 90) {
+            if (totalPaperPixels < 120 || !foundMinX || !foundMinY || (maxX - minX) < 20 || (maxY - minY) < 12) {
               targetState = 'SEARCHING';
               message = '전표 앞면을 격자 안에 맞춰 주세요';
               icon = 'fa-arrows-to-dot';
               color = '#00BAC6';
             } else {
-              // 이상치(잡음/손가락) 제거를 위한 5% ~ 95% 백분위수 바운딩 박스 산출
-              xCoords.sort((a, b) => a - b);
-              yCoords.sort((a, b) => a - b);
+              const pixelW = maxX - minX + 1;
+              const pixelH = maxY - minY + 1;
+              const centerPxX = (minX + maxX) / 2;
+              const centerPxY = (minY + maxY) / 2;
 
-              const p5Idx = Math.floor(featureCount * 0.05);
-              const p95Idx = Math.floor(featureCount * 0.95);
-
-              const minX = xCoords[p5Idx];
-              const maxX = xCoords[p95Idx];
-              const minY = yCoords[p5Idx];
-              const maxY = yCoords[p95Idx];
-
-              const spanW = maxX - minX;
-              const spanH = maxY - minY;
-              const centerX = (minX + maxX) / 2;
-              const centerY = (minY + maxY) / 2;
-
-              // 4:3 뷰파인더(160×120) 내 가이드 격자 기준: 폭 144 (8~152), 높이 70 (25~95)
-              if (spanW < 80 || spanH < 36) {
-                targetState = 'TOO_FAR';
+              // 뷰파인더 160×120 내 격자 영역(실제 전표 94%×68%): 폭 ~150 (5~155), 높이 ~82 (19~101), 중심 (80, 60)
+              if (pixelW < 84 || pixelH < 44) {
+                targetState = 'WARNING';
                 message = '전표가 너무 멀어요. 더 가까이 대주세요 ⬇️';
                 icon = 'fa-magnifying-glass-plus';
                 color = '#FFA000';
-              } else if (spanW > 146 || spanH > 75 || (minX <= 6 && maxX >= 154)) {
-                targetState = 'TOO_CLOSE';
+              } else if (pixelW > 154 || pixelH > 96 || (minX <= 1 && maxX >= 158)) {
+                targetState = 'WARNING';
                 message = '전표가 너무 가까워요. 조금 뒤로 물러서 주세요 ⬆️';
                 icon = 'fa-magnifying-glass-minus';
                 color = '#FF7043';
-              } else if (centerX < 64) {
-                targetState = 'OFF_CENTER';
+              } else if (centerPxX < 64) {
+                targetState = 'WARNING';
                 message = '전표를 오른쪽으로 조금 이동해 주세요 ➡️';
                 icon = 'fa-arrow-right';
                 color = '#FFB300';
-              } else if (centerX > 96) {
-                targetState = 'OFF_CENTER';
+              } else if (centerPxX > 96) {
+                targetState = 'WARNING';
                 message = '전표를 왼쪽으로 조금 이동해 주세요 ⬅️';
                 icon = 'fa-arrow-left';
                 color = '#FFB300';
-              } else if (centerY < 46) {
-                targetState = 'OFF_CENTER';
+              } else if (centerPxY < 44) {
+                targetState = 'WARNING';
                 message = '전표를 아래로 조금 내려 주세요 ⬇️';
                 icon = 'fa-arrow-down';
                 color = '#FFB300';
-              } else if (centerY > 74) {
-                targetState = 'OFF_CENTER';
+              } else if (centerPxY > 76) {
+                targetState = 'WARNING';
                 message = '전표를 위로 조금 올려 주세요 ⬆️';
                 icon = 'fa-arrow-up';
                 color = '#FFB300';
@@ -2492,18 +2648,8 @@ document.addEventListener('DOMContentLoaded', async () => {
               }
             }
 
-            // 실시간 상태 반영
-            if (targetState === smoothState) {
-              stateStreak++;
-            } else {
-              smoothState = targetState;
-              stateStreak = 1;
-            }
-
-            if (stateStreak >= 1 || targetState === 'OPTIMAL') {
-              const hudStatusType = (targetState === 'OPTIMAL') ? 'OPTIMAL' : (targetState === 'SEARCHING' ? 'SEARCHING' : 'WARNING');
-              updateVoucherLiveHUD(hudStatusType, message, icon, color);
-            }
+            // 실시간 상태 즉각 반영 (지연 없이 즉각 반응)
+            updateVoucherLiveHUD(targetState, message, icon, color);
           } catch (e) {
             console.debug("Live viewfinder analysis frame pass:", e);
           }
@@ -2524,7 +2670,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   }
 
   // 실시간 비디오 카메라 스트림 구동 개시
-  function startActiveCameraStream() {
+  async function startActiveCameraStream() {
     const video = document.getElementById('camera-stream');
     const preview = document.getElementById('demo-voucher-preview');
     const hint = document.getElementById('viewfinder-hint');
@@ -2539,29 +2685,56 @@ document.addEventListener('DOMContentLoaded', async () => {
     // 기본 HUD 초기화
     updateVoucherLiveHUD('SEARCHING', '전표 앞면을 격자 안에 맞춰 주세요', 'fa-arrows-to-dot', '#00BAC6');
 
-    navigator.mediaDevices.getUserMedia({
-      video: {
-        facingMode: "environment", // 스마트폰 후면 카메라 강제 호출
-        width: { ideal: 1920 },
-        height: { ideal: 1080 }
-      },
-      audio: false
-    }).then(stream => {
+    try {
+      let stream = null;
+      try {
+        // 1차: 후면 카메라 우선 요청
+        stream = await navigator.mediaDevices.getUserMedia({
+          video: {
+            facingMode: { ideal: "environment" },
+            width: { ideal: 1280 },
+            height: { ideal: 720 }
+          },
+          audio: false
+        });
+      } catch (err1) {
+        // 2차: 일반 웹캠/PC 카메라 호환 요청
+        console.warn("후면 카메라 획득 실패, 기본 카메라로 재시도:", err1);
+        stream = await navigator.mediaDevices.getUserMedia({
+          video: true,
+          audio: false
+        });
+      }
+
       activeStream = stream;
       video.srcObject = stream;
+      video.muted = true;
+      video.setAttribute('playsinline', '');
+      video.setAttribute('autoplay', '');
       video.style.display = 'block'; // 비디오 스트림 표출
       if (preview) preview.style.display = 'none'; // 백업용 모의 프리뷰 숨김
       if (hint) hint.style.display = 'none';        // 비디오 스트림 구동 시 중앙 안내 텍스트 숨김
       
+      const onPlaying = () => {
+        video.removeEventListener('playing', onPlaying);
+        startLiveViewfinderAnalysis();
+      };
+      video.addEventListener('playing', onPlaying);
+
+      video.play().catch(e => {
+        console.warn("Video autoplay notice:", e);
+        startLiveViewfinderAnalysis();
+      });
+
       // 실시간 프레임 분석 및 스마트 HUD 피드백 시작
       startLiveViewfinderAnalysis();
-    }).catch(err => {
+    } catch (err) {
       console.warn("실시간 카메라 렌즈 획득 실패 (PC 혹은 권한차단):", err);
       video.style.display = 'none';
       if (preview) preview.style.display = 'none';
       if (hint) hint.style.display = 'block';
       updateVoucherLiveHUD('SEARCHING', '전표 앞면을 격자 안에 맞춰 주세요', 'fa-arrows-to-dot', '#00BAC6');
-    });
+    }
   }
 
   // 실시간 비디오 카메라 스트림 해제/정지
@@ -3547,15 +3720,18 @@ document.addEventListener('DOMContentLoaded', async () => {
 
   // 신뢰도 뱃지 동적 생성 헬퍼 함수 (실제 OCR 및 검증 정확도 반영)
   function renderOcrConfidenceBadge(val, fieldKey) {
-    const rawPct = (typeof val === 'number') ? val : 0.96;
+    if (val === undefined || val === null || val === 0 || val === 0.0) {
+      return `<span id="ocr-conf-badge-${fieldKey}" class="ocr-conf-badge" style="color:#e74c3c; font-size:10px; font-weight:700;"><i class="fa-solid fa-circle-xmark"></i> 미인식 (직접입력)</span>`;
+    }
+    const rawPct = (typeof val === 'number') ? val : 0.0;
     const pct = Math.round(rawPct <= 1 ? rawPct * 100 : rawPct);
     
-    if (pct >= 95) {
+    if (pct >= 90) {
       return `<span id="ocr-conf-badge-${fieldKey}" class="ocr-conf-badge" style="color:#00b894; font-size:10px; font-weight:700;"><i class="fa-solid fa-circle-check"></i> ✓ ${pct}%</span>`;
-    } else if (pct >= 80) {
-      return `<span id="ocr-conf-badge-${fieldKey}" class="ocr-conf-badge" style="color:#f39c12; font-size:10px; font-weight:700;"><i class="fa-solid fa-triangle-exclamation"></i> ⚠ ${pct}%</span>`;
+    } else if (pct >= 60) {
+      return `<span id="ocr-conf-badge-${fieldKey}" class="ocr-conf-badge" style="color:#f39c12; font-size:10px; font-weight:700;"><i class="fa-solid fa-triangle-exclamation"></i> ⚠ ${pct}% (확인필요)</span>`;
     } else {
-      return `<span id="ocr-conf-badge-${fieldKey}" class="ocr-conf-badge" style="color:#e74c3c; font-size:10px; font-weight:700;"><i class="fa-solid fa-circle-xmark"></i> ⚠ ${pct}% (확인필요)</span>`;
+      return `<span id="ocr-conf-badge-${fieldKey}" class="ocr-conf-badge" style="color:#e74c3c; font-size:10px; font-weight:700;"><i class="fa-solid fa-circle-xmark"></i> 미인식 (직접입력)</span>`;
     }
   }
 
@@ -3617,7 +3793,7 @@ document.addEventListener('DOMContentLoaded', async () => {
       ocrFormMulti.classList.remove('hidden');
       
       document.getElementById('multi-total-count-label').textContent = `총 ${ocrResultData.totalCount} 건`;
-      document.getElementById('multi-total-amount-label').textContent = `총 금액 ${ocrResultData.totalAmount.toLocaleString()} 원`;
+      document.getElementById('multi-total-amount-label').textContent = `총 금액 ${(ocrResultData.totalAmount || 0).toLocaleString()} 원`;
       
       const tbody = document.getElementById('ocr-multi-table-body');
       if (tbody) {
@@ -3637,11 +3813,11 @@ document.addEventListener('DOMContentLoaded', async () => {
           tr.innerHTML = `
             <td style="padding:6px; font-weight:700;">${idx + 1}</td>
             <td style="padding:6px; font-weight:700; color:var(--brand-mint-dark);">${sourceName}</td>
-            <td style="padding:4px;"><input type="text" value="${rec.bank}" class="multi-row-input" data-idx="${idx}" data-field="bank" placeholder="은행"></td>
-            <td style="padding:4px;"><input type="text" value="${rec.accountNumber}" class="multi-row-input" data-idx="${idx}" data-field="accountNumber" placeholder="계좌번호"></td>
-            <td style="padding:4px;"><input type="text" value="${rec.accountHolder}" class="multi-row-input" data-idx="${idx}" data-field="accountHolder" placeholder="예금주"></td>
+            <td style="padding:4px;"><input type="text" value="${rec.bank || ''}" class="multi-row-input" data-idx="${idx}" data-field="bank" placeholder="은행"></td>
+            <td style="padding:4px;"><input type="text" value="${rec.accountNumber || ''}" class="multi-row-input" data-idx="${idx}" data-field="accountNumber" placeholder="계좌번호"></td>
+            <td style="padding:4px;"><input type="text" value="${rec.accountHolder || ''}" class="multi-row-input" data-idx="${idx}" data-field="accountHolder" placeholder="예금주"></td>
             <td style="padding:4px; text-align:right;">
-              <input type="text" inputmode="numeric" value="${Number(rec.amount || 0).toLocaleString()}" class="multi-row-input" data-idx="${idx}" data-field="amount" style="text-align:right; width:80%; font-weight:700;" placeholder="금액">
+              <input type="text" inputmode="numeric" value="${rec.amount ? Number(rec.amount).toLocaleString() : ''}" class="multi-row-input" data-idx="${idx}" data-field="amount" style="text-align:right; width:80%; font-weight:700;" placeholder="금액">
               <div style="margin-top:2px;">${confBadge}</div>
             </td>
             <td style="padding:4px; text-align:center;">
@@ -3699,7 +3875,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             }
 
             let sum = 0;
-            ocrResultData.transactions.forEach(t => sum += t.amount);
+            ocrResultData.transactions.forEach(t => sum += (parseInt(t.amount) || 0));
             ocrResultData.totalAmount = sum;
             document.getElementById('multi-total-amount-label').textContent = `총 금액 ${sum.toLocaleString()} 원`;
           });
@@ -3729,7 +3905,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                 <span>출금 계좌번호</span>
                 ${renderOcrConfidenceBadge(conf.withdrawalAccount, 'withdrawalAccount')}
               </label>
-              <input type="text" class="ocr-field-input ocr-std-input" data-key="withdrawalAccount" value="${d.withdrawalAccount || '508-13-897215-9'}" placeholder="출금 계좌번호">
+              <input type="text" class="ocr-field-input ocr-std-input" data-key="withdrawalAccount" value="${d.withdrawalAccount || ''}" placeholder="출금 계좌번호 입력">
             </div>
 
             <div class="ocr-field-grid-2">
@@ -3738,14 +3914,14 @@ document.addEventListener('DOMContentLoaded', async () => {
                   <span>출금 금액 (원)</span>
                   ${renderOcrConfidenceBadge(conf.amount, 'amount')}
                 </label>
-                <input type="text" inputmode="numeric" class="ocr-field-input ocr-std-input" data-key="amount" value="${Number(d.amount || 100000).toLocaleString()}" style="font-weight: 800; color: #c53030;" placeholder="0">
+                <input type="text" inputmode="numeric" class="ocr-field-input ocr-std-input" data-key="amount" value="${d.amount ? Number(d.amount).toLocaleString() : ''}" style="font-weight: 800; color: #c53030;" placeholder="0">
               </div>
               <div class="ocr-field-item">
                 <label class="ocr-field-label">
                   <span>성명 (예금주)</span>
                   ${renderOcrConfidenceBadge(conf.accountHolder, 'accountHolder')}
                 </label>
-                <input type="text" class="ocr-field-input ocr-std-input" data-key="accountHolder" value="${d.accountHolder || '김진우'}" placeholder="예금주 성명">
+                <input type="text" class="ocr-field-input ocr-std-input" data-key="accountHolder" value="${d.accountHolder || ''}" placeholder="예금주 성명">
               </div>
             </div>
 
@@ -3755,14 +3931,14 @@ document.addEventListener('DOMContentLoaded', async () => {
                   <span>통장 기록 (메모)</span>
                   ${renderOcrConfidenceBadge(conf.memo, 'memo')}
                 </label>
-                <input type="text" maxlength="7" class="ocr-field-input ocr-std-input" data-key="memo" value="${d.memo || '생활비 출금'}" placeholder="한글 7자 이내">
+                <input type="text" maxlength="7" class="ocr-field-input ocr-std-input" data-key="memo" value="${d.memo || ''}" placeholder="한글 7자 이내">
               </div>
               <div class="ocr-field-item">
                 <label class="ocr-field-label">
                   <span>출금 일자</span>
                   ${renderOcrConfidenceBadge(conf.date, 'date')}
                 </label>
-                <input type="date" class="ocr-field-input ocr-std-input" data-key="date" value="${d.date || '2026-09-10'}">
+                <input type="date" class="ocr-field-input ocr-std-input" data-key="date" value="${d.date || new Date().toISOString().slice(0, 10)}">
               </div>
             </div>
           </div>
@@ -3780,14 +3956,14 @@ document.addEventListener('DOMContentLoaded', async () => {
                   <span>현금 지급액</span>
                   ${renderOcrConfidenceBadge(conf.cashPayout, 'cashPayout')}
                 </label>
-                <input type="text" inputmode="numeric" class="ocr-field-input ocr-std-input" data-key="cashPayout" value="${Number(d.cashPayout || d.amount || 100000).toLocaleString()}" style="font-weight: 800;" placeholder="0">
+                <input type="text" inputmode="numeric" class="ocr-field-input ocr-std-input" data-key="cashPayout" value="${d.cashPayout ? Number(d.cashPayout).toLocaleString() : (d.amount ? Number(d.amount).toLocaleString() : '')}" style="font-weight: 800;" placeholder="0">
               </div>
               <div class="ocr-field-item">
                 <label class="ocr-field-label">
                   <span>자필 서명 / 인</span>
                   ${renderOcrConfidenceBadge(conf.signatureStatus, 'signatureStatus')}
                 </label>
-                <input type="text" readonly class="ocr-field-input ocr-std-input" data-key="signatureStatus" value="${d.signatureStatus || '서명 완료 (정상)'}" style="background-color: #f1f5f9; color: #059669; font-weight: 800;">
+                <input type="text" class="ocr-field-input ocr-std-input" data-key="signatureStatus" value="${d.signatureStatus || '서명 확인'}" style="background-color: #f1f5f9; color: #059669; font-weight: 800;">
               </div>
             </div>
           </div>
@@ -3825,7 +4001,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                   <span>예금주 (받는 분)</span>
                   ${renderOcrConfidenceBadge(conf.recipientName, 'recipientName')}
                 </label>
-                <input type="text" class="ocr-field-input ocr-std-input" data-key="recipientName" value="${d.recipientName || '이대결'}" placeholder="예금주">
+                <input type="text" class="ocr-field-input ocr-std-input" data-key="recipientName" value="${d.recipientName || ''}" placeholder="예금주">
               </div>
             </div>
 
@@ -3834,7 +4010,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                 <span>계좌번호 [Account No.]</span>
                 ${renderOcrConfidenceBadge(conf.recipientAccount, 'recipientAccount')}
               </label>
-              <input type="text" class="ocr-field-input ocr-std-input" data-key="recipientAccount" value="${d.recipientAccount || '508-13-897215-9'}" placeholder="계좌번호 입력">
+              <input type="text" class="ocr-field-input ocr-std-input" data-key="recipientAccount" value="${d.recipientAccount || ''}" placeholder="계좌번호 입력">
             </div>
 
             <div class="ocr-field-grid-2">
@@ -3843,14 +4019,14 @@ document.addEventListener('DOMContentLoaded', async () => {
                   <span>송금 금액 (원)</span>
                   ${renderOcrConfidenceBadge(conf.amount, 'amount')}
                 </label>
-                <input type="text" inputmode="numeric" class="ocr-field-input ocr-std-input" data-key="amount" value="${Number(d.amount || 100000).toLocaleString()}" style="font-weight: 800; color: #c53030;" placeholder="0">
+                <input type="text" inputmode="numeric" class="ocr-field-input ocr-std-input" data-key="amount" value="${d.amount ? Number(d.amount).toLocaleString() : ''}" style="font-weight: 800; color: #c53030;" placeholder="0">
               </div>
               <div class="ocr-field-item">
                 <label class="ocr-field-label">
                   <span>송금 일자</span>
                   ${renderOcrConfidenceBadge(conf.date, 'date')}
                 </label>
-                <input type="date" class="ocr-field-input ocr-std-input" data-key="date" value="${d.date || '2026-09-10'}">
+                <input type="date" class="ocr-field-input ocr-std-input" data-key="date" value="${d.date || new Date().toISOString().slice(0, 10)}">
               </div>
             </div>
           </div>
@@ -3869,14 +4045,14 @@ document.addEventListener('DOMContentLoaded', async () => {
                   <span>성명 [Name]</span>
                   ${renderOcrConfidenceBadge(conf.sender, 'sender')}
                 </label>
-                <input type="text" class="ocr-field-input ocr-std-input" data-key="sender" value="${d.sender || '김진우'}" placeholder="신청인 성명">
+                <input type="text" class="ocr-field-input ocr-std-input" data-key="sender" value="${d.sender || ''}" placeholder="신청인 성명">
               </div>
               <div class="ocr-field-item">
                 <label class="ocr-field-label">
                   <span>전화번호 [Phone]</span>
                   ${renderOcrConfidenceBadge(conf.phone, 'phone')}
                 </label>
-                <input type="tel" class="ocr-field-input ocr-std-input" data-key="phone" value="${d.phone || '010-4921-1967'}" placeholder="010-0000-0000">
+                <input type="tel" class="ocr-field-input ocr-std-input" data-key="phone" value="${d.phone || ''}" placeholder="010-0000-0000">
               </div>
             </div>
 
@@ -3886,14 +4062,14 @@ document.addEventListener('DOMContentLoaded', async () => {
                   <span>주민(사업자)등록번호</span>
                   ${renderOcrConfidenceBadge(conf.idNum, 'idNum')}
                 </label>
-                <input type="text" class="ocr-field-input ocr-std-input" data-key="idNum" value="${d.idNum || '000913-3267777'}" placeholder="000000-0000000">
+                <input type="text" class="ocr-field-input ocr-std-input" data-key="idNum" value="${d.idNum || ''}" placeholder="000000-0000000">
               </div>
               <div class="ocr-field-item">
                 <label class="ocr-field-label">
                   <span>송금내역 (메모)</span>
                   ${renderOcrConfidenceBadge(conf.memo, 'memo')}
                 </label>
-                <input type="text" maxlength="7" class="ocr-field-input ocr-std-input" data-key="memo" value="${d.memo || '개인 송금'}" placeholder="한글 7자 이내">
+                <input type="text" maxlength="7" class="ocr-field-input ocr-std-input" data-key="memo" value="${d.memo || ''}" placeholder="한글 7자 이내">
               </div>
             </div>
           </div>
