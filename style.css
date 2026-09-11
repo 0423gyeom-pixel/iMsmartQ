@@ -5398,20 +5398,20 @@ body {
 }
 
 /* 외국인 번역기 모달 */
+/* 외국인 번역기 모달 */
 .foreigner-modal-content {
   max-width: 440px !important;
   width: 100% !important;
   max-height: 90vh !important;
   max-height: 90dvh !important;
   border-radius: 22px !important;
-  padding: 16px 18px !important;
+  padding: 16px 18px 12px 18px !important;
   box-shadow: 0 20px 40px rgba(15, 23, 42, 0.16) !important;
   background: #ffffff !important;
   display: flex !important;
   flex-direction: column !important;
   gap: 10px !important;
-  overflow-y: auto !important;
-  -webkit-overflow-scrolling: touch;
+  overflow: hidden !important; /* 모달 외곽 프레임은 고정하고 내부 바디에서 독립 스크롤 */
   margin: auto !important;
   box-sizing: border-box !important;
 }
@@ -5481,22 +5481,28 @@ body {
 .foreigner-modal-body {
   display: flex;
   flex-direction: column;
-  gap: 8px;
-  flex: 1 1 auto;
-  min-height: 0;
+  gap: 10px;
+  flex: 1 1 auto !important;
+  min-height: 0 !important;
+  overflow-y: auto !important; /* 키보드가 올라와도 본문만 부드럽게 스크롤 */
+  -webkit-overflow-scrolling: touch;
+  padding-right: 4px;
+  padding-bottom: 6px;
+  box-sizing: border-box;
 }
 
 .foreigner-input-box {
   border: 1.5px solid #cbd5e1;
   border-radius: 14px;
-  padding: 12px 14px;
+  padding: 10px 12px 8px 12px;
   background: #ffffff;
-  min-height: 110px;
   display: flex;
   flex-direction: column;
-  justify-content: space-between;
+  justify-content: flex-start;
   transition: border-color 0.2s, box-shadow 0.2s;
-  flex: 1 1 auto;
+  flex: 0 0 auto !important; /* 키보드가 올라와도 입력창이 찌그러지지 않음 */
+  box-sizing: border-box;
+  overflow: visible;
 }
 
 .foreigner-input-box:focus-within {
@@ -5508,7 +5514,7 @@ body {
   display: flex;
   gap: 8px;
   align-items: flex-start;
-  flex: 1;
+  flex: 1 1 auto;
 }
 
 .foreigner-input-globe-icon {
@@ -5521,12 +5527,14 @@ body {
   border: none;
   outline: none;
   font-size: 14px;
-  line-height: 1.5;
+  line-height: 1.45;
   color: #1e293b;
   resize: none;
-  min-height: 70px;
+  min-height: 55px;
+  height: 55px;
   font-family: inherit;
   background: transparent;
+  box-sizing: border-box;
 }
 
 .foreigner-textarea::placeholder {
@@ -5536,9 +5544,10 @@ body {
 
 .foreigner-char-counter {
   text-align: right;
-  font-size: 11.5px;
+  font-size: 11px;
   color: #94a3b8;
   font-weight: 500;
+  flex-shrink: 0;
 }
 
 /* 음성 인식 (STT) 하단 바 & 음성인식 액션 버튼 */
@@ -5549,6 +5558,7 @@ body {
   margin-top: 6px;
   padding-top: 6px;
   border-top: 1px dashed #e2e8f0;
+  flex-shrink: 0 !important; /* 절대로 찌그러지거나 밖으로 튀어나가지 않음 */
 }
 
 .foreigner-voice-btn {
@@ -6053,8 +6063,8 @@ body {
   display: flex;
   flex-direction: column;
   gap: 6px;
-  max-height: 180px;
-  overflow-y: auto;
+  max-height: none !important;
+  overflow: visible !important;
 }
 
 .history-card-item {
@@ -6188,8 +6198,13 @@ body {
 }
 
 .foreigner-modal-footer {
-  margin-top: 2px;
+  margin-top: 6px;
+  padding-top: 6px;
+  border-top: 1px solid #f1f5f9;
+  background: #ffffff;
   flex-shrink: 0;
+  z-index: 10;
+  position: relative;
 }
 
 .foreigner-send-btn {
@@ -6410,57 +6425,82 @@ body {
 }
 
 /* 모바일 키보드 / 작은 화면 반응형 최적화 */
-@media (max-height: 660px) {
+@media (max-height: 720px), (max-width: 480px) {
+  #foreigner-translator-modal.modal-overlay {
+    align-items: flex-start !important;
+    padding: 10px !important;
+    overflow-y: auto !important;
+  }
   .foreigner-modal-content {
-    margin: auto !important;
-    padding: 14px 16px !important;
+    margin: 0 auto !important;
+    padding: 12px 14px 10px 14px !important;
     gap: 8px !important;
     border-radius: 18px !important;
-    max-height: 94dvh !important;
+    max-height: calc(100dvh - 20px) !important;
+    height: auto !important;
   }
   .foreigner-modal-icon-badge {
-    width: 36px !important;
-    height: 36px !important;
+    width: 34px !important;
+    height: 34px !important;
   }
   .foreigner-modal-icon-badge svg {
-    width: 18px !important;
-    height: 18px !important;
+    width: 16px !important;
+    height: 16px !important;
   }
   .foreigner-modal-title {
-    font-size: 16px !important;
+    font-size: 15px !important;
   }
   .foreigner-modal-desc {
     font-size: 11px !important;
   }
   .foreigner-lang-selector {
-    padding: 5px 8px !important;
+    padding: 4px 6px !important;
   }
   .lang-pill {
-    padding: 3px 8px !important;
+    padding: 2px 7px !important;
     font-size: 11px !important;
   }
   .foreigner-chip {
+    padding: 2px 7px !important;
+    font-size: 10.5px !important;
+  }
+  .foreigner-input-box {
+    min-height: auto !important;
+    height: auto !important;
+    padding: 8px 10px !important;
+    flex: 0 0 auto !important;
+    overflow: visible !important;
+  }
+  .foreigner-textarea {
+    min-height: 48px !important;
+    height: 48px !important;
+    font-size: 13.5px !important;
+  }
+  .foreigner-input-bottom-bar {
+    margin-top: 4px !important;
+    padding-top: 4px !important;
+    flex-shrink: 0 !important;
+  }
+  .foreigner-voice-btn {
     padding: 3px 8px !important;
     font-size: 11px !important;
   }
-  .foreigner-input-box {
-    min-height: 90px !important;
-    padding: 10px 12px !important;
-  }
-  .foreigner-textarea {
-    min-height: 55px !important;
-    font-size: 13.5px !important;
+  .foreigner-modal-footer {
+    margin-top: 4px !important;
+    padding-top: 4px !important;
+    background: #ffffff !important;
   }
   .foreigner-send-btn {
     height: 42px !important;
     font-size: 14px !important;
+    border-radius: 10px !important;
   }
   .foreigner-result-modal-content {
-    margin: auto !important;
-    padding: 14px 16px !important;
-    gap: 10px !important;
+    margin: 0 auto !important;
+    padding: 12px 14px !important;
+    gap: 8px !important;
     border-radius: 18px !important;
-    max-height: 94dvh !important;
+    max-height: calc(100dvh - 20px) !important;
   }
 }
 

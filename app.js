@@ -6776,6 +6776,7 @@ const initSmartQApp = async () => {
   let savedTranslatedKorean = "";
   let currentSpeechText = "";
   let foreignerHistory = [];
+  let cachedDirectAnalysisPromise = null;
 
   try {
     const storedHistory = localStorage.getItem('im_foreigner_history');
@@ -7251,8 +7252,244 @@ const initSmartQApp = async () => {
     return `${normalized}에 대해 창구 행원에게 안내 및 업무 처리를 요청합니다.`;
   }
 
+  // --- 2-1. AI 세부 업무 선택지 전용 즉시 분석 사전 (Zero Delay Pre-analyzed Results) ---
+  const predefinedAiOptionResults = {
+    opt_remit_intl: {
+      intentName: "해외 송금 (International Remittance)",
+      estTime: "약 7분 소요",
+      badgeColor: "#2563eb",
+      counter: "외환 / 해외송금 창구",
+      summary: "해외 거주 가족 및 수취인에게 외화 송금을 요청하는 고객입니다. 수취인 계좌 정보 및 당행 외국환거래 지정은행 등록 여부 확인이 필요합니다.",
+      tags: ["외환/해외송금 창구", "해외 송금", "지정은행 확인", "SWIFT 코드"],
+      checklists: [
+        "외국인등록증(ARC) 또는 유효한 여권 원본 확인",
+        "외국환거래 지정은행 등록 여부 전산 조회 (당행 지정 필수)",
+        "수취인 영문 성명, 은행코드(SWIFT BIC), 수취 계좌번호 확인",
+        "연간 미화 5만불 초과 송금 시 지급증빙서류(소득금액증명원 등) 확인"
+      ],
+      html: "안녕하세요, <strong>해외 송금(외화 송금) 및 외국환거래 지정</strong> 업무를 신청하고자 합니다.",
+      speech: "안녕하세요, 해외 송금 및 외국환거래 지정 업무를 신청하고자 합니다."
+    },
+    opt_remit_domestic: {
+      intentName: "국내 송금 및 계좌 이체 (Domestic Transfer)",
+      estTime: "약 3분 소요",
+      badgeColor: "#059669",
+      counter: "빠른창구 / 일반예금",
+      summary: "한국 내 타행 또는 타인 계좌로 원화 계좌이체/송금을 요청하는 고객입니다.",
+      tags: ["빠른창구 / 일반예금", "국내 타행 이체", "원화 송금", "수취인 조회"],
+      checklists: [
+        "수취 은행명 및 계좌번호, 예금주 성명 실시간 전산 대조 확인",
+        "출금 계좌 비밀번호 핀패드 입력 및 이체 잔여 한도 확인",
+        "이체 수수료 안내 및 이체 거래확인증 교부"
+      ],
+      html: "안녕하세요, <strong>국내 다른 은행 또는 타인 계좌로 원화 계좌이체/송금</strong>을 신청하고자 합니다.",
+      speech: "안녕하세요, 국내 다른 은행 또는 타인 계좌로 원화 계좌이체와 송금을 신청하고자 합니다."
+    },
+    opt_remit_cash: {
+      intentName: "창구 현금 송금 / 무통장 입금 (Cash Remittance)",
+      estTime: "약 4분 소요",
+      badgeColor: "#d97706",
+      counter: "입출금 / 빠른창구",
+      summary: "통장 없이 현금으로 타인 계좌에 무통장 송금/입금을 요청하는 고객입니다.",
+      tags: ["입출금 / 빠른창구", "무통장 입금", "현금 송금", "수취인 확인"],
+      checklists: [
+        "송금 전표 작성(송금인 성명/연락처, 수취 계좌번호) 확인",
+        "현금 지폐 계수기 통과 및 위조지폐 감별 확인",
+        "무통장 입금 완료 영수증 교부"
+      ],
+      html: "안녕하세요, <strong>통장 없이 현금으로 무통장 송금(입금)</strong>을 신청하고자 합니다.",
+      speech: "안녕하세요, 통장 없이 현금으로 무통장 송금 및 입금을 신청하고자 합니다."
+    },
+    opt_account_new: {
+      intentName: "신규 계좌 개설 (Open Account)",
+      estTime: "약 10분 소요",
+      badgeColor: "#059669",
+      counter: "예금 / 신규 창구",
+      summary: "외국인 전용 입출금 통장 개설 및 체크카드 동시 발급을 신청하고자 하는 고객입니다.",
+      tags: ["예금/신규 창구", "통장 개설", "체크카드 동시발급", "한도제한계좌"],
+      checklists: [
+        "외국인등록증 원본 확인 (체류기간 만료일 3개월 이상 잔여)",
+        "금융거래 목적 확인 서류 (재직증명서 / 표준근로계약서 / 학생증 등)",
+        "한도제한계좌(1일 창구 100만원/ATM 30만원) 제도 사전 안내",
+        "체크카드 및 전자금융(iM뱅크) 동시 가입 의사 확인"
+      ],
+      html: "안녕하세요, <strong>외국인 전용 입출금 통장 개설 및 체크카드 발급</strong>을 신청하고자 합니다.",
+      speech: "안녕하세요, 외국인 전용 입출금 통장 개설 및 체크카드 발급을 신청하고자 합니다."
+    },
+    opt_account_limit: {
+      intentName: "한도제한계좌 해제 및 한도 상향 (Limit Upgrade)",
+      estTime: "약 5분 소요",
+      badgeColor: "#0284c7",
+      counter: "예금 / 일반 상담",
+      summary: "계좌의 1회/1일 이체 및 출금 한도제한 해제와 한도 상향을 요청하는 고객입니다.",
+      tags: ["예금 / 일반 상담", "한도제한 해제", "소득증빙 확인", "이체한도 증액"],
+      checklists: [
+        "소득 증빙 서류 (재직증명서, 급여명세서, 소득금액증명원 등) 심사",
+        "3개월 이상 급여 입금 실적 또는 공과금 자동이체 내역 조회",
+        "전산 한도제한 해제 등록 및 보안매체별 최대 이체한도 재설정"
+      ],
+      html: "안녕하세요, <strong>계좌 이체 및 출금 한도제한 해제(한도 상향)</strong>를 신청하고자 합니다.",
+      speech: "안녕하세요, 계좌 이체 및 출금 한도제한 해제 및 한도 상향을 신청하고자 합니다."
+    },
+    opt_account_saving: {
+      intentName: "예금 / 적금 상품 가입 (Savings & Deposit)",
+      estTime: "약 8분 소요",
+      badgeColor: "#7c3aed",
+      counter: "예금 / 자산관리 창구",
+      summary: "목돈 마련을 위한 외국인 우대금리 정기예금 및 적금 상품 가입을 상담하고자 하는 고객입니다.",
+      tags: ["예금 / 자산관리", "외국인 우대금리", "정기적금", "자산관리"],
+      checklists: [
+        "희망 저축 기간(6개월/1년/2년) 및 월 불입 희망 금액 확인",
+        "외국인 우대금리 적용 가능 적금/정기예금 상품 안내",
+        "자동이체 연결 계좌 및 만기 자동해지 서비스 등록"
+      ],
+      html: "안녕하세요, <strong>목돈 마련을 위한 외국인 우대금리 정기예금/적금 가입</strong>을 상담하고자 합니다.",
+      speech: "안녕하세요, 목돈 마련을 위한 외국인 우대금리 정기예금 및 적금 가입을 상담하고자 합니다."
+    },
+    opt_card_issue: {
+      intentName: "체크카드 발급 및 갱신 (Card Issue)",
+      estTime: "약 4분 소요",
+      badgeColor: "#0284c7",
+      counter: "예금 / 카드 창구",
+      summary: "체크카드 신규 발급, 유효기간 만료 갱신, 또는 훼손 재발급을 요청하는 고객입니다.",
+      tags: ["예금 / 카드 창구", "체크카드 발급", "Mastercard겸용", "후불교통"],
+      checklists: [
+        "본인 확인(외국인등록증) 및 연결 계좌 잔액 확인",
+        "신분증 영문 성명과 카드 각인 영문명 일치 여부 확인",
+        "해외겸용(Mastercard) 및 후불교통카드 탑재 여부 선택 안내"
+      ],
+      html: "안녕하세요, <strong>체크카드 신규 발급 또는 갱신 재발급</strong>을 신청하고자 합니다.",
+      speech: "안녕하세요, 체크카드 신규 발급 또는 갱신 재발급을 신청하고자 합니다."
+    },
+    opt_card_lost: {
+      intentName: "카드 분실 신고 및 거래 정지 (Lost Card & Freeze)",
+      estTime: "약 4분 소요",
+      badgeColor: "#dc2626",
+      counter: "긴급 / 사고신고 창구",
+      summary: "카드를 분실하여 즉시 사고 등록 및 출금 차단, 신규 재발급을 요청하는 고객입니다.",
+      tags: ["사고 등록", "결제 차단", "즉시 재발급", "긴급 조치"],
+      checklists: [
+        "외국인등록증(ARC) 또는 여권 실물 원본으로 본인 확인",
+        "전산 분실 즉시 등록 및 해당 카드 결제/출금 일체 차단",
+        "신규 체크카드 현장 즉시 재발급 및 신규 비밀번호(4자리) 등록"
+      ],
+      html: "안녕하세요, <strong>카드 분실 신고 및 결제 차단, 신규 재발급</strong>을 긴급 요청합니다.",
+      speech: "안녕하세요, 카드 분실 신고 및 결제 차단, 신규 재발급을 긴급 요청합니다."
+    },
+    opt_card_pin: {
+      intentName: "비밀번호 오류 해제 및 재설정 (Reset PIN)",
+      estTime: "약 4분 소요",
+      badgeColor: "#ea580c",
+      counter: "빠른창구 / 상담",
+      summary: "카드 또는 계좌 비밀번호 오류(3회 초과)로 잠긴 상태를 전산 해제하고 새로 재설정하고자 하는 고객입니다.",
+      tags: ["오류 해제", "PIN 재설정", "키패드 4자리", "본인 확인"],
+      checklists: [
+        "본인 실명확인증표(외국인등록증 또는 여권) 확인",
+        "비밀번호 오류 횟수(3회/5회 초과) 전산 해제 처리",
+        "고객 키패드(PIN 패드)를 통한 고객 직접 신규 비밀번호 4자리 입력 유도"
+      ],
+      html: "안녕하세요, <strong>비밀번호 오류 잠금 해제 및 신규 비밀번호 재설정</strong>을 신청하고자 합니다.",
+      speech: "안녕하세요, 비밀번호 오류 잠금 해제 및 신규 비밀번호 재설정을 신청하고자 합니다."
+    },
+    opt_fx_to_krw: {
+      intentName: "외화 환전 ➔ 원화 수령 (FX to KRW)",
+      estTime: "약 3분 소요",
+      badgeColor: "#d97706",
+      counter: "외환 / 환전 창구",
+      summary: "가지고 있는 외화를 한국 원화(KRW) 현금으로 환전하고자 하는 고객입니다.",
+      tags: ["외환 / 환전 창구", "원화 환전", "당일 고시환율", "위폐 감별"],
+      checklists: [
+        "외화 실물 지폐 위조지폐 감별기 통과 및 권종 확인",
+        "당일 고시 대고객 전신환/현찰 매매율 적용 확인",
+        "원화 현금 및 환전 영수증 교부"
+      ],
+      html: "안녕하세요, <strong>외국 통화(외화)를 한국 원화(KRW) 현금으로 환전</strong>하고자 합니다.",
+      speech: "안녕하세요, 외국 통화를 한국 원화 현금으로 환전하고자 합니다."
+    },
+    opt_fx_to_foreign: {
+      intentName: "원화 ➔ 외화 현찰 환전 (KRW to FX)",
+      estTime: "약 3분 소요",
+      badgeColor: "#059669",
+      counter: "외환 / 환전 창구",
+      summary: "한국 원화를 달러나 기타 외국 통화 현찰로 환전하고자 하는 고객입니다.",
+      tags: ["외환 / 환전 창구", "외화 수령", "우대환율 적용", "권종 선택"],
+      checklists: [
+        "외국인등록증/여권 확인 및 환전 목적 확인",
+        "희망 통화(USD/EUR/JPY/CNY 등) 보유 권종 확인",
+        "환전 금액 수령증 서명 및 외화 현찰 교부"
+      ],
+      html: "안녕하세요, <strong>한국 원화를 외화(달러 등 외국 통화)로 환전</strong>하고자 합니다.",
+      speech: "안녕하세요, 한국 원화를 외국 통화로 환전하고자 합니다."
+    },
+    opt_fx_deposit: {
+      intentName: "외화통장 예치 및 입금 (FX Deposit)",
+      estTime: "약 4분 소요",
+      badgeColor: "#7c3aed",
+      counter: "외환 창구",
+      summary: "외화 예금통장에 외화 현찰을 입금하여 보관하고자 하는 고객입니다.",
+      tags: ["외환 창구", "외화통장 입금", "외화 예금", "통장 정리"],
+      checklists: [
+        "외화 예금통장 및 실물 신분증 확인",
+        "입금할 외화 지폐 위폐 감별 및 권종별 계수",
+        "외화 예금통장 인자 및 잔액 증빙 교부"
+      ],
+      html: "안녕하세요, <strong>외화 예금통장에 외화 현찰을 입금</strong>하고자 합니다.",
+      speech: "안녕하세요, 외화 예금통장에 외화 현찰을 입금하고자 합니다."
+    },
+    opt_cash_deposit: {
+      intentName: "창구 현금 입금 (Cash Deposit)",
+      estTime: "약 3분 소요",
+      badgeColor: "#0891b2",
+      counter: "빠른창구 / 입출금",
+      summary: "창구에서 현금을 본인 또는 타인 계좌로 직접 입금하고자 하는 고객입니다.",
+      tags: ["빠른창구", "현금 입금", "계좌 입금", "통장 정리"],
+      checklists: [
+        "입금 계좌번호 및 예금주 실명 확인",
+        "현금 지폐 계수기 통과 및 금액 일치 확인",
+        "통장 인자 및 입금 거래확인서 교부"
+      ],
+      html: "안녕하세요, <strong>본인 또는 타인 계좌로 현금을 입금</strong>하고자 합니다.",
+      speech: "안녕하세요, 계좌로 현금을 입금하고자 합니다."
+    },
+    opt_cash_withdraw: {
+      intentName: "창구 현금 출금 (Cash Withdrawal)",
+      estTime: "약 3분 소요",
+      badgeColor: "#0284c7",
+      counter: "빠른창구 / 입출금",
+      summary: "통장 또는 체크카드로 창구에서 현금을 출금하고자 하는 고객입니다.",
+      tags: ["빠른창구", "현금 출금", "비밀번호 입력", "신분증 확인"],
+      checklists: [
+        "통장 또는 체크카드 및 실물 신분증 확인",
+        "출금 전표 작성 및 핀패드 비밀번호 4자리 직접 입력",
+        "현금 인출 지폐 계수 및 수령증 서명"
+      ],
+      html: "안녕하세요, <strong>창구에서 통장/카드로 현금을 출금</strong>하고자 합니다.",
+      speech: "안녕하세요, 창구에서 통장 또는 카드로 현금을 출금하고자 합니다."
+    },
+    opt_cash_passbook: {
+      intentName: "통장 정리 및 내역 조회 (Passbook Update)",
+      estTime: "약 3분 소요",
+      badgeColor: "#64748b",
+      counter: "빠른창구 / 일반상담",
+      summary: "통장 거래 기록 정리 및 계좌 거래내역서 발급을 요청하는 고객입니다.",
+      tags: ["빠른창구", "통장 기장", "거래내역 조회", "미기장 인자"],
+      checklists: [
+        "실물 통장 마그네틱 확인 및 자동인자",
+        "통장 인자 한도 초과 시 통장 이월 재발급",
+        "필요 시 거래내역 증명서 출력 교부"
+      ],
+      html: "안녕하세요, <strong>통장 정리(기장) 및 거래내역 확인</strong>을 요청합니다.",
+      speech: "안녕하세요, 통장 정리 및 거래내역 확인을 요청합니다."
+    }
+  };
+
   // --- 3. 스마트 AI 창구 의도 분석 & 다국어 직접 입력 정밀 번역 엔진 ---
-  async function analyzeForeignerIntent(text, langKey) {
+  async function analyzeForeignerIntent(text, langKey, optId = null) {
+    // 0. AI 선택지 ID가 지정된 경우 외부 API 호출 없이 즉시 0ms 반환
+    if (optId && predefinedAiOptionResults[optId]) {
+      return predefinedAiOptionResults[optId];
+    }
+
     if (!text || !text.trim()) {
       return {
         intentName: "창구 일반 업무 (General Inquiry)",
@@ -7367,8 +7604,14 @@ const initSmartQApp = async () => {
     }
 
     // B. 음성 / 직접 입력한 경우 -> 실제 실시간 다국어 기계 번역 수행
-    const translatedRaw = await fetchRealTranslation(trimmed, langKey);
-    let realKorean = (translatedRaw || trimmed).trim();
+    // 이미 한국어로 작성된 텍스트이거나 한국어 입력인 경우 외부 API 호출을 생략하여 즉시 0ms 처리
+    let realKorean = trimmed;
+    if (!/[가-힣]/.test(trimmed) && langKey !== 'ko') {
+      const translatedRaw = await fetchRealTranslation(trimmed, langKey);
+      if (translatedRaw) {
+        realKorean = translatedRaw.trim();
+      }
+    }
 
     // AI 업무 의도 및 행원 체크리스트 동적 분석 (번역된 한국어 및 원문 결합 정밀 NLP)
     const combinedSearch = (realKorean + " " + trimmed).toLowerCase();
@@ -8656,6 +8899,9 @@ const initSmartQApp = async () => {
     const optionsList = document.getElementById('foreigner-options-list');
     if (!optionsSection || !optionsList) return;
 
+    // '원문 그대로 전달' 클릭 시 딜레이가 없도록 백그라운드 프리패치 시작
+    cachedDirectAnalysisPromise = analyzeForeignerIntent(taskText, langKey);
+
     const options = generateForeignerServiceOptions(taskText, langKey);
     const pack = foreignerLanguagePacks[langKey] || foreignerLanguagePacks.en;
 
@@ -8701,7 +8947,7 @@ const initSmartQApp = async () => {
       optionsSection.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
     }, 120);
 
-    // 각 카드 클릭 이벤트 바인딩
+    // 각 카드 클릭 이벤트 바인딩 - 딜레이 없이 0초 즉시 전환
     optionsList.querySelectorAll('.ai-option-card').forEach(card => {
       card.addEventListener('click', async () => {
         const idx = parseInt(card.getAttribute('data-idx'), 10);
@@ -8711,13 +8957,14 @@ const initSmartQApp = async () => {
             selectedOpt.promptText,
             selectedOpt.title,
             taskText,
-            selectedOpt.badge
+            selectedOpt.badge,
+            selectedOpt.id
           );
         }
       });
     });
 
-    // 원문 그대로 전달 버튼 클릭 이벤트 바인딩
+    // 원문 그대로 전달 버튼 클릭 이벤트 바인딩 - 프리패치된 번역으로 즉시 전환
     const btnDirect = document.getElementById('btn-ai-option-direct');
     if (btnDirect) {
       btnDirect.addEventListener('click', async () => {
@@ -8732,16 +8979,24 @@ const initSmartQApp = async () => {
   }
 
   // 은행원 제시 모달로 분석 결과 및 번역 데이터 전송 공통 실행 함수
-  async function executeForeignerTranslationToTeller(promptText, selectedTitle, rawInputText, optBadge) {
+  async function executeForeignerTranslationToTeller(promptText, selectedTitle, rawInputText, optBadge, optId = null) {
     stopForeignerSTT();
     const pack = foreignerLanguagePacks[currentForeignerLang] || foreignerLanguagePacks.en;
 
     if (btnForeignerSend) btnForeignerSend.disabled = true;
-    if (foreignerSendText) foreignerSendText.textContent = pack.translatingBtn || "Translating...";
 
     try {
       savedOriginalText = rawInputText || promptText;
-      const analysis = await analyzeForeignerIntent(promptText, currentForeignerLang);
+
+      // 0초 즉시 전환: AI 선택지 ID가 있거나 프리패치된 데이터가 있으면 네트워크 대기 없이 즉각 처리
+      let analysis = null;
+      if (optId && predefinedAiOptionResults[optId]) {
+        analysis = predefinedAiOptionResults[optId];
+      } else if (rawInputText && cachedDirectAnalysisPromise && promptText === rawInputText) {
+        analysis = await cachedDirectAnalysisPromise;
+      } else {
+        analysis = await analyzeForeignerIntent(promptText, currentForeignerLang, optId);
+      }
       savedTranslatedKorean = analysis.html;
       currentSpeechText = analysis.speech;
 
@@ -8846,6 +9101,12 @@ const initSmartQApp = async () => {
       if (modalFooter && modalFooter.classList.contains('hidden')) {
         modalFooter.classList.remove('hidden');
       }
+    });
+
+    foreignerTextarea.addEventListener('focus', () => {
+      setTimeout(() => {
+        foreignerTextarea.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+      }, 300);
     });
   }
 
