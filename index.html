@@ -48,8 +48,8 @@
     <main class="app-content">
       <!-- 좌측 열: 번호표 및 대기 관리 / 유의사항 -->
       <div class="layout-col-ticket">
-        <!-- 메인 번호표 카드 -->
-        <section class="ticket-card animate-fade-in">
+        <!-- 메인 번호표 카드 (영업점 현장 모드) -->
+        <section class="ticket-card animate-fade-in" id="branch-ticket-card">
           <!-- 지점명 + 상태 배지 (1행 통합) -->
           <div class="ticket-top-row">
             <div class="ticket-branch">
@@ -92,6 +92,77 @@
           </div>
         </section>
 
+        <!-- iM뱅크 앱 사전 준비 전용 카드 (앱 모드 활성화 시 표시) -->
+        <section class="app-pre-visit-card animate-fade-in" id="app-pre-visit-card" style="display: none;">
+          <div class="pre-visit-top-row">
+            <div class="pre-visit-badge-channel">
+              <i class="fa-solid fa-mobile-screen-button"></i>
+              <span>iM뱅크 모바일앱</span>
+            </div>
+            <div class="pre-visit-badge-status">
+              <i class="fa-solid fa-sparkles"></i> 방문 전 사전준비
+            </div>
+          </div>
+
+          <div class="pre-visit-hero">
+            <div class="pre-visit-target-branch">
+              <i class="fa-solid fa-location-dot"></i>
+              <span>방문 예정 지점: <strong>본점영업부</strong></span>
+            </div>
+            <h2 class="pre-visit-title">지점 방문 전<br><span class="highlight-cyan">서류 챙기고 대기 단축!</span></h2>
+            <p class="pre-visit-desc">필수 서류를 미리 확인하고 모바일로 작성하면<br>영업점 창구 대기시간을 최대 70% 단축할 수 있습니다.</p>
+          </div>
+
+          <!-- 앱 모드 사전준비 진행현황 프로그레스 바 -->
+          <div class="pre-visit-progress-wrap">
+            <div class="pre-progress-header">
+              <span class="pre-progress-label"><i class="fa-solid fa-list-check"></i> 사전 준비 완료도</span>
+              <span class="pre-progress-val" id="app-prep-percent">0 / 3 완료</span>
+            </div>
+            <div class="pre-progress-bar-bg">
+              <div class="pre-progress-bar-fill" id="app-prep-bar" style="width: 33%;"></div>
+            </div>
+          </div>
+
+          <!-- 사전 준비 3대 단계 바로가기 리스트 -->
+          <div class="pre-visit-steps-list">
+            <div class="pre-step-item" id="btn-prestep-checklist">
+              <div class="pre-step-icon step-chk"><i class="fa-solid fa-clipboard-check"></i></div>
+              <div class="pre-step-info">
+                <div class="step-meta">
+                  <span class="step-badge">1단계</span>
+                  <strong>서류 체크리스트</strong>
+                </div>
+                <p>업무별 필수 구비서류 자동 점검</p>
+              </div>
+              <i class="fa-solid fa-chevron-right pre-step-arrow"></i>
+            </div>
+
+            <div class="pre-step-item" id="btn-prestep-verify">
+              <div class="pre-step-icon step-vfy"><i class="fa-solid fa-shield-halved"></i></div>
+              <div class="pre-step-info">
+                <div class="step-meta">
+                  <span class="step-badge">2단계</span>
+                  <strong>서류 진위확인</strong>
+                </div>
+                <p>정부24·홈택스 발급서류 사전 검증</p>
+              </div>
+              <i class="fa-solid fa-chevron-right pre-step-arrow"></i>
+            </div>
+
+            <div class="pre-step-item" id="btn-prestep-write">
+              <div class="pre-step-icon step-wrt"><i class="fa-solid fa-file-pen"></i></div>
+              <div class="pre-step-info">
+                <div class="step-meta">
+                  <span class="step-badge">3단계</span>
+                  <strong>신청서 미리작성</strong>
+                </div>
+                <p>통장개설·송금전표 모바일 사전 작성</p>
+              </div>
+              <i class="fa-solid fa-chevron-right pre-step-arrow"></i>
+            </div>
+          </div>
+        </section>
       </div>
 
       <!-- 우측 열: 스마트 뱅킹 서비스 허브 -->
@@ -2342,6 +2413,28 @@
       <button type="button" class="btn-presenter btn-presenter-reset" id="btn-presenter-reset" title="단축키: \ 또는 r">
         <span><i class="fa-solid fa-rotate-left"></i> 대기 5명 리셋</span>
         <kbd class="presenter-kbd">\</kbd>
+      </button>
+    </div>
+
+    <!-- [시연 전용] 채널 모드 전환 컨트롤러 (영업점 현장 QR ↔ iM뱅크 앱 사전준비) -->
+    <div class="presenter-divider"></div>
+    <div class="presenter-channel-header">
+      <span class="presenter-channel-title">
+        <i class="fa-solid fa-arrows-split-up-and-left" style="color: #38bdf8;"></i>
+        <span>접속 채널 전환 시연</span>
+      </span>
+      <span class="presenter-channel-hint">현장 QR ↔ iM뱅크 앱</span>
+    </div>
+    <div class="presenter-mode-toggle-group">
+      <button type="button" class="btn-presenter-mode active" id="btn-presenter-mode-branch" title="단축키: 1 (영업점 현장 모드)">
+        <i class="fa-solid fa-building-columns"></i>
+        <span>🏢 영업점 현장 (QR체크)</span>
+        <kbd class="presenter-kbd">1</kbd>
+      </button>
+      <button type="button" class="btn-presenter-mode" id="btn-presenter-mode-app" title="단축키: 2 (iM뱅크 앱 모드)">
+        <i class="fa-solid fa-mobile-screen-button"></i>
+        <span>📱 iM뱅크 앱 (사전준비)</span>
+        <kbd class="presenter-kbd">2</kbd>
       </button>
     </div>
   </aside>

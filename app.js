@@ -6031,8 +6031,116 @@ const initSmartQApp = async () => {
       updateWaitQueueState(0);
     } else if (e.key === '\\' || e.key === 'r' || e.key === 'R') {
       updateWaitQueueState(5);
+    } else if (e.key === '1') {
+      setChannelMode('branch');
+    } else if (e.key === '2') {
+      setChannelMode('app');
     }
   });
+
+  // 4-1. [시연 전용] 접속 채널 모드 전환 (영업점 현장 QR ↔ iM뱅크 앱 사전준비)
+  // * 오직 발표자 리모컨 및 단축키(1, 2)를 통해서만 제어
+  let currentChannelMode = 'branch';
+  const branchTicketCard = document.getElementById('branch-ticket-card');
+  const appPreVisitCard = document.getElementById('app-pre-visit-card');
+  const btnModeBranch = document.getElementById('btn-presenter-mode-branch');
+  const btnModeApp = document.getElementById('btn-presenter-mode-app');
+
+  function setChannelMode(mode, silent = false) {
+    currentChannelMode = mode;
+    if (mode === 'app') {
+      document.body.classList.add('mode-app-active');
+      if (branchTicketCard) branchTicketCard.style.display = 'none';
+      if (appPreVisitCard) {
+        appPreVisitCard.style.display = 'flex';
+        appPreVisitCard.classList.remove('animate-fade-in');
+        void appPreVisitCard.offsetWidth; // trigger reflow
+        appPreVisitCard.classList.add('animate-fade-in');
+      }
+      if (btnModeBranch) btnModeBranch.classList.remove('active');
+      if (btnModeApp) btnModeApp.classList.add('active');
+      if (!silent) showToast('📱 [iM뱅크 앱] 방문 전 사전 준비 화면으로 전환되었습니다.');
+    } else {
+      document.body.classList.remove('mode-app-active');
+      if (branchTicketCard) {
+        branchTicketCard.style.display = 'block';
+        branchTicketCard.classList.remove('animate-fade-in');
+        void branchTicketCard.offsetWidth;
+        branchTicketCard.classList.add('animate-fade-in');
+      }
+      if (appPreVisitCard) appPreVisitCard.style.display = 'none';
+      if (btnModeBranch) btnModeBranch.classList.add('active');
+      if (btnModeApp) btnModeApp.classList.remove('active');
+      if (!silent) showToast('🏢 [영업점 현장] QR 체크인 실시간 번호표 화면입니다.');
+    }
+  }
+
+  window.setChannelMode = setChannelMode;
+
+  // URL 파라미터 또는 해시 감지 (?channel=app 또는 #app)
+  const urlParams = new URLSearchParams(window.location.search);
+  if (urlParams.get('channel') === 'app' || window.location.hash === '#app') {
+    setTimeout(() => setChannelMode('app', true), 100);
+  }
+
+  if (btnModeBranch) {
+    btnModeBranch.addEventListener('click', () => setChannelMode('branch'));
+  }
+  if (btnModeApp) {
+    btnModeApp.addEventListener('click', () => setChannelMode('app'));
+  }
+
+  // 앱 모드 내 3대 사전 단계 바로가기 클릭 연동
+  const btnPrestepChecklist = document.getElementById('btn-prestep-checklist');
+  if (btnPrestepChecklist) {
+    btnPrestepChecklist.addEventListener('click', () => {
+      if (typeof resetChecklistModal === 'function') {
+        resetChecklistModal();
+      }
+      if (typeof openModalWithConsentCheck === 'function') {
+        openModalWithConsentCheck('checklist-modal');
+      } else {
+        const btn = document.getElementById('btn-easy-checklist');
+        if (btn) btn.click();
+      }
+      playNotificationSound('beep');
+    });
+  }
+
+  const btnPrestepVerify = document.getElementById('btn-prestep-verify');
+  if (btnPrestepVerify) {
+    btnPrestepVerify.addEventListener('click', () => {
+      if (typeof openDocVerifyModal === 'function') {
+        openDocVerifyModal();
+      } else {
+        const btn = document.getElementById('btn-easy-doc-verify');
+        if (btn) btn.click();
+      }
+      playNotificationSound('beep');
+    });
+  }
+
+  const btnPrestepWrite = document.getElementById('btn-prestep-write');
+  if (btnPrestepWrite) {
+    btnPrestepWrite.addEventListener('click', () => {
+      if (typeof openModalWithConsentCheck === 'function') {
+        openModalWithConsentCheck('pre-writing-modal');
+      } else {
+        const btn = document.getElementById('btn-easy-pre-writing');
+        if (btn) btn.click();
+      }
+      playNotificationSound('beep');
+    });
+  }
+
+  // 테스트 및 바로가기 지원: #open-verify, #open-write, #open-checklist
+  if (window.location.hash === '#open-verify') {
+    setTimeout(() => { if (btnPrestepVerify) btnPrestepVerify.click(); }, 350);
+  } else if (window.location.hash === '#open-write') {
+    setTimeout(() => { if (btnPrestepWrite) btnPrestepWrite.click(); }, 350);
+  } else if (window.location.hash === '#open-checklist') {
+    setTimeout(() => { if (btnPrestepChecklist) btnPrestepChecklist.click(); }, 350);
+  }
 
   // 5. 모바일 비밀 제스처 (지점명 '본점영업부' 2초 내 3회 탭 시 비밀리에 1명씩 감소)
   const branchNameEl = document.querySelector('.branch-name');

@@ -7315,6 +7315,338 @@ html.no-scroll,
   border: 1px solid rgba(255, 255, 255, 0.1);
 }
 
+/* 발표자 리모컨: 채널 전환 섹션 */
+.presenter-divider {
+  margin: 12px 0 10px 0;
+  border: none;
+  height: 1px;
+  background: rgba(255, 255, 255, 0.12);
+}
+
+.presenter-channel-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 8px;
+}
+
+.presenter-channel-title {
+  font-size: 12px;
+  font-weight: 800;
+  color: #f8fafc;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.presenter-channel-hint {
+  font-size: 10.5px;
+  color: #94a3b8;
+}
+
+.presenter-mode-toggle-group {
+  display: flex;
+  gap: 8px;
+}
+
+.btn-presenter-mode {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+  padding: 10px 6px;
+  border-radius: 12px;
+  border: 1.5px solid rgba(255, 255, 255, 0.12);
+  background: rgba(255, 255, 255, 0.06);
+  color: #cbd5e1;
+  font-size: 11.5px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.22s cubic-bezier(0.4, 0, 0.2, 1);
+  position: relative;
+  text-align: center;
+}
+
+.btn-presenter-mode i {
+  font-size: 15px;
+}
+
+.btn-presenter-mode:hover {
+  background: rgba(255, 255, 255, 0.14);
+  color: #ffffff;
+  transform: translateY(-2px);
+}
+
+.btn-presenter-mode.active#btn-presenter-mode-branch {
+  background: linear-gradient(135deg, rgba(0, 199, 169, 0.25) 0%, rgba(0, 199, 169, 0.08) 100%);
+  border-color: #00c7a9;
+  color: #00c7a9;
+  box-shadow: 0 4px 14px rgba(0, 199, 169, 0.35);
+}
+
+.btn-presenter-mode.active#btn-presenter-mode-app {
+  background: linear-gradient(135deg, rgba(56, 189, 248, 0.3) 0%, rgba(14, 165, 233, 0.1) 100%);
+  border-color: #38bdf8;
+  color: #38bdf8;
+  box-shadow: 0 4px 14px rgba(56, 189, 248, 0.35);
+}
+
+/* ==========================================================================
+   --- iM뱅크 앱 사전 방문 준비 패스 카드 (앱 모드 전용) ---
+   ========================================================================== */
+/* iM뱅크 앱 모드 활성화 시: 쉬운모드 버튼, 현장 기능버튼 그리드, 유의사항, 하단 알림바 완전 숨김 */
+body.mode-app-active #easy-mode-toggle-btn,
+body.mode-app-active .layout-col-services,
+body.mode-app-active .notice-section,
+body.mode-app-active .app-footer {
+  display: none !important;
+}
+
+/* 앱 모드에서는 사전준비 카드(layout-col-ticket)가 화면 전체 폭을 차지하도록 확장 */
+body.mode-app-active .layout-col-ticket {
+  width: 100% !important;
+  max-width: 100% !important;
+  flex: 1 1 100% !important;
+}
+
+body.mode-app-active .app-content {
+  display: block !important;
+  padding-bottom: 24px !important;
+}
+
+.app-pre-visit-card {
+  background: #ffffff;
+  border-radius: 24px;
+  padding: clamp(20px, 3cqh, 28px) clamp(18px, 2.8cqw, 24px);
+  box-shadow: 0 10px 30px rgba(0, 199, 169, 0.08), 0 2px 8px rgba(0, 0, 0, 0.04);
+  border: 1.5px solid #dbeafe;
+  display: flex;
+  flex-direction: column;
+  gap: clamp(14px, 2.2cqh, 20px);
+  position: relative;
+  overflow: hidden;
+  box-sizing: border-box;
+}
+
+.app-pre-visit-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 5px;
+  background: linear-gradient(90deg, #0284c7, #38bdf8, #00c7a9);
+}
+
+.pre-visit-top-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.pre-visit-badge-channel {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 11.5px;
+  font-weight: 800;
+  color: #0284c7;
+  background: #eff6ff;
+  padding: 4px 10px;
+  border-radius: 8px;
+  border: 1px solid #bfdbfe;
+}
+
+.pre-visit-badge-status {
+  font-size: 11.5px;
+  font-weight: 800;
+  color: #0d9488;
+  background: #f0fdfa;
+  padding: 4px 10px;
+  border-radius: 8px;
+  border: 1px solid #ccfbf1;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.pre-visit-hero {
+  text-align: left;
+}
+
+.pre-visit-target-branch {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 12px;
+  color: #64748b;
+  margin-bottom: 4px;
+}
+
+.pre-visit-target-branch strong {
+  color: #1e293b;
+}
+
+.pre-visit-title {
+  font-size: clamp(18px, 2.5cqh, 22px);
+  font-weight: 800;
+  color: #0f172a;
+  line-height: 1.25;
+  margin: 0 0 6px 0;
+  letter-spacing: -0.5px;
+}
+
+.highlight-cyan {
+  color: #0284c7;
+  background: linear-gradient(120deg, rgba(2, 132, 199, 0.12) 0%, rgba(56, 189, 248, 0.18) 100%);
+  padding: 0 4px;
+  border-radius: 4px;
+}
+
+.pre-visit-desc {
+  font-size: clamp(11.5px, 1.5cqh, 13px);
+  color: #64748b;
+  line-height: 1.45;
+  margin: 0;
+  letter-spacing: -0.3px;
+}
+
+/* 완료도 프로그레스 */
+.pre-visit-progress-wrap {
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+  padding: 12px 14px;
+}
+
+.pre-progress-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 8px;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.pre-progress-label {
+  color: #475569;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.pre-progress-val {
+  color: #0284c7;
+  font-weight: 800;
+}
+
+.pre-progress-bar-bg {
+  height: 7px;
+  background: #e2e8f0;
+  border-radius: 6px;
+  overflow: hidden;
+}
+
+.pre-progress-bar-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #0284c7, #00c7a9);
+  border-radius: 6px;
+  transition: width 0.3s ease;
+}
+
+/* 3대 스텝 리스트 */
+.pre-visit-steps-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.pre-step-item {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 14px 16px;
+  background: #ffffff;
+  border: 1.5px solid #e2e8f0;
+  border-radius: 16px;
+  cursor: pointer;
+  transition: all 0.22s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.pre-step-item:hover {
+  border-color: #38bdf8;
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(2, 132, 199, 0.12);
+  background: #f8fafc;
+}
+
+.pre-step-icon {
+  width: 44px;
+  height: 44px;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 18px;
+  flex-shrink: 0;
+}
+
+.step-chk { background: #e0f2fe; color: #0284c7; }
+.step-vfy { background: #dcfce7; color: #16a34a; }
+.step-wrt { background: #fef3c7; color: #d97706; }
+
+.pre-step-info {
+  flex: 1;
+  min-width: 0;
+}
+
+.step-meta {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-bottom: 3px;
+}
+
+.step-badge {
+  font-size: 10px;
+  font-weight: 800;
+  padding: 2px 6px;
+  border-radius: 4px;
+  background: #f1f5f9;
+  color: #64748b;
+}
+
+.pre-step-info strong {
+  font-size: 13.5px;
+  font-weight: 700;
+  color: #1e293b;
+  letter-spacing: -0.3px;
+}
+
+.pre-step-info p {
+  margin: 0;
+  font-size: 11.5px;
+  color: #64748b;
+  letter-spacing: -0.3px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.pre-step-arrow {
+  font-size: 13px;
+  color: #94a3b8;
+  transition: transform 0.2s ease;
+}
+
+.pre-step-item:hover .pre-step-arrow {
+  color: #0284c7;
+  transform: translateX(3px);
+}
+
+
 /* ==========================================================================
    --- 내 차례 즉시 호출 긴박 알림 풀스크린 모달 & 이펙트 ---
    ========================================================================== */
