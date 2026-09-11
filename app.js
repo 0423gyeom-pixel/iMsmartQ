@@ -6082,6 +6082,9 @@ const initSmartQApp = async () => {
       voiceBtn: 'Voice Input',
       listening: 'Listening... Speak in English',
       langCode: 'en-US',
+      optionsTitle: 'Select your exact service',
+      optionsDesc: 'Choose the specific banking service you need to show the teller clearly.',
+      directSend: 'Send my original text as is',
       chips: [
         { label: 'Open Account', text: 'I would like to open a new bank account and get a debit card.' },
         { label: 'Send Money', text: 'I need to send money overseas (international remittance).' },
@@ -6103,6 +6106,9 @@ const initSmartQApp = async () => {
       voiceBtn: '语音输入 (Voice)',
       listening: '正在聆听... 请用中文说话',
       langCode: 'zh-CN',
+      optionsTitle: '请选择您的具体业务',
+      optionsDesc: '请在下方选择您需要的具体业务，以便银行职员更准确地为您办理。',
+      directSend: '按原输入内容直接提交',
       chips: [
         { label: '银行开户', text: '我想办理新银行账户开户和借记卡。' },
         { label: '境外汇款', text: '我想办理跨境汇款业务。' },
@@ -6124,6 +6130,9 @@ const initSmartQApp = async () => {
       voiceBtn: 'Nhập giọng nói (Voice)',
       listening: 'Đang nghe... Hãy nói tiếng Việt',
       langCode: 'vi-VN',
+      optionsTitle: 'Vui lòng chọn dịch vụ cụ thể của bạn',
+      optionsDesc: 'Chọn dịch vụ chi tiết bên dưới để nhân viên ngân hàng hỗ trợ bạn chính xác nhất.',
+      directSend: 'Gửi nguyên văn nội dung tôi đã nhập',
       chips: [
         { label: 'Mở tài khoản', text: 'Tôi muốn mở một tài khoản ngân hàng mới và làm thẻ ghi nợ.' },
         { label: 'Chuyển tiền', text: 'Tôi muốn chuyển tiền quốc tế về nước.' },
@@ -6145,6 +6154,9 @@ const initSmartQApp = async () => {
       voiceBtn: 'Ovozli kiritish (Voice)',
       listening: "Tinglanmoqda... O'zbekcha gapiring",
       langCode: 'uz-UZ',
+      optionsTitle: 'Aniq xizmatingizni tanlang',
+      optionsDesc: "Bank xodimiga aniq ma'lumot berish uchun quyidagi xizmatlardan birini tanlang.",
+      directSend: "Kiritilgan matnni o'z holicha yuborish",
       chips: [
         { label: 'Hisob ochish', text: "Yangi bank hisobi ochish va debet karta olishni xohlayman." },
         { label: "Pul jo'natish", text: "Chet elga pul o'tkazish (xalqaro pul jo'natmasi) xizmatidan foydalanmoqchiman." },
@@ -6166,6 +6178,9 @@ const initSmartQApp = async () => {
       voiceBtn: 'Input Suara (Voice)',
       listening: 'Mendengarkan... Bicara bahasa Indonesia',
       langCode: 'id-ID',
+      optionsTitle: 'Pilih layanan perbankan yang Anda butuhkan',
+      optionsDesc: 'Pilih layanan spesifik di bawah ini agar teller bank dapat melayani Anda dengan tepat.',
+      directSend: 'Kirim teks asli seperti yang saya masukkan',
       chips: [
         { label: 'Buka Rekening', text: 'Saya ingin membuka rekening bank baru dan membuat kartu debit.' },
         { label: 'Kirim Uang', text: 'Saya ingin mengirim uang ke luar negeri (remitansi internasional).' },
@@ -6187,6 +6202,9 @@ const initSmartQApp = async () => {
       voiceBtn: 'Pagsasalita (Voice)',
       listening: 'Nakikinig... Magsalita sa Tagalog',
       langCode: 'fil-PH',
+      optionsTitle: 'Piliin ang iyong eksaktong serbisyo',
+      optionsDesc: 'Piliin ang partikular na serbisyo sa ibaba upang malinaw na maipaliwanag sa teller ng bangko.',
+      directSend: 'Ipadala ang orihinal kong inilagay',
       chips: [
         { label: 'Magbukas ng Account', text: 'Gusto kong magbukas ng bagong bank account at kumuha ng debit card.' },
         { label: 'Magpadala ng Pera', text: 'Gusto kong magpadala ng pera sa ibang bansa (remittance).' },
@@ -6208,6 +6226,9 @@ const initSmartQApp = async () => {
       voiceBtn: 'အသံဖြင့်ပြောရန် (Voice)',
       listening: 'နားထောင်နေသည်... မြန်မာလို ပြောပါ',
       langCode: 'my-MM',
+      optionsTitle: 'သင်ဆောင်ရွက်လိုသော လုပ်ငန်းအသေးစိတ်ကို ရွေးပါ',
+      optionsDesc: 'ဘဏ်ဝန်ထမ်းအား တိကျစွာပြောပြနိုင်ရန် အောက်ပါလုပ်ငန်းများထဲမှ တစ်ခုကို ရွေးချယ်ပါ။',
+      directSend: 'ရေးထားသော မူရင်းစာသားအတိုင်း ပေးပို့မည်',
       chips: [
         { label: 'ဘဏ်စာရင်းဖွင့်', text: 'ဘဏ်အကောင့်အသစ်ဖွင့်ပြီး Debit ကတ် ရယူလိုပါသည်။' },
         { label: 'နိုင်ငံခြားငွေလွှဲ', text: 'ပြည်ပသို့ ငွေလွှဲလိုပါသည်။ (အပြည်ပြည်ဆိုင်ရာ ငွေလွှဲခြင်း)' },
@@ -6229,6 +6250,9 @@ const initSmartQApp = async () => {
       voiceBtn: 'พูดด้วยเสียง (Voice)',
       listening: 'กำลังฟัง... กรุณาพูดภาษาไทย',
       langCode: 'th-TH',
+      optionsTitle: 'กรุณาเลือกบริการที่คุณต้องการอย่างละเอียด',
+      optionsDesc: 'เลือกธุรกรรมที่เฉพาะเจาะจงด้านล่าง เพื่อให้เจ้าหน้าที่ธนาคารเข้าใจและดำเนินการได้อย่างถูกต้อง',
+      directSend: 'ส่งข้อความตามที่ฉันกรอกไว้โดยตรง',
       chips: [
         { label: 'เปิดบัญชี', text: 'ฉันต้องการเปิดบัญชีธนาคารใหม่และทำบัตรเดบิต' },
         { label: 'โอนเงินต่างประเทศ', text: 'ฉันต้องการโอนเงินไปต่างประเทศ (โอนเงินระหว่างประเทศ)' },
@@ -6250,6 +6274,9 @@ const initSmartQApp = async () => {
       voiceBtn: 'បញ្ចូលសំឡេង (Voice)',
       listening: 'កំពុងស្ដាប់... សូមនិយាយជាភាសាខ្មែរ',
       langCode: 'km-KH',
+      optionsTitle: 'សូមជ្រើសរើសសេវាកម្មជាក់លាក់របស់អ្នក',
+      optionsDesc: 'ជ្រើសរើសសេវាកម្មលម្អិតខាងក្រោមដើម្បីប្រាប់បុគ្គលិកធនាគារឱ្យកាន់តែច្បាស់លាស់។',
+      directSend: 'ផ្ញើតាមខ្លឹមសារដើមដែលខ្ញុំបានបញ្ចូល',
       chips: [
         { label: 'បើកគណនី', text: 'ខ្ញុំចង់បើកគណនីធនាគារថ្មី និងធ្វើកាតដេប៊ីត។' },
         { label: 'ផ្ទេរប្រាក់ទៅក្រៅប្រទេស', text: 'ខ្ញុំចង់ផ្ទេរប្រាក់ទៅក្រៅប្រទេស (ផ្ញើប្រាក់អន្តរជាតិ)។' },
@@ -6271,6 +6298,9 @@ const initSmartQApp = async () => {
       voiceBtn: 'Голосовой ввод (Voice)',
       listening: 'Слушаю... Говорите по-русски',
       langCode: 'ru-RU',
+      optionsTitle: 'Выберите точную услугу',
+      optionsDesc: 'Выберите конкретную услугу ниже, чтобы сотрудник банка понял вас максимально точно.',
+      directSend: 'Отправить исходный текст без изменений',
       chips: [
         { label: 'Открыть счет', text: 'Я хочу открыть новый банковский счет и оформить дебетовую карту.' },
         { label: 'Перевод денег', text: 'Мне необходимо сделать международный перевод денег за границу.' },
@@ -6292,6 +6322,9 @@ const initSmartQApp = async () => {
       voiceBtn: '音声で入力 (Voice)',
       listening: '音声を認識中... 日本語でお話しください',
       langCode: 'ja-JP',
+      optionsTitle: '具体的なご用件を選択してください',
+      optionsDesc: '以下の選択肢からご希望の業務をお選びいただくと、窓口行員へ正確に伝わります。',
+      directSend: '入力した原文のまま行員に提示する',
       chips: [
         { label: '口座開設', text: '新規に普通預金口座を開設し、デビットカードの発行をお願いしたいです。' },
         { label: '海外送金', text: '海外への送金（外国送金）手続きをお願いしたいです。' },
@@ -6313,6 +6346,9 @@ const initSmartQApp = async () => {
       voiceBtn: 'आवाज इनपुट (Voice)',
       listening: 'सुन्दैछ... कृपया नेपालीमा बोल्नुहोस्',
       langCode: 'ne-NP',
+      optionsTitle: 'तपाईंको निश्चित बैंकिङ काम छान्नुहोस्',
+      optionsDesc: 'कर्मचारीलाई स्पष्ट रूपमा बताउन तल दिइएको कामहरू मध्ये छान्नुहोस्।',
+      directSend: 'मैले लेखेको मूल पाठ जस्ताको तस्तै पठाउनुहोस्',
       chips: [
         { label: 'खाता खोल्ने', text: 'म नयाँ बैंक खाता खोल्न र डेबिट कार्ड लिन चाहन्छु।' },
         { label: 'विदेश पैसा पठाउने', text: 'म विदेशमा पैसा पठाउन चाहन्छु (अन्तर्राष्ट्रिय रेमिट्यान्स)।' },
@@ -6361,6 +6397,15 @@ const initSmartQApp = async () => {
       foreignerSttStatusText.textContent = pack.listening || 'Listening... Speak now';
     }
 
+    const aiOptionsTitle = document.getElementById('ai-options-title');
+    const aiOptionsDesc = document.getElementById('ai-options-desc');
+    if (aiOptionsTitle) {
+      aiOptionsTitle.textContent = pack.optionsTitle || 'Select your exact service';
+    }
+    if (aiOptionsDesc) {
+      aiOptionsDesc.textContent = pack.optionsDesc || 'Choose the specific banking service you need to show the teller clearly.';
+    }
+
     if (!foreignerChipContainer) return;
     foreignerChipContainer.innerHTML = '';
     pack.chips.forEach(item => {
@@ -6374,6 +6419,8 @@ const initSmartQApp = async () => {
         if (foreignerTextarea) {
           foreignerTextarea.value = item.text;
           if (foreignerCharCount) foreignerCharCount.textContent = item.text.length;
+          const optionsSec = document.getElementById('foreigner-ai-options-section');
+          if (optionsSec) optionsSec.classList.add('hidden');
         }
       });
       foreignerChipContainer.appendChild(btn);
@@ -6744,6 +6791,13 @@ const initSmartQApp = async () => {
     }
     if (tellerKrText) tellerKrText.innerHTML = `"${savedTranslatedKorean}"`;
     if (tellerOrigText) tellerOrigText.textContent = `"${savedOriginalText}"`;
+
+    const tellerSelectedTaskBar = document.getElementById('teller-selected-task-bar');
+    const tellerSelectedTaskName = document.getElementById('teller-selected-task-name');
+    if (tellerSelectedTaskBar && tellerSelectedTaskName) {
+      tellerSelectedTaskName.textContent = item.intentName || '고객 확인 완료 업무';
+      tellerSelectedTaskBar.classList.remove('hidden');
+    }
 
     if (foreignerModal) foreignerModal.classList.add('hidden');
     openTellerResultModal();
@@ -7561,6 +7615,19 @@ const initSmartQApp = async () => {
     if (aiIntentMetaTags) {
       aiIntentMetaTags.innerHTML = '<span class="ai-meta-tag" style="background: #eff6ff; color: #1d4ed8; border: 1px solid #bfdbfe; font-size: 11px; font-weight: 700; padding: 2px 7px; border-radius: 12px;"><i class="fa-solid fa-building-columns"></i> 창구 배정 준비중</span>';
     }
+
+    const foreignerAiOptionsSection = document.getElementById('foreigner-ai-options-section');
+    if (foreignerAiOptionsSection) {
+      foreignerAiOptionsSection.classList.add('hidden');
+    }
+    const tellerSelectedTaskBar = document.getElementById('teller-selected-task-bar');
+    if (tellerSelectedTaskBar) {
+      tellerSelectedTaskBar.classList.add('hidden');
+    }
+    const modalFooter = document.querySelector('.foreigner-modal-footer');
+    if (modalFooter) {
+      modalFooter.classList.remove('hidden');
+    }
   }
 
   // 모달 열기 및 닫기 함수
@@ -7708,14 +7775,973 @@ const initSmartQApp = async () => {
     });
   }
 
-  // 실시간 글자수 카운트
+  // --- [고도화] AI 세부 업무 선택지 다국어 번역 사전 (12개 국적 언어 지원) ---
+  const aiOptionTranslations = {
+    opt_remit_intl: {
+      emoji: '🌍',
+      krName: '해외 송금',
+      labels: {
+        en: 'International Remittance',
+        zh: '境外汇款',
+        vi: 'Chuyển tiền quốc tế',
+        uz: "Xalqaro pul jo'natish",
+        id: 'Remitansi Internasional',
+        tl: 'Padala sa Ibang Bansa',
+        my: 'နိုင်ငံခြားငွေလွှဲ',
+        th: 'โอนเงินต่างประเทศ',
+        km: 'ផ្ទេរប្រាក់ទៅក្រៅប្រទេស',
+        ru: 'Международный перевод',
+        ja: '海外送金',
+        ne: 'अन्तर्राष्ट्रिय रेमिट्यान्स'
+      },
+      descs: {
+        en: 'Send money overseas to a recipient bank account and register foreign exchange bank',
+        zh: '向境外收款人账户办理外币汇款及指定外汇银行登记',
+        vi: 'Chuyển ngoại tệ đến tài khoản người nhận ở nước ngoài và đăng ký ngân hàng ngoại hối',
+        uz: "Chet eldagi qabul qiluvchi hisobiga pul jo'natish va valyuta bankini ro'yxatdan o'tkazish",
+        id: 'Kirim uang ke luar negeri ke rekening penerima dan registrasi bank valas',
+        tl: 'Magpadala ng pera sa ibang bansa sa account ng tatanggap at magparehistro ng forex bank',
+        my: 'ပြည်ပသို့ ငွေလွှဲခြင်းနှင့် နိုင်ငံခြားငွေလဲလှယ်ရေးဘဏ် မှတ်ပုံတင်ခြင်း',
+        th: 'โอนเงินตราต่างประเทศไปยังบัญชีผู้รับในต่างประเทศและลงทะเบียนธนาคารแลกเปลี่ยนเงินตรา',
+        km: 'ផ្ទេររូបិយប័ណ្ណបរទេសទៅគណនីអ្នកទទួលនៅក្រៅប្រទេស និងចុះឈ្មោះធនាគារប្តូរប្រាក់',
+        ru: 'Отправка валюты за границу на счет получателя и регистрация банка валютных операций',
+        ja: '海外の受取人口座への外貨送金および外国為替取引指定銀行の登録',
+        ne: 'विदेशमा रहेको प्राप्तकर्ताको खातामा पैसा पठाउने र बैंक दर्ता गर्ने'
+      }
+    },
+    opt_remit_domestic: {
+      emoji: '🇰🇷',
+      krName: '국내 송금 및 계좌 이체',
+      labels: {
+        en: 'Domestic Transfer',
+        zh: '韩国境内转账',
+        vi: 'Chuyển khoản nội địa',
+        uz: "Ichki pul o'tkazmasi",
+        id: 'Transfer Domestik',
+        tl: 'Lokal na Pagpapadala',
+        my: 'ပြည်တွင်းငွေလွှဲ',
+        th: 'โอนเงินภายในประเทศ',
+        km: 'ផ្ទេរប្រាក់ក្នុងស្រុក',
+        ru: 'Внутренний перевод',
+        ja: '国内振込・送金',
+        ne: 'आन्तरिक बैंक ट्रान्सफर'
+      },
+      descs: {
+        en: 'Instantly transfer Korean Won to another bank or person in Korea',
+        zh: '向韩国其他银行或他人账户办理韩元即时转账',
+        vi: 'Chuyển tiền Won ngay lập tức đến ngân hàng khác hoặc người khác tại Hàn Quốc',
+        uz: "Koreyadagi boshqa bankka yoki shaxsga von pul o'tkazmasi",
+        id: 'Transfer instan mata uang Won ke bank lain atau rekening orang lain di Korea',
+        tl: 'Maglipat agad ng Korean Won sa ibang bangko o tao sa Korea',
+        my: 'ကိုရီးယားနိုင်ငံရှိ အခြားဘဏ် သို့မဟုတ် အခြားသူထံသို့ ဝမ်ငွေလွှဲခြင်း',
+        th: 'โอนเงินวอนเกาหลีไปยังธนาคารอื่นหรือบุคคลอื่นในเกาหลีได้ทันที',
+        km: 'ផ្ទេរប្រាក់វ៉ុនទៅធនាគារផ្សេង ឬអ្នកដទៃនៅកូរ៉េភ្លាមៗ',
+        ru: 'Мгновенный перевод вон на счет другого банка или человека в Корее',
+        ja: '韓国内の他行口座または他人名義口座へのウォン即時振込',
+        ne: 'कोरियामा अन्य बैंक वा व्यक्तिको खातामा तत्काल कोरियन वोन पठाउने'
+      }
+    },
+    opt_remit_cash: {
+      emoji: '💵',
+      krName: '창구 현금 송금 / 무통장 입금',
+      labels: {
+        en: 'Cash Remittance',
+        zh: '柜台现金汇款',
+        vi: 'Chuyển tiền mặt tại quầy',
+        uz: "Naqd pul jo'natish",
+        id: 'Remitansi Tunai',
+        tl: 'Cash Remittance sa Counter',
+        my: 'ကောင်တာမှ ငွေသားလွှဲခြင်း',
+        th: 'โอนเงินสดที่เคาน์เตอร์',
+        km: 'ផ្ទេរសាច់ប្រាក់នៅបញ្ជរ',
+        ru: 'Перевод наличными',
+        ja: '窓口現金送金',
+        ne: 'काउन्टर नगद रेमिट्यान्स'
+      },
+      descs: {
+        en: "Send cash directly to another person's account at the counter without a bankbook",
+        zh: '无需存折或银行卡，直接在柜台存入现金转账汇款',
+        vi: 'Chuyển tiền mặt trực tiếp vào tài khoản người khác tại quầy không cần sổ',
+        uz: "Daftarcha yoki kartasiz to'g'ridan-to'g'ri kassada naqd pul jo'natish",
+        id: 'Kirim uang tunai langsung ke rekening orang lain di teller tanpa buku tabungan',
+        tl: 'Magpadala ng cash sa account ng ibang tao sa counter kahit walang passbook',
+        my: 'ဘဏ်စာအုပ်မလိုဘဲ ကောင်တာတွင် အခြားသူ၏အကောင့်သို့ ငွေသားတိုက်ရိုက်လွှဲခြင်း',
+        th: 'โอนเงินสดเข้าบัญชีผู้อื่นโดยตรงที่เคาน์เตอร์โดยไม่ต้องใช้สมุดบัญชี',
+        km: 'ផ្ទេរសាច់ប្រាក់ដោយផ្ទាល់ទៅគណនីអ្នកដទៃនៅបញ្ជរដោយមិនបាច់ប្រើសៀវភៅធនាគារ',
+        ru: 'Отправка наличных прямо в кассе на чужой счет без сберкнижки',
+        ja: '通帳やカードがなくても窓口で現金にて他人名義口座へ直接振込',
+        ne: 'पासबुक बिना काउन्टरमा सिधै अरुको खातामा नगद पठाउने'
+      }
+    },
+    opt_acc_standard: {
+      emoji: '💳',
+      krName: '일반 입출금 통장 및 체크카드',
+      labels: {
+        en: 'Standard Account',
+        zh: '活期存折及借记卡',
+        vi: 'Tài khoản thường & Thẻ ghi nợ',
+        uz: 'Standart hisob va karta',
+        id: 'Rekening Tabungan & Kartu Debit',
+        tl: 'Standard Bank Account',
+        my: 'ရိုးရိုးငွေစာရင်းနှင့် ကတ်',
+        th: 'บัญชีเงินฝากและบัตรเดบิต',
+        km: 'គណនីធម្មតា និងកាតដេប៊ីត',
+        ru: 'Обычный счет и карта',
+        ja: '普通預金口座・デビットカード',
+        ne: 'साधारण खाता र कार्ड'
+      },
+      descs: {
+        en: 'Open a standard checking account with a debit card for daily life and salary',
+        zh: '开立用于日常生活和工资领取的普通活期存折并办理借记卡',
+        vi: 'Mở tài khoản thanh toán thông thường và làm thẻ ghi nợ để nhận lương',
+        uz: 'Kundalik hayot va maosh olish uchun standart hisob va debet karta ochish',
+        id: 'Buka rekening tabungan standar dengan kartu debit untuk gaji dan kebutuhan harian',
+        tl: 'Magbukas ng standard checking account na may kasamang debit card',
+        my: 'လစာနှင့် နေ့စဉ်သုံးအတွက် ရိုးရိုးငွေစာရင်းဖွင့်ပြီး Debit ကတ်ထုတ်ယူခြင်း',
+        th: 'เปิดบัญชีเงินฝากกระแสรายวันพร้อมบัตรเดบิตสำหรับการใช้ชีวิตประจำวันและเงินเดือน',
+        km: 'បើកគណនីចរន្តធម្មតាជាមួយកាតដេប៊ីតសម្រាប់ការរស់នៅ និងបើកប្រាក់ខែ',
+        ru: 'Открытие стандартного текущего счета с дебетовой картой для жизни и зарплаты',
+        ja: '日常生活や給与受取のための普通預金口座開設とデビットカード同時発行',
+        ne: 'दैनिक खर्च र तलबको लागि साधारण बैंक खाता र डेबिट कार्ड खोल्ने'
+      }
+    },
+    opt_acc_salary: {
+      emoji: '💼',
+      krName: '외국인 근로자 급여 통장',
+      labels: {
+        en: 'Worker Salary Account',
+        zh: '外籍劳工薪资专户',
+        vi: 'Tài khoản lương người lao động',
+        uz: 'Ish haqi hisob raqami',
+        id: 'Rekening Gaji Pekerja',
+        tl: 'Salary Account ng Manggagawa',
+        my: 'လစာငွေစာရင်း',
+        th: 'บัญชีเงินเดือนแรงงานต่างชาติ',
+        km: 'គណនីប្រាក់ខែពលករ',
+        ru: 'Зарплатный счет иностранца',
+        ja: '外国人労働者給与口座',
+        ne: 'कामदार तलब खाता'
+      },
+      descs: {
+        en: 'Account for foreign workers with overseas remittance fee waivers and exchange benefits',
+        zh: '专为外籍劳工打造，享受境外汇款手续费减免和优惠汇率的专属薪资账户',
+        vi: 'Tài khoản dành riêng cho người lao động với ưu đãi miễn phí chuyển tiền quốc tế',
+        uz: "Xorijiy ishchilar uchun xalqaro pul o'tkazmasi komissiyasiz ish haqi hisobi",
+        id: 'Rekening pekerja asing dengan bebas biaya remitansi dan diskon nilai tukar',
+        tl: 'Account para sa dayuhang manggagawa na may libreng remittance fee',
+        my: 'နိုင်ငံခြားငွေလွှဲခ ကင်းလွတ်ခွင့်ပါဝင်သော နိုင်ငံခြားသားအလုပ်သမား လစာငွေစာရင်း',
+        th: 'บัญชีเงินเดือนสำหรับแรงงานต่างชาติพร้อมสิทธิประโยชน์ฟรีค่าธรรมเนียมโอนเงิน',
+        km: 'គណនីប្រាក់ខែសម្រាប់ពលករបរទេសដោយឥតគិតថ្លៃសេវាផ្ទេរប្រាក់ទៅក្រៅប្រទេស',
+        ru: 'Зарплатный счет для иностранных рабочих со льготами на международные переводы',
+        ja: '給与振込で海外送金手数料免除や為替優遇特典が受けられる外国人労働者専用口座',
+        ne: 'विदेशमा पैसा पठाउँदा शुल्क छुट हुने कामदार विशेष तलब खाता'
+      }
+    },
+    opt_acc_savings: {
+      emoji: '📈',
+      krName: '목돈 모으기 적금 / 정기예금',
+      labels: {
+        en: 'Savings & Deposit',
+        zh: '储蓄定存及定期储蓄',
+        vi: 'Tiết kiệm tích lũy / Định kỳ',
+        uz: "Jamg'arma va omonat",
+        id: 'Tabungan & Deposito',
+        tl: 'Savings & Time Deposit',
+        my: 'စုငွေစာရင်း',
+        th: 'เงินฝากประจำและออมทรัพย์',
+        km: 'ប្រាក់បញ្ញើសន្សំ',
+        ru: 'Сберегательный вклад',
+        ja: '定期預金・積立貯金',
+        ne: 'बचत तथा मुद्दती खाता'
+      },
+      descs: {
+        en: 'High-interest savings account for foreign customers to build wealth',
+        zh: '专为外籍客户提供的高利率特惠定期存款及理财储蓄产品',
+        vi: 'Gói tiết kiệm lãi suất ưu đãi dành cho người nước ngoài để tích lũy tài chính',
+        uz: "Chet elliklar uchun yuqori foizli maxsus jamg'arma omonati",
+        id: 'Produk tabungan bunga tinggi khusus nasabah asing untuk mengumpulkan dana',
+        tl: 'Mataas na interes na savings para sa mga dayuhang kustomer',
+        my: 'အတိုးနှုန်းမြင့်မားသော နိုင်ငံခြားသားသီးသန့် စုငွေစာရင်း',
+        th: 'บัญชีเงินฝากดอกเบี้ยพิเศษสำหรับชาวต่างชาติเพื่อสะสมเงินก้อน',
+        km: 'គណនីសន្សំការប្រាក់ខ្ពស់សម្រាប់អតិថិជនបរទេសដើម្បីបង្កើនទ្រព្យសម្បត្តិ',
+        ru: 'Выгодный вклад с повышенной процентной ставкой для иностранцев',
+        ja: '外国人優遇金利が適用されるまとまった資産形成のための定期預金・積立',
+        ne: 'विदेशीहरूको लागि उच्च ब्याज पाइने बचत तथा मुद्दती निक्षेप'
+      }
+    },
+    opt_card_issue: {
+      emoji: '💳',
+      krName: '체크카드 신규 발급 / 갱신',
+      labels: {
+        en: 'Debit Card Issuance',
+        zh: '办理/补换借记卡',
+        vi: 'Phát hành / Đổi thẻ ATM',
+        uz: 'Debet karta ochish / yangilash',
+        id: 'Penerbitan Kartu Debit',
+        tl: 'Pag-isyu ng Debit Card',
+        my: 'Debit ကတ်အသစ်ထုတ်ခြင်း',
+        th: 'ออกบัตรเดบิตใหม่ / ต่ออายุ',
+        km: 'ធ្វើកាតដេប៊ីតថ្មី',
+        ru: 'Выпуск дебетовой карты',
+        ja: 'デビットカード新規・再発行',
+        ne: 'डेबिट कार्ड जारी गर्ने'
+      },
+      descs: {
+        en: 'Issue or renew debit card with domestic payment and public transit functions',
+        zh: '办理或换发具备韩国境内刷卡支付及公共交通卡功能的借记卡',
+        vi: 'Làm mới hoặc cấp lại thẻ ghi nợ có tính năng thanh toán và thẻ giao thông',
+        uz: "To'lovlar va jamoat transporti uchun debet karta rasmiylashtirish",
+        id: 'Penerbitan kartu debit baru/perpanjangan untuk pembayaran dan transportasi',
+        tl: 'Pag-isyu o pag-renew ng debit card para sa bayad at pampublikong sakay',
+        my: 'ငွေပေးချေခြင်းနှင့် သယ်ယူပို့ဆောင်ရေးသုံး Debit ကတ်အသစ်ထုတ်ခြင်း',
+        th: 'ออกบัตรเดบิตใหม่หรือต่ออายุเพื่อใช้ชำระเงินและขึ้นรถสาธารณะ',
+        km: 'ធ្វើកាតដេប៊ីតថ្មី ឬបន្តសុពលភាពសម្រាប់ទូទាត់ និងជិះយានយន្តសាធារណៈ',
+        ru: 'Выпуск новой или замена карты с функцией оплаты и проездного',
+        ja: '国内決済および後払い交通カード機能付きデビットカードの新規・更新発行',
+        ne: 'भुक्तानी र यातायात कार्ड सुविधा भएको नयाँ डेबिट कार्ड जारी गर्ने'
+      }
+    },
+    opt_card_lost: {
+      emoji: '🚨',
+      krName: '카드 분실 신고 및 거래 정지',
+      labels: {
+        en: 'Lost Card & Freeze',
+        zh: '银行卡挂失及冻结',
+        vi: 'Báo mất thẻ & Khóa giao dịch',
+        uz: 'Karta yo\'qotish va bloklash',
+        id: 'Lapor Kartu Hilang & Blokir',
+        tl: 'Pag-ulat ng Nawalang Card',
+        my: 'ကတ်ပျောက်ဆုံးမှုတိုင်ကြားခြင်း',
+        th: 'แจ้งบัตรหายและระงับบัตร',
+        km: 'រាយការណ៍កាតបាត់ និងផ្អាក',
+        ru: 'Блокировка утерянной карты',
+        ja: 'カード紛失届・利用停止',
+        ne: 'कार्ड हराएको रिपोर्ट र रोक्का'
+      },
+      descs: {
+        en: 'Immediately freeze lost or stolen card to stop withdrawals and request reissuance',
+        zh: '紧急挂失遗失或被盗银行卡，即刻停止出金及刷卡并申请补发新卡',
+        vi: 'Khóa ngay thẻ bị mất/đánh cắp để ngăn chặn rút tiền và làm lại thẻ mới',
+        uz: "Yo'qolgan kartani zudlik bilan bloklash va yangisini rasmiylashtirish",
+        id: 'Segera blokir kartu yang hilang/dicuri untuk mencegah penarikan uang',
+        tl: 'Agarang i-freeze ang nawalang card upang pigilan ang pag-withdraw',
+        my: 'ငွေထုတ်ယူခြင်းတားဆီးရန် ပျောက်ဆုံးကတ်အား ချက်ချင်းပိတ်ပြီး အသစ်လျှောက်ခြင်း',
+        th: 'ระงับบัตรที่สูญหายหรือถูกขโมยทันทีเพื่อป้องกันการถอนเงินและออกบัตรใหม่',
+        km: 'ផ្អាកកាតដែលបាត់ភ្លាមៗដើម្បីបញ្ឈប់ការដកប្រាក់ និងស្នើសុំធ្វើកាតថ្មី',
+        ru: 'Срочная блокировка утерянной карты для защиты денег и заказ новой',
+        ja: '紛失または盗難に遭ったカードの出金・決済を即時停止し新規再発行を申請',
+        ne: 'पैसा झिक्नबाट रोक्न हराएको कार्ड तुरुन्त रोक्का गरी नयाँ कार्ड लिने'
+      }
+    },
+    opt_card_pin: {
+      emoji: '🔢',
+      krName: '비밀번호 오류 해제 및 재설정',
+      labels: {
+        en: 'Reset PIN',
+        zh: '密码解锁及重置',
+        vi: 'Mở khóa & Đặt lại mã PIN',
+        uz: 'PIN kodni tiklash',
+        id: 'Buka Kunci & Reset PIN',
+        tl: 'Pag-reset ng PIN',
+        my: 'PIN ကုဒ်ပြန်လည်သတ်မှတ်ခြင်း',
+        th: 'ปลดล็อคและรีเซ็ตรหัส PIN',
+        km: 'ដោះសោរ និងកំណត់កូដ PIN ឡើងវិញ',
+        ru: 'Сброс ПИН-кода',
+        ja: '暗証番号ロック解除・再設定',
+        ne: 'PIN रिसेट गर्ने'
+      },
+      descs: {
+        en: 'Unlock card blocked by incorrect PIN attempts and register a new 4-digit PIN',
+        zh: '解除因密码连续输错而锁定的状态，并重新设置4位数新密码',
+        vi: 'Mở khóa thẻ bị khóa do nhập sai mật khẩu và thiết lập mã PIN 4 số mới',
+        uz: "Noto'g'ri PIN sababli bloklangan kartani ochish va yangi kod o'rnatish",
+        id: 'Buka blokir kartu akibat salah PIN dan atur ulang 4 digit PIN baru',
+        tl: 'I-unlock ang na-block na card dahil sa maling PIN at magtakda ng bago',
+        my: 'PIN အမှားကြောင့် သော့ခတ်ထားသောကတ်အား ပြန်ဖွင့်ပြီး နံပါတ်အသစ် သတ်မှတ်ခြင်း',
+        th: 'ปลดล็อคบัตรที่ถูกระงับเนื่องจากใส่รหัสผิดและตั้งรหัส PIN 4 หลักใหม่',
+        km: 'ដោះសោកាតដែលត្រូវបានចាក់សោដោយសារលេខកូដខុស និងកំណត់លេខកូដ ៤ ខ្ទង់ថ្មី',
+        ru: 'Разблокировка карты после ошибок ввода ПИН-кода и установка нового',
+        ja: '暗証番号の相違でロックされた状態を電算解除し新パスワード4桁を登録',
+        ne: 'PIN गल्ती भएर बन्द भएको कार्ड खुलाउने र नयाँ ४ अंकको PIN सेट गर्ने'
+      }
+    },
+    opt_fx_to_krw: {
+      emoji: '💱',
+      krName: '외화 ➔ 원화 환전',
+      labels: {
+        en: 'Foreign Currency to KRW',
+        zh: '外币兑换韩元',
+        vi: 'Đổi ngoại tệ sang Won',
+        uz: 'Valyutani vonga almashtirish',
+        id: 'Tukar Valas ke KRW',
+        tl: 'Foreign Currency sa KRW',
+        my: 'နိုင်ငံခြားငွေမှ ဝမ်သို့ လဲလှယ်ခြင်း',
+        th: 'แลกเงินตราต่างประเทศเป็นวอน',
+        km: 'ប្តូររូបិយប័ណ្ណបរទេសទៅជាប្រាក់វ៉ុន',
+        ru: 'Обмен валюты на воны',
+        ja: '外貨からウォンへの両替',
+        ne: 'विदेशी मुद्राबाट कोरियन वोनमा साट्ने'
+      },
+      descs: {
+        en: 'Exchange foreign currency cash (USD, etc.) to Korean Won at the current exchange rate',
+        zh: '将持有的美元、人民币、越南盾等外币现金按当日汇率兑换为韩元现金',
+        vi: 'Đổi tiền mặt ngoại tệ (USD, v.v.) sang tiền Won theo tỷ giá hiện hành',
+        uz: "Qo'lingizdagi xorijiy valyutani (USD va boshqalar) koreys voniga almashtirish",
+        id: 'Tukar uang tunai valas (USD, dll) ke Won Korea dengan kurs hari ini',
+        tl: 'Palitan ang hawak na foreign currency cash (USD, atbp.) sa Korean Won',
+        my: 'လက်ဝယ်ရှိ နိုင်ငံခြားငွေသားများကို ယနေ့ပေါက်ဈေးဖြင့် ဝမ်သို့ လဲလှယ်ခြင်း',
+        th: 'แลกเปลี่ยนเงินสดต่างประเทศ (USD ฯลฯ) เป็นเงินวอนเกาหลีตามอัตราแลกเปลี่ยนปัจจุบัน',
+        km: 'ប្តូរសាច់ប្រាក់រូបិយប័ណ្ណបរទេស (USD...) ទៅជាប្រាក់វ៉ុនតាមអត្រាប្តូរប្រាក់បច្ចុប្បន្ន',
+        ru: 'Обмен наличной иностранной валюты (доллары и др.) на воны по курсу дня',
+        ja: '所持している外貨现金を当日公示レートにて韓国ウォン現金へ両替',
+        ne: 'आफूसँग भएको विदेशी मुद्रा (डलर आदि) लाई आजको दर अनुसार वोनमा साट्ने'
+      }
+    },
+    opt_fx_to_foreign: {
+      emoji: '🏦',
+      krName: '원화 ➔ 외화 환전',
+      labels: {
+        en: 'KRW to Foreign Currency',
+        zh: '韩元兑换外币',
+        vi: 'Đổi Won sang ngoại tệ',
+        uz: 'Vondan valyuta sotib olish',
+        id: 'Tukar KRW ke Valas',
+        tl: 'KRW sa Foreign Currency',
+        my: 'ဝမ်မှ နိုင်ငံခြားငွေသို့ လဲလှယ်ခြင်း',
+        th: 'แลกเงินวอนเป็นเงินตราต่างประเทศ',
+        km: 'ប្តូរប្រាក់វ៉ុនទៅជារូបិយប័ណ្ណបរទេស',
+        ru: 'Покупка иностранной валюты',
+        ja: 'ウォンから外貨への両替',
+        ne: 'कोरियन वोनबाट विदेशी मुद्रा साट्ने'
+      },
+      descs: {
+        en: 'Buy foreign currency cash (USD, EUR, etc.) with Korean Won',
+        zh: '使用韩元现金或账户余额兑换购买美元、欧元等外币现钞',
+        vi: 'Mua tiền mặt ngoại tệ (USD, EUR, v.v.) bằng tiền Won Hàn Quốc',
+        uz: 'Koreys voniga xorijiy valyuta (USD, EUR va boshqalar) naqd pulini sotib olish',
+        id: 'Beli uang tunai valas (USD, EUR, dll) menggunakan uang Won Korea',
+        tl: 'Bumili ng foreign currency cash (USD, EUR, atbp.) gamit ang Korean Won',
+        my: 'ကိုရီးယားဝမ်ငွေဖြင့် ဒေါ်လာ၊ ယူရို အစရှိသော နိုင်ငံခြားငွေသား ဝယ်ယူခြင်း',
+        th: 'ซื้อเงินสดสกุลเงินต่างประเทศ (USD, EUR ฯลฯ) ด้วยเงินวอนเกาหลี',
+        km: 'ទិញសាច់ប្រាក់រូបិយប័ណ្ណបរទេស (USD, EUR...) ដោយប្រើប្រាក់វ៉ុនកូរ៉េ',
+        ru: 'Покупка наличной иностранной валюты (доллары, евро) за корейские воны',
+        ja: '韓国ウォン現金または口座出金により米ドル・ユーロ等の外貨現札を購入',
+        ne: 'कोरियन वोनबाट डलर, यूरो जस्ता विदेशी मुद्रा नगद किन्ने'
+      }
+    },
+    opt_fx_deposit: {
+      emoji: '🌐',
+      krName: '외화 통장 입금 및 예치',
+      labels: {
+        en: 'Foreign Currency Deposit',
+        zh: '外币账户存款及储蓄',
+        vi: 'Nạp tiền vào tài khoản ngoại tệ',
+        uz: "Valyuta hisobiga pul qo'yish",
+        id: 'Setoran Rekening Valas',
+        tl: 'Deposito sa Foreign Currency Account',
+        my: 'နိုင်ငံခြားငွေစာရင်းသို့ ငွေသွင်းခြင်း',
+        th: 'ฝากเงินเข้าบัญชีเงินตราต่างประเทศ',
+        km: 'ដាក់ប្រាក់ក្នុងគណនីរូបិយប័ណ្ណបរទេស',
+        ru: 'Депозит на валютный счет',
+        ja: '外貨預金口座への預入れ',
+        ne: 'विदेशी मुद्रा खातामा जम्मा'
+      },
+      descs: {
+        en: 'Deposit and keep foreign money safely in your foreign currency account',
+        zh: '将所持外币安全存入您名下的外币专用存折账户中保管',
+        vi: 'Nạp và lưu giữ ngoại tệ an toàn vào tài khoản tiền gửi ngoại tệ của bạn',
+        uz: "Xorijiy valyutani o'zingizning valyuta hisobingizga xavfsiz saqlash",
+        id: 'Setor dan simpan mata uang asing dengan aman di rekening valas Anda',
+        tl: 'Magdeposito ng foreign currency nang ligtas sa iyong account',
+        my: 'နိုင်ငံခြားငွေကို နိုင်ငံခြားငွေစာရင်းထဲသို့ လုံခြုံစွာ ထည့်သွင်းသိမ်းဆည်းခြင်း',
+        th: 'ฝากเงินตราต่างประเทศเข้าบัญชีเงินตราต่างประเทศอย่างปลอดภัย',
+        km: 'ដាក់ប្រាក់រូបិយប័ណ្ណបរទេសក្នុងគណនីរូបិយប័ណ្ណបរទេសរបស់អ្នកដោយសុវត្ថិភាព',
+        ru: 'Внесение и безопасное хранение валюты на вашем валютном счете',
+        ja: '所持している外貨をご自身の外貨預金通帳口座へ安全に入金・預入れ',
+        ne: 'विदेशी मुद्रालाई आफ्नो विदेशी मुद्रा बैंक खातामा सुरक्षित जम्मा गर्ने'
+      }
+    },
+    opt_cash_deposit: {
+      emoji: '📥',
+      krName: '창구 현금 입금',
+      labels: {
+        en: 'Cash Deposit',
+        zh: '柜台现金存款',
+        vi: 'Nạp tiền mặt tại quầy',
+        uz: "Naqd pul qo'yish",
+        id: 'Setor Tunai di Teller',
+        tl: 'Cash Deposit sa Counter',
+        my: 'ကောင်တာမှ ငွေသားသွင်းခြင်း',
+        th: 'ฝากเงินสดที่เคาน์เตอร์',
+        km: 'ដាក់សាច់ប្រាក់នៅបញ្ជរ',
+        ru: 'Внесение наличных',
+        ja: '窓口現金入金',
+        ne: 'काउन्टरमा नगद जम्मा'
+      },
+      descs: {
+        en: 'Deposit cash directly into your bank account or a designated account',
+        zh: '在柜台将现金直接存入本人账户或他人指定账户',
+        vi: 'Nạp tiền mặt trực tiếp vào tài khoản ngân hàng của bạn hoặc tài khoản chỉ định',
+        uz: "Kassada to'g'ridan-to'g'ri o'z hisobingizga naqd pul qo'yish",
+        id: 'Setor uang tunai langsung ke rekening Anda atau rekening tujuan di teller',
+        tl: 'Magdeposito ng cash sa counter papunta sa iyong account',
+        my: 'ကောင်တာတွင် ကိုယ်ပိုင်အကောင့် သို့မဟုတ် အခြားအကောင့်သို့ ငွေသားသွင်းခြင်း',
+        th: 'ฝากเงินสดเข้าบัญชีของคุณหรือบัญชีที่กำหนดโดยตรงที่เคาน์เตอร์',
+        km: 'ដាក់សាច់ប្រាក់ដោយផ្ទាល់ទៅក្នុងគណនីរបស់អ្នកនៅបញ្ជរធនាគារ',
+        ru: 'Внесение наличных денег в кассе на свой или чужой счет',
+        ja: '窓口にて現金を本人名義口座または指定口座へ直接入金',
+        ne: 'काउन्टरमा सिधै आफ्नो वा तोकिएको खातामा नगद जम्मा गर्ने'
+      }
+    },
+    opt_cash_withdraw: {
+      emoji: '📤',
+      krName: '창구 현금 출금',
+      labels: {
+        en: 'Cash Withdrawal',
+        zh: '柜台现金取款',
+        vi: 'Rút tiền mặt tại quầy',
+        uz: 'Naqd pul yechish',
+        id: 'Tarik Tunai di Teller',
+        tl: 'Cash Withdrawal sa Counter',
+        my: 'ကောင်တာမှ ငွေသားထုတ်ခြင်း',
+        th: 'ถอนเงินสดที่เคาน์เตอร์',
+        km: 'ដកសាច់ប្រាក់នៅបញ្ជរ',
+        ru: 'Снятие наличных',
+        ja: '窓口現金出金',
+        ne: 'काउन्टरबाट नगद झिक्ने'
+      },
+      descs: {
+        en: 'Withdraw cash from your bank account at the counter using passbook or card',
+        zh: '使用存折或银行卡在柜台办理大额或日常现金取款',
+        vi: 'Rút tiền mặt từ tài khoản ngân hàng tại quầy bằng sổ hoặc thẻ',
+        uz: 'Daftarcha yoki karta orqali kassadan naqd pul yechish',
+        id: 'Tarik uang tunai dari rekening Anda di teller menggunakan buku atau kartu',
+        tl: 'Mag-withdraw ng cash sa counter gamit ang passbook o card',
+        my: 'ဘဏ်စာအုပ် သို့မဟုတ် ကတ်ဖြင့် ကောင်တာမှ ငွေသားထုတ်ယူခြင်း',
+        th: 'ถอนเงินสดจากบัญชีของคุณที่เคาน์เตอร์โดยใช้สมุดบัญชีหรือบัตร',
+        km: 'ដកសាច់ប្រាក់ពីគណនីនៅបញ្ជរដោយប្រើសៀវភៅធនាគារ ឬកាត',
+        ru: 'Снятие наличных денег со счета в кассе по сберкнижке или карте',
+        ja: '通帳またはキャッシュカードを用いて窓口にて現金を引出し',
+        ne: 'पासबुक वा कार्ड प्रयोग गरी काउन्टरबाट नगद झिक्ने'
+      }
+    },
+    opt_cash_passbook: {
+      emoji: '🧾',
+      krName: '통장 정리 및 내역 조회',
+      labels: {
+        en: 'Passbook Update',
+        zh: '存折补登及流水查询',
+        vi: 'Cập nhật sổ & Sao kê',
+        uz: 'Omonat daftarchasini yangilash',
+        id: 'Cetak Buku Tabungan & Mutasi',
+        tl: 'Update ng Passbook & Statement',
+        my: 'ငွေစာရင်းစာအုပ်အပ်ဒိတ်လုပ်ခြင်း',
+        th: 'ปรับสมุดบัญชีและขอรายการเดินบัญชี',
+        km: 'អាប់ដេតសៀវភៅធនាគារ',
+        ru: 'Обновление сберкнижки и выписка',
+        ja: '通帳記帳・取引明細',
+        ne: 'पासबुक अपडेट र स्टेटमेन्ट'
+      },
+      descs: {
+        en: 'Print transaction records in passbook or issue an account transaction statement',
+        zh: '补打存折内交易明细记录，或打印开立账户交易流水证明书',
+        vi: 'In lịch sử giao dịch vào sổ tiết kiệm hoặc in sao kê tài khoản ngân hàng',
+        uz: "Daftarchadagi yozuvlarni chop etish yoki hisob ko'chirmasini olish",
+        id: 'Cetak mutasi transaksi di buku tabungan atau cetak rekening koran',
+        tl: 'I-print ang rekord ng transaksyon sa passbook o humingi ng statement',
+        my: 'စာအုပ်တွင် မှတ်တမ်းရိုက်နှိပ်ခြင်း သို့မဟုတ် စာရင်းထုတ်ယူခြင်း',
+        th: 'พิมพ์รายการธุรกรรมลงในสมุดบัญชีหรือขอใบแจ้งยอดบัญชี',
+        km: 'បោះពុម្ពកំណត់ត្រាប្រតិបត្តិការក្នុងសៀវភៅ ឬចេញរបាយការណ៍គណនី',
+        ru: 'Печать операций в сберкнижке или получение выписки по счету',
+        ja: '通帳への未記帳取引の印字整理および入出金取引明細書の発行',
+        ne: 'पासबुकमा कारोबार विवरण प्रिन्ट गर्ने वा स्टेटमेन्ट निकाल्ने'
+      }
+    }
+  };
+
+  // 헬퍼: 언어별 선택지 객체 빌더
+  function createClarificationOption(optId, icon, colorClass, tag, detailTag, promptText, badge, langKey) {
+    const trans = aiOptionTranslations[optId] || {};
+    const targetLang = langKey || currentForeignerLang || 'en';
+    const label = (trans.labels && trans.labels[targetLang]) ? trans.labels[targetLang] : (trans.labels?.en || '');
+    const desc = (trans.descs && trans.descs[targetLang]) ? trans.descs[targetLang] : (trans.descs?.en || '');
+    const emoji = trans.emoji || '';
+    const krName = trans.krName || '';
+
+    const title = `${emoji} ${krName} (${label})`;
+
+    return {
+      id: optId,
+      icon,
+      colorClass,
+      tag,
+      detailTag,
+      title,
+      desc,
+      promptText,
+      badge: badge || krName
+    };
+  }
+
+  // --- [고도화] AI 세부 업무 선택지 생성 엔진 (Smart Service Clarification Engine) ---
+  function generateForeignerServiceOptions(text, langKey) {
+    const raw = (text || '').trim();
+    const lower = raw.toLowerCase();
+    const currentLang = langKey || currentForeignerLang || 'en';
+
+    // 키워드 카테고리 매칭 (12개 언어 지원)
+    const isRemit = lower.includes('send') || lower.includes('remit') || lower.includes('transfer') ||
+      lower.includes('wire') || lower.includes('gửi') || lower.includes('chuyển') ||
+      lower.includes('jo\'nat') || lower.includes('o\'tkaz') || lower.includes('padala') ||
+      lower.includes('kirim') || lower.includes('汇款') || lower.includes('转账') ||
+      lower.includes('โอนเงิน') || lower.includes('송금') || lower.includes('이체') ||
+      lower.includes('보내') || lower.includes('부치') || lower.includes('деньги') ||
+      lower.includes('перевод') || lower.includes('送金');
+
+    const isAccount = lower.includes('account') || lower.includes('open') || lower.includes('bankbook') ||
+      lower.includes('passbook') || lower.includes('tài khoản') || lower.includes('mở') ||
+      lower.includes('hisob') || lower.includes('rekening') || lower.includes('开户') ||
+      lower.includes('口座') || lower.includes('계좌') || lower.includes('통장') ||
+      lower.includes('만들') || lower.includes('개설') || lower.includes('счет') ||
+      lower.includes('открыть') || lower.includes('खाता');
+
+    const isCardOrPin = lower.includes('card') || lower.includes('debit') || lower.includes('lost') ||
+      lower.includes('stolen') || lower.includes('pin') || lower.includes('password') ||
+      lower.includes('thẻ') || lower.includes('mất') || lower.includes('karta') ||
+      lower.includes('kartu') || lower.includes('挂失') || lower.includes('密码') ||
+      lower.includes('비밀번호') || lower.includes('비번') || lower.includes('카드') ||
+      lower.includes('분실') || lower.includes('정지') || lower.includes('오류') ||
+      lower.includes('пароль') || lower.includes('kard') || lower.includes('card');
+
+    const isExchange = lower.includes('exchange') || lower.includes('currency') || lower.includes('dollar') ||
+      lower.includes('usd') || lower.includes('đổi tiền') || lower.includes('valyuta') ||
+      lower.includes('valas') || lower.includes('换汇') || lower.includes('兑换') ||
+      lower.includes('両替') || lower.includes('환전') || lower.includes('외화') ||
+      lower.includes('달러') || lower.includes('바꾸') || lower.includes('обмен') ||
+      lower.includes('валюта') || lower.includes('मुद्रा');
+
+    const isCash = lower.includes('deposit') || lower.includes('withdraw') || lower.includes('cash') ||
+      lower.includes('nạp tiền') || lower.includes('rút tiền') || lower.includes('pul qo\'yish') ||
+      lower.includes('pul yechish') || lower.includes('存钱') || lower.includes('取钱') ||
+      lower.includes('현금') || lower.includes('입금') || lower.includes('출금') ||
+      lower.includes('돈 넣') || lower.includes('돈 찾') || lower.includes('돈 뽑') ||
+      lower.includes('снять') || lower.includes('наличные');
+
+    // 1. 송금/이체 업무 선택지
+    if (isRemit) {
+      return [
+        createClarificationOption(
+          'opt_remit_intl',
+          'fa-solid fa-earth-americas',
+          'ai-option-icon-blue',
+          '외환 / 해외송금 창구',
+          '수취인 계좌 / SWIFT',
+          '해외 송금을 신청하고자 합니다. 해외 수취인 계좌 및 SWIFT 코드를 확인해 주세요.',
+          '해외 송금',
+          currentLang
+        ),
+        createClarificationOption(
+          'opt_remit_domestic',
+          'fa-solid fa-money-bill-transfer',
+          'ai-option-icon-emerald',
+          '빠른창구 / 일반예금',
+          '국내 타행 이체 / 원화',
+          '국내 은행 계좌 이체 및 국내 원화 송금을 하고자 합니다.',
+          '국내 송금',
+          currentLang
+        ),
+        createClarificationOption(
+          'opt_remit_cash',
+          'fa-solid fa-hand-holding-dollar',
+          'ai-option-icon-amber',
+          '입출금 / 빠른창구',
+          '창구 무통장 현금송금',
+          '창구에서 현금으로 타인 계좌에 무통장 송금을 하고자 합니다.',
+          '현금 송금',
+          currentLang
+        )
+      ];
+    }
+
+    // 2. 계좌 개설 / 통장 업무 선택지
+    if (isAccount) {
+      return [
+        createClarificationOption(
+          'opt_acc_standard',
+          'fa-solid fa-id-card',
+          'ai-option-icon-blue',
+          '예금 / 신규창구',
+          '외국인등록증 필수',
+          '외국인 신규 일반 입출금 통장 개설 및 체크카드 신규 발급을 신청합니다.',
+          '통장 신규개설',
+          currentLang
+        ),
+        createClarificationOption(
+          'opt_acc_salary',
+          'fa-solid fa-briefcase',
+          'ai-option-icon-emerald',
+          '급여 / 신규창구',
+          '재직/근로계약서 지참',
+          '외국인 근로자 전용 급여 통장 개설과 송금 수수료 우대 혜택을 신청합니다.',
+          '근로자 급여통장',
+          currentLang
+        ),
+        createClarificationOption(
+          'opt_acc_savings',
+          'fa-solid fa-piggy-bank',
+          'ai-option-icon-purple',
+          '예금 / 자산관리',
+          '외국인 우대금리',
+          '목돈 마련을 위한 외국인 우대금리 정기예금 및 적금 가입을 상담하고자 합니다.',
+          '예·적금 가입',
+          currentLang
+        )
+      ];
+    }
+
+    // 3. 카드 / 분실 / PIN 업무 선택지
+    if (isCardOrPin) {
+      return [
+        createClarificationOption(
+          'opt_card_issue',
+          'fa-solid fa-credit-card',
+          'ai-option-icon-blue',
+          '예금 / 카드창구',
+          '후불교통 / Mastercard',
+          '체크카드 신규 발급 또는 기간 만료에 따른 재발급을 신청합니다.',
+          '체크카드 발급',
+          currentLang
+        ),
+        createClarificationOption(
+          'opt_card_lost',
+          'fa-solid fa-triangle-exclamation',
+          'ai-option-icon-amber',
+          '긴급 / 사고신고',
+          '즉시 출금차단 긴급처리',
+          '카드를 분실하여 즉시 사고 등록 및 출금 차단, 신규 재발급을 요청합니다.',
+          '카드 분실정지',
+          currentLang
+        ),
+        createClarificationOption(
+          'opt_card_pin',
+          'fa-solid fa-key',
+          'ai-option-icon-purple',
+          '빠른창구 / 상담',
+          '키패드 4자리 직접설정',
+          '카드 비밀번호 오류로 잠긴 상태를 전산 해제하고 새로 재설정하고자 합니다.',
+          '비밀번호 재설정',
+          currentLang
+        )
+      ];
+    }
+
+    // 4. 환전 업무 선택지
+    if (isExchange) {
+      return [
+        createClarificationOption(
+          'opt_fx_to_krw',
+          'fa-solid fa-arrow-right-arrow-left',
+          'ai-option-icon-blue',
+          '외환 / 환전창구',
+          '당일 고시환율 적용',
+          '가지고 있는 외화를 한국 원화(KRW) 현금으로 환전하고자 합니다.',
+          '외화 환전',
+          currentLang
+        ),
+        createClarificationOption(
+          'opt_fx_to_foreign',
+          'fa-solid fa-coins',
+          'ai-option-icon-emerald',
+          '외환 / 환전창구',
+          '주요 통화 우대환율',
+          '한국 원화를 달러나 기타 외국 통화 현찰로 환전하고자 합니다.',
+          '원화➔외화 환전',
+          currentLang
+        ),
+        createClarificationOption(
+          'opt_fx_deposit',
+          'fa-solid fa-vault',
+          'ai-option-icon-purple',
+          '외환창구',
+          '외화통장 예치',
+          '외화 예금통장에 외화를 입금하여 보관하고자 합니다.',
+          '외화통장 입금',
+          currentLang
+        )
+      ];
+    }
+
+    // 5. 현금 입출금 업무 선택지
+    if (isCash) {
+      return [
+        createClarificationOption(
+          'opt_cash_deposit',
+          'fa-solid fa-money-bill-1-wave',
+          'ai-option-icon-blue',
+          '빠른창구 / 입출금',
+          '창구 현금 입금',
+          '창구를 통해 현금을 계좌에 입금하고자 합니다.',
+          '현금 입금',
+          currentLang
+        ),
+        createClarificationOption(
+          'opt_cash_withdraw',
+          'fa-solid fa-money-bill-wheat',
+          'ai-option-icon-emerald',
+          '빠른창구 / 입출금',
+          '출금전표 및 신분증',
+          '통장 또는 체크카드로 창구에서 현금을 출금하고자 합니다.',
+          '현금 출금',
+          currentLang
+        ),
+        createClarificationOption(
+          'opt_cash_passbook',
+          'fa-solid fa-receipt',
+          'ai-option-icon-purple',
+          '제증명 / 창구',
+          '통장 인쇄 및 내역서',
+          '통장 정리 및 최근 거래내역 조회를 신청하고자 합니다.',
+          '통장 정리',
+          currentLang
+        )
+      ];
+    }
+
+    // 6. 일반 문의 / 기타 경우 기본 대표 업무 3종 추천
+    return [
+      createClarificationOption(
+        'opt_remit_intl',
+        'fa-solid fa-earth-americas',
+        'ai-option-icon-blue',
+        '외환 / 해외송금 창구',
+        '외화 송금 / SWIFT',
+        '해외 송금을 신청하고자 합니다. 해외 수취인 계좌 및 SWIFT 코드를 확인해 주세요.',
+        '해외 송금',
+        currentLang
+      ),
+      createClarificationOption(
+        'opt_acc_standard',
+        'fa-solid fa-id-card',
+        'ai-option-icon-emerald',
+        '예금 / 신규창구',
+        '외국인등록증 필수',
+        '외국인 신규 일반 입출금 통장 개설 및 체크카드 신규 발급을 신청합니다.',
+        '통장 개설',
+        currentLang
+      ),
+      createClarificationOption(
+        'opt_card_issue',
+        'fa-solid fa-credit-card',
+        'ai-option-icon-purple',
+        '예금 / 카드창구',
+        '체크카드 발급',
+        '체크카드 신규 발급 또는 기간 만료에 따른 재발급을 신청합니다.',
+        '카드 발급',
+        currentLang
+      )
+    ];
+  }
+
+  // AI 선택지 동적 렌더링 함수
+  function renderForeignerAiOptions(taskText, langKey) {
+    const optionsSection = document.getElementById('foreigner-ai-options-section');
+    const optionsList = document.getElementById('foreigner-options-list');
+    if (!optionsSection || !optionsList) return;
+
+    const options = generateForeignerServiceOptions(taskText, langKey);
+    const pack = foreignerLanguagePacks[langKey] || foreignerLanguagePacks.en;
+
+    let html = options.map((opt, idx) => {
+      return `
+        <div class="ai-option-card" data-idx="${idx}">
+          <div class="ai-option-icon-box ${opt.colorClass}">
+            <i class="${opt.icon}"></i>
+          </div>
+          <div class="ai-option-text-wrap">
+            <div class="ai-option-top-row">
+              <span class="ai-option-tag">${escapeHtml(opt.tag)}</span>
+              <span class="ai-option-detail-tag">${escapeHtml(opt.detailTag)}</span>
+            </div>
+            <div class="ai-option-main-title">${escapeHtml(opt.title)}</div>
+            <div class="ai-option-sub-desc">${escapeHtml(opt.desc)}</div>
+          </div>
+          <div class="ai-option-arrow-box">
+            <i class="fa-solid fa-chevron-right"></i>
+          </div>
+        </div>
+      `;
+    }).join('');
+
+    html += `
+      <button type="button" class="ai-option-direct-btn" id="btn-ai-option-direct">
+        <i class="fa-solid fa-paper-plane"></i>
+        <span>${escapeHtml(pack.directSend || '내가 입력한 내용 그대로 전달하기')}</span>
+      </button>
+    `;
+
+    optionsList.innerHTML = html;
+    optionsSection.classList.remove('hidden');
+
+    // 선택지가 떴을 때는 하단의 [Translate] 버튼을 숨겨 선택지 터치에 집중되도록 함
+    const modalFooter = document.querySelector('.foreigner-modal-footer');
+    if (modalFooter) {
+      modalFooter.classList.add('hidden');
+    }
+
+    // 부드러운 스크롤 이동
+    setTimeout(() => {
+      optionsSection.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    }, 120);
+
+    // 각 카드 클릭 이벤트 바인딩
+    optionsList.querySelectorAll('.ai-option-card').forEach(card => {
+      card.addEventListener('click', async () => {
+        const idx = parseInt(card.getAttribute('data-idx'), 10);
+        const selectedOpt = options[idx];
+        if (selectedOpt) {
+          await executeForeignerTranslationToTeller(
+            selectedOpt.promptText,
+            selectedOpt.title,
+            taskText,
+            selectedOpt.badge
+          );
+        }
+      });
+    });
+
+    // 원문 그대로 전달 버튼 클릭 이벤트 바인딩
+    const btnDirect = document.getElementById('btn-ai-option-direct');
+    if (btnDirect) {
+      btnDirect.addEventListener('click', async () => {
+        await executeForeignerTranslationToTeller(
+          taskText,
+          '고객 직접 입력 전달 (Direct Input)',
+          taskText,
+          '직접 입력'
+        );
+      });
+    }
+  }
+
+  // 은행원 제시 모달로 분석 결과 및 번역 데이터 전송 공통 실행 함수
+  async function executeForeignerTranslationToTeller(promptText, selectedTitle, rawInputText, optBadge) {
+    stopForeignerSTT();
+    const pack = foreignerLanguagePacks[currentForeignerLang] || foreignerLanguagePacks.en;
+
+    if (btnForeignerSend) btnForeignerSend.disabled = true;
+    if (foreignerSendText) foreignerSendText.textContent = pack.translatingBtn || "Translating...";
+
+    try {
+      savedOriginalText = rawInputText || promptText;
+      const analysis = await analyzeForeignerIntent(promptText, currentForeignerLang);
+      savedTranslatedKorean = analysis.html;
+      currentSpeechText = analysis.speech;
+
+      // 히스토리 항목 구성 및 저장
+      const now = new Date();
+      const timeString = `${now.getHours() < 12 ? '오전' : '오후'} ${now.getHours() % 12 || 12}:${String(now.getMinutes()).padStart(2, '0')}`;
+      const historyItem = {
+        id: 'hist_' + Date.now(),
+        time: timeString,
+        lang: currentForeignerLang,
+        originalText: savedOriginalText,
+        intentName: selectedTitle || analysis.intentName,
+        estTime: analysis.estTime,
+        summary: analysis.summary,
+        counter: analysis.counter,
+        tags: analysis.tags,
+        checklists: analysis.checklists,
+        translatedHtml: analysis.html,
+        speechText: analysis.speech
+      };
+      foreignerHistory = [historyItem, ...foreignerHistory.filter(h => h.originalText !== savedOriginalText)].slice(0, 10);
+      saveForeignerHistory();
+
+      // [고도화] 은행원 제시창 상단 '고객 확인 완료 업무' 배너 렌더링
+      const tellerSelectedTaskBar = document.getElementById('teller-selected-task-bar');
+      const tellerSelectedTaskName = document.getElementById('teller-selected-task-name');
+      if (tellerSelectedTaskBar && tellerSelectedTaskName) {
+        tellerSelectedTaskName.textContent = selectedTitle || analysis.intentName;
+        tellerSelectedTaskBar.classList.remove('hidden');
+      }
+
+      // 1. AI 의도 분석 및 행원 체크리스트 UI 렌더링
+      if (aiIntentTaskText) {
+        aiIntentTaskText.textContent = analysis.intentName;
+      }
+      if (aiIntentEstTime) {
+        aiIntentEstTime.innerHTML = `<i class="fa-regular fa-clock"></i> 예상 ${analysis.estTime}`;
+      }
+      if (aiIntentSummaryText) {
+        aiIntentSummaryText.textContent = analysis.summary || `${analysis.intentName} 관련하여 방문한 고객입니다.`;
+      }
+      if (aiIntentMetaTags) {
+        const tags = Array.isArray(analysis.tags) && analysis.tags.length > 0
+          ? analysis.tags
+          : [analysis.counter || "일반상담 창구", "실시간 의도분석 완료"];
+        aiIntentMetaTags.innerHTML = tags.map((t, idx) => {
+          const isCounter = idx === 0;
+          const bg = isCounter ? '#eff6ff' : '#f1f5f9';
+          const color = isCounter ? '#1d4ed8' : '#475569';
+          const border = isCounter ? '#bfdbfe' : '#cbd5e1';
+          const icon = isCounter ? '<i class="fa-solid fa-building-columns"></i> ' : '<i class="fa-solid fa-tag"></i> ';
+          return `<span class="ai-meta-tag" style="background: ${bg}; color: ${color}; border: 1px solid ${border}; font-size: 11px; font-weight: 700; padding: 2px 7px; border-radius: 12px;">${icon}${escapeHtml(t)}</span>`;
+        }).join('');
+      }
+      if (aiTellerChecklist && Array.isArray(analysis.checklists)) {
+        aiTellerChecklist.innerHTML = analysis.checklists
+          .map(item => `<li><span class="check-icon">✓</span> ${escapeHtml(item)}</li>`)
+          .join('');
+      }
+
+      // 2. 제시용 카드에 번역 및 원문 내용 반영
+      if (tellerKrText) tellerKrText.innerHTML = `"${savedTranslatedKorean}"`;
+      if (tellerOrigText) tellerOrigText.textContent = `"${savedOriginalText}"`;
+
+      // 3. 즉석 응대창 초기화
+      if (tellerReplyDisplay) {
+        tellerReplyDisplay.classList.add('hidden');
+      }
+      if (tellerQuickReplyChips) {
+        tellerQuickReplyChips.querySelectorAll('.teller-reply-chip').forEach(b => b.classList.remove('active'));
+      }
+
+      hasForeignerTask = true;
+      if (foreignerModal) foreignerModal.classList.add('hidden');
+      if (foreignerTextarea) foreignerTextarea.value = "";
+      if (foreignerCharCount) foreignerCharCount.textContent = "0";
+
+      const optionsSection = document.getElementById('foreigner-ai-options-section');
+      if (optionsSection) optionsSection.classList.add('hidden');
+
+      // 은행원 제시용 모달 열기 (선택된 언어 pack.instruction 반영)
+      openTellerResultModal();
+      showToast("선택하신 업무가 번역되어 은행원 제시 화면에 반영되었습니다.", false);
+    } catch (err) {
+      console.error("Translation processing error:", err);
+      showToast("번역 처리 중 오류가 발생했습니다. 다시 시도해 주세요.", true);
+    } finally {
+      if (btnForeignerSend) btnForeignerSend.disabled = false;
+      if (foreignerSendText) foreignerSendText.textContent = pack.translateBtn || "Translate";
+    }
+  }
+
+  // 실시간 글자수 카운트 및 입력 내용 수정 시 이전 AI 선택지 숨김 + 푸터 복원
   if (foreignerTextarea && foreignerCharCount) {
     foreignerTextarea.addEventListener('input', () => {
       foreignerCharCount.textContent = foreignerTextarea.value.length;
+      const optionsSection = document.getElementById('foreigner-ai-options-section');
+      if (optionsSection && !optionsSection.classList.contains('hidden')) {
+        optionsSection.classList.add('hidden');
+      }
+      const modalFooter = document.querySelector('.foreigner-modal-footer');
+      if (modalFooter && modalFooter.classList.contains('hidden')) {
+        modalFooter.classList.remove('hidden');
+      }
     });
   }
 
-  // 번역 및 창구 전송 / 저장 처리
+  // 번역 및 AI 세부 업무 선택지 생성 / 전송 처리
   if (btnForeignerSend) {
     btnForeignerSend.addEventListener('click', async () => {
       stopForeignerSTT();
@@ -7728,88 +8754,18 @@ const initSmartQApp = async () => {
 
       const pack = foreignerLanguagePacks[currentForeignerLang] || foreignerLanguagePacks.en;
 
-      // 번역 중 상태 표시
+      // 번역 분석 중 상태 표시
       btnForeignerSend.disabled = true;
       if (foreignerSendText) foreignerSendText.textContent = pack.translatingBtn || "Translating...";
 
       try {
-        savedOriginalText = taskText;
-        const analysis = await analyzeForeignerIntent(taskText, currentForeignerLang);
-        savedTranslatedKorean = analysis.html;
-        currentSpeechText = analysis.speech;
-
-        // 히스토리 항목 구성 및 저장
-        const now = new Date();
-        const timeString = `${now.getHours() < 12 ? '오전' : '오후'} ${now.getHours() % 12 || 12}:${String(now.getMinutes()).padStart(2, '0')}`;
-        const historyItem = {
-          id: 'hist_' + Date.now(),
-          time: timeString,
-          lang: currentForeignerLang,
-          originalText: taskText,
-          intentName: analysis.intentName,
-          estTime: analysis.estTime,
-          summary: analysis.summary,
-          counter: analysis.counter,
-          tags: analysis.tags,
-          checklists: analysis.checklists,
-          translatedHtml: analysis.html,
-          speechText: analysis.speech
-        };
-        foreignerHistory = [historyItem, ...foreignerHistory.filter(h => h.originalText !== taskText)].slice(0, 10);
-        saveForeignerHistory();
-
-        // 1. AI 의도 분석 및 행원 체크리스트 UI 렌더링
-        if (aiIntentTaskText) {
-          aiIntentTaskText.textContent = analysis.intentName;
-        }
-        if (aiIntentEstTime) {
-          aiIntentEstTime.innerHTML = `<i class="fa-regular fa-clock"></i> 예상 ${analysis.estTime}`;
-        }
-        if (aiIntentSummaryText) {
-          aiIntentSummaryText.textContent = analysis.summary || `${analysis.intentName} 관련하여 방문한 고객입니다.`;
-        }
-        if (aiIntentMetaTags) {
-          const tags = Array.isArray(analysis.tags) && analysis.tags.length > 0
-            ? analysis.tags
-            : [analysis.counter || "일반상담 창구", "실시간 의도분석 완료"];
-          aiIntentMetaTags.innerHTML = tags.map((t, idx) => {
-            const isCounter = idx === 0;
-            const bg = isCounter ? '#eff6ff' : '#f1f5f9';
-            const color = isCounter ? '#1d4ed8' : '#475569';
-            const border = isCounter ? '#bfdbfe' : '#cbd5e1';
-            const icon = isCounter ? '<i class="fa-solid fa-building-columns"></i> ' : '<i class="fa-solid fa-tag"></i> ';
-            return `<span class="ai-meta-tag" style="background: ${bg}; color: ${color}; border: 1px solid ${border}; font-size: 11px; font-weight: 700; padding: 2px 7px; border-radius: 12px;">${icon}${escapeHtml(t)}</span>`;
-          }).join('');
-        }
-        if (aiTellerChecklist && Array.isArray(analysis.checklists)) {
-          aiTellerChecklist.innerHTML = analysis.checklists
-            .map(item => `<li><span class="check-icon">✓</span> ${escapeHtml(item)}</li>`)
-            .join('');
-        }
-
-        // 2. 제시용 카드에 번역 및 원문 내용 반영
-        if (tellerKrText) tellerKrText.innerHTML = `"${savedTranslatedKorean}"`;
-        if (tellerOrigText) tellerOrigText.textContent = `"${savedOriginalText}"`;
-
-        // 3. 즉석 응대창 초기화
-        if (tellerReplyDisplay) {
-          tellerReplyDisplay.classList.add('hidden');
-        }
-        if (tellerQuickReplyChips) {
-          tellerQuickReplyChips.querySelectorAll('.teller-reply-chip').forEach(b => b.classList.remove('active'));
-        }
-
-        hasForeignerTask = true;
-        if (foreignerModal) foreignerModal.classList.add('hidden');
-        if (foreignerTextarea) foreignerTextarea.value = "";
-        if (foreignerCharCount) foreignerCharCount.textContent = "0";
-
-        // 은행원 제시용 모달 열기 (선택된 언어 pack.instruction 반영)
-        openTellerResultModal();
-        showToast("AI 의도 분석 및 실시간 번역이 완료되었습니다! 창구 순번 시 보여주세요.", false);
+        // AI 의도 분석 기반 세부 업무 선택지 카드 렌더링
+        renderForeignerAiOptions(taskText, currentForeignerLang);
+        showToast("AI가 업무 의도를 파악했습니다. 세부 업무를 선택해 주세요.", false);
       } catch (err) {
-        console.error("Translation processing error:", err);
-        showToast("번역 처리 중 오류가 발생했습니다. 다시 시도해 주세요.", true);
+        console.error("Translation options error:", err);
+        // 에러 시 기존 단일 번역 모드로 즉시 실행 폴백
+        await executeForeignerTranslationToTeller(taskText, '고객 직접 입력 전달', taskText);
       } finally {
         btnForeignerSend.disabled = false;
         if (foreignerSendText) foreignerSendText.textContent = pack.translateBtn || "Translate";

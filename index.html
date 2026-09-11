@@ -517,6 +517,22 @@
           </div>
         </div>
 
+        <!-- [고도화] AI 의도 기반 세부 업무 선택지 컨테이너 (AI Smart Service Clarification) -->
+        <div id="foreigner-ai-options-section" class="foreigner-ai-options-section hidden">
+          <div class="ai-options-header">
+            <div class="ai-options-title-row">
+              <span class="ai-options-badge"><i class="fa-solid fa-wand-magic-sparkles"></i> AI Service Match</span>
+              <h4 class="ai-options-title" id="ai-options-title">Select your exact service</h4>
+            </div>
+            <p class="ai-options-desc" id="ai-options-desc">
+              Choose the exact banking service you need to show the teller clearly.
+            </p>
+          </div>
+          <div class="ai-options-cards-list" id="foreigner-options-list">
+            <!-- 동적 렌더링 카드들 -->
+          </div>
+        </div>
+
         <!-- [신규] 최근 작성 내역 (Recent History) -->
         <div class="foreigner-history-section hidden" id="foreigner-history-section">
           <div class="history-section-header">
@@ -558,6 +574,14 @@
       <div class="teller-instruction-bar">
         <i class="fa-solid fa-circle-info"></i>
         <span id="teller-instruction-text">순번이 되었을 때 이 화면을 은행원에게 그대로 보여주세요!</span>
+      </div>
+
+      <!-- 고객이 직접 확인/선택한 맞춤 세부 업무 배너 -->
+      <div id="teller-selected-task-bar" class="teller-selected-task-bar hidden">
+        <div class="selected-task-bar-content">
+          <span class="selected-task-badge"><i class="fa-solid fa-check-double"></i> 고객 확인 완료 업무</span>
+          <strong class="selected-task-title" id="teller-selected-task-name">해외 송금 (International Remittance)</strong>
+        </div>
       </div>
 
       <!-- 고객 번역 및 원문 카드 (창구 전달용 한국어 번역) -->
