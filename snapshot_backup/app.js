@@ -1360,18 +1360,6 @@ const initSmartQApp = async () => {
     if (tabButtons) {
       tabButtons.forEach(btn => btn.classList.remove('active'));
     }
-
-    // 쉬운모드일 때 4대 업무 퀵 버튼 active 동기화 및 첫 번째(통장 만들기) 자동 선택
-    const easyChkBtns = document.querySelectorAll('.btn-easy-chk-quick');
-    if (easyChkBtns) {
-      easyChkBtns.forEach((b, idx) => b.classList.toggle('active', idx === 0));
-    }
-    if (document.body.classList.contains('easy-mode-active')) {
-      setTimeout(() => {
-        const firstOpt = document.querySelector('.checklist-opt-item[data-val="personal_new"]');
-        if (firstOpt) firstOpt.click();
-      }, 50);
-    }
   };
 
   // --- AI 일괄 서류 확인 시뮬레이션 상태 변수 ---
@@ -2366,7 +2354,8 @@ const initSmartQApp = async () => {
   function gotoScanStep(stepNum) {
     if (!selectView || !captureView || !resultView || !successView) return;
     
-    const isEasyActive = document.body.classList.contains('easy-mode-active');
+    const easyModeLayoutContainer = document.getElementById('easy-mode-layout-container');
+    const isEasyActive = easyModeLayoutContainer && !easyModeLayoutContainer.classList.contains('hidden');
     
     const modalHeader = document.querySelector('#transfer-voucher-modal .modal-header');
     const scanFlowSteps = document.querySelector('#transfer-voucher-modal .scan-flow-steps');
@@ -2401,35 +2390,6 @@ const initSmartQApp = async () => {
         if (modalHeader) modalHeader.classList.remove('hidden');
         if (scanFlowSteps) scanFlowSteps.classList.remove('hidden');
         if (stepInds[0]) stepInds[0].classList.add('active-step');
-
-        // 단일 이체 기본 선택 상태 동기화
-        if (vTypeCards && vTypeCards.length > 0) {
-          const firstCard = document.querySelector('.v-type-card[data-vtype="SINGLE_TRANSFER"]');
-          if (firstCard) {
-            vTypeCards.forEach(c => {
-              c.classList.remove('active');
-              c.style.borderColor = "var(--light-gray)";
-              c.style.backgroundColor = "var(--white)";
-              const icon = c.querySelector('i');
-              const title = c.querySelector('div:nth-of-type(1)');
-              if (icon) icon.style.color = "var(--cool-gray)";
-              if (title) title.style.color = "var(--charcoal)";
-            });
-            firstCard.classList.add('active');
-            firstCard.style.borderColor = "var(--brand-mint)";
-            firstCard.style.backgroundColor = "var(--brand-mint-light)";
-            const actIcon = firstCard.querySelector('i');
-            const actTitle = firstCard.querySelector('div:nth-of-type(1)');
-            if (actIcon) actIcon.style.color = "var(--brand-mint)";
-            if (actTitle) actTitle.style.color = "var(--brand-mint-dark)";
-            const btnSpan = goToCaptureBtn ? goToCaptureBtn.querySelector('span') : null;
-            if (btnSpan) btnSpan.textContent = '선택한 유형으로 촬영 시작';
-            if (goToCaptureBtn) {
-              const icon = goToCaptureBtn.querySelector('i');
-              if (icon) icon.className = 'fa-solid fa-chevron-right';
-            }
-          }
-        }
       }
       if (typeof renderMySentVoucherList === 'function') {
         renderMySentVoucherList();
@@ -2596,37 +2556,35 @@ const initSmartQApp = async () => {
     }
   }
 
-  // 거래 유형 카드 선택 리스너 바인딩 (단일 이체 / 대량 이체 2종)
+  // 거래 유형 카드 선택 리스너 바인딩
   const vTypeCards = document.querySelectorAll('.v-type-card');
   const goToManualMassBtn = document.getElementById('go-to-manual-mass-btn');
-
   vTypeCards.forEach(card => {
     card.addEventListener('click', () => {
       vTypeCards.forEach(c => {
         c.classList.remove('active');
         c.style.borderColor = "var(--light-gray)";
         c.style.backgroundColor = "var(--white)";
-        const icon = c.querySelector('i');
-        const title = c.querySelector('div:nth-of-type(1)');
-        if (icon) icon.style.color = "var(--cool-gray)";
-        if (title) title.style.color = "var(--charcoal)";
       });
       card.classList.add('active');
       card.style.borderColor = "var(--brand-mint)";
       card.style.backgroundColor = "var(--brand-mint-light)";
-      const actIcon = card.querySelector('i');
-      const actTitle = card.querySelector('div:nth-of-type(1)');
-      if (actIcon) actIcon.style.color = "var(--brand-mint)";
-      if (actTitle) actTitle.style.color = "var(--brand-mint-dark)";
-
       selectedVoucherType = card.getAttribute('data-vtype');
-      playNotificationSound('beep');
+
+      // 대량이체 선택 시 '전표 촬영 없이 직접 입력하기' 버튼 노출 연동
+      if (goToManualMassBtn) {
+        if (selectedVoucherType === 'MASS_TRANSFER') {
+          goToManualMassBtn.classList.remove('hidden');
+        } else {
+          goToManualMassBtn.classList.add('hidden');
+        }
+      }
     });
   });
 
   let isManualMassMode = false;
 
-  // 전표 직접 수기 작성 모드 시작 함수
+  // 대량이체 직접 수기 작성 모드 시작 함수
   function startManualMassTransfer() {
     isManualMassMode = true;
     selectedVoucherType = 'MASS_TRANSFER';
@@ -2649,7 +2607,7 @@ const initSmartQApp = async () => {
     activePreviewImageIndex = 0;
     gotoScanStep(3);
     playNotificationSound('beep');
-    showToast('전표 직접 입력 모드로 진입했습니다.');
+    showToast('대량이체 직접 입력 모드로 진입했습니다.');
   }
 
   if (goToManualMassBtn) {
@@ -5358,14 +5316,8 @@ const initSmartQApp = async () => {
     if (docVerifyStepResult) docVerifyStepResult.classList.add('hidden');
     if (docVerifyLaser) docVerifyLaser.style.display = 'none';
     if (docCapturedPreview) docCapturedPreview.style.display = 'none';
-    const isEasyModeDoc = document.body.classList.contains('easy-mode-active');
-    if (docScanBtnText) docScanBtnText.textContent = isEasyModeDoc ? "사진 찍어서 진짜인지 확인하기" : "서류 촬영 및 자동 진위확인";
+    if (docScanBtnText) docScanBtnText.textContent = "서류 촬영 및 진위확인";
     if (btnStartDocVerify) btnStartDocVerify.disabled = false;
-
-    // 쉬운모드일 때 기본 서류를 어르신들이 가장 많이 확인하는 신분증(idcard)으로 자동 초기화
-    if (document.body.classList.contains('easy-mode-active') && !targetDocType) {
-      targetDocType = 'idcard';
-    }
 
     if (targetDocType && docVerifyDatabase[targetDocType]) {
       currentDocVerifyType = targetDocType;
@@ -5378,35 +5330,9 @@ const initSmartQApp = async () => {
       renderDocVerifyPills(currentVerifyCategory);
     }
     
-    // 쉬운모드 3대 서류 퀵 버튼 active 동기화
-    document.querySelectorAll('.btn-easy-doc-quick').forEach(btn => {
-      btn.classList.toggle('active', btn.getAttribute('data-doc') === currentDocVerifyType);
-    });
-
     // 실시간 카메라 구동
     startDocVerifyCameraStream();
     playNotificationSound('beep');
-  }
-
-  // [쉬운모드 전용] 3대 서류 원터치 퀵 버튼 클릭 연동
-  const easyDocQuickBtns = document.querySelectorAll('.btn-easy-doc-quick');
-  if (easyDocQuickBtns) {
-    easyDocQuickBtns.forEach(btn => {
-      btn.addEventListener('click', (e) => {
-        e.stopPropagation();
-        easyDocQuickBtns.forEach(b => b.classList.remove('active'));
-        btn.classList.add('active');
-        const docKey = btn.getAttribute('data-doc') || 'idcard';
-        currentDocVerifyType = docKey;
-        
-        const info = docVerifyDatabase[docKey];
-        if (docPreviewText && info) {
-          docPreviewText.textContent = info.name;
-        }
-        updateManualInputForm(docKey);
-        playNotificationSound('click');
-      });
-    });
   }
 
   function closeDocVerifyModal() {
@@ -5525,8 +5451,7 @@ const initSmartQApp = async () => {
 
       showToast(`'${info.shortName}' 공공기관 전산 원장 진위확인이 완료되었습니다.`, false);
       if (btnStartDocVerify) btnStartDocVerify.disabled = false;
-      const isEasyDocDone = document.body.classList.contains('easy-mode-active');
-      if (docScanBtnText) docScanBtnText.textContent = isEasyDocDone ? "사진 찍어서 진짜인지 확인하기" : "서류 촬영 및 자동 진위확인";
+      if (docScanBtnText) docScanBtnText.textContent = "서류 촬영 및 자동 진위확인";
     }, 900);
   }
 
@@ -5592,32 +5517,44 @@ const initSmartQApp = async () => {
 
   // --- 쉬운 모드 (Easy Mode) 토글 시스템 제어 ---
   const easyModeToggleBtn = document.getElementById('easy-mode-toggle-btn');
+  const easyModeLayoutContainer = document.getElementById('easy-mode-layout-container');
+  const quickMenuGrid = document.querySelector('.quick-menu-grid');
   const headerLogoSmartQ = document.querySelector('.logo-smartq');
   
   if (easyModeToggleBtn) {
     easyModeToggleBtn.addEventListener('click', () => {
-      const isEasyActive = document.body.classList.contains('easy-mode-active');
+      const isEasyActive = easyModeLayoutContainer && !easyModeLayoutContainer.classList.contains('hidden');
       
       if (isEasyActive) {
-        // 쉬운 모드 끄기 처리 (일반 모드로 복귀)
-        document.body.classList.remove('easy-mode-active');
-        easyModeToggleBtn.classList.remove('active');
-        easyModeToggleBtn.innerHTML = '<i class="fa-solid fa-glasses"></i> <span class="easy-btn-text">쉬운모드</span>';
+        // 쉬운 모드 끄기 처리
+        if (easyModeLayoutContainer) easyModeLayoutContainer.classList.add('hidden');
+        if (quickMenuGrid) quickMenuGrid.classList.remove('hidden'); // 기존 2x2 그리드 복원
         
-        // 로고는 요청대로 항상 SmartQ로 깔끔하게 유지
+        // 로고 영문 SmartQ 복원
         if (headerLogoSmartQ) headerLogoSmartQ.textContent = 'SmartQ';
+
+        // 버튼 톤앤무드 복원
+        easyModeToggleBtn.style.backgroundColor = 'var(--brand-mint-light)';
+        easyModeToggleBtn.style.color = 'var(--brand-mint-dark)';
+        easyModeToggleBtn.style.border = '2px solid var(--brand-mint)';
+        easyModeToggleBtn.innerHTML = '<i class="fa-solid fa-magnifying-glass-plus"></i> 쉬운 모드 켜기';
         
-        showToast('일반 모드로 전환되었습니다.');
+        showToast('쉬운 모드가 해제되었습니다.');
       } else {
-        // 쉬운 모드 켜기 처리 (큰 글씨 / 대형 버튼 레이아웃 활성화)
-        document.body.classList.add('easy-mode-active');
-        easyModeToggleBtn.classList.add('active');
-        easyModeToggleBtn.innerHTML = '<i class="fa-solid fa-glasses"></i> <span class="easy-btn-text">쉬운모드</span>';
+        // 쉬운 모드 켜기 처리
+        if (easyModeLayoutContainer) easyModeLayoutContainer.classList.remove('hidden');
+        if (quickMenuGrid) quickMenuGrid.classList.add('hidden'); // 기존 2x2 그리드 숨기기
         
-        // 로고는 요청대로 항상 SmartQ로 깔끔하게 유지
-        if (headerLogoSmartQ) headerLogoSmartQ.textContent = 'SmartQ';
+        // 로고 SmartQ (똑똑한 대기열) 변환
+        if (headerLogoSmartQ) headerLogoSmartQ.textContent = 'SmartQ (똑똑한 대기열)';
+
+        // 버튼 톤앤무드 활성화 강조 (차콜 톤으로 켜짐 표시)
+        easyModeToggleBtn.style.backgroundColor = '#2c3e50';
+        easyModeToggleBtn.style.color = '#ffffff';
+        easyModeToggleBtn.style.border = '2px solid #2c3e50';
+        easyModeToggleBtn.innerHTML = '<i class="fa-solid fa-magnifying-glass-minus"></i> 쉬운 모드 끄기';
         
-        showToast('쉬운 모드가 켜졌습니다. 큰 글씨와 대형 버튼으로 보기 쉬워집니다.');
+        showToast('쉬운 모드가 활성화되었습니다. 글씨와 버튼이 크고 명확해집니다.');
       }
       playNotificationSound('beep');
     });
@@ -5900,23 +5837,6 @@ const initSmartQApp = async () => {
         if (typeof resetChecklistModal === 'function') {
           resetChecklistModal();
         }
-      });
-    }
-
-    // 6. [쉬운모드 전용] 4대 대표 업무 원터치 퀵 버튼 클릭 연동
-    const easyChkQuickBtns = document.querySelectorAll('.btn-easy-chk-quick');
-    if (easyChkQuickBtns) {
-      easyChkQuickBtns.forEach(btn => {
-        btn.addEventListener('click', (e) => {
-          e.stopPropagation();
-          easyChkQuickBtns.forEach(b => b.classList.remove('active'));
-          btn.classList.add('active');
-          const tabVal = btn.getAttribute('data-val');
-          const targetOpt = document.querySelector(`.checklist-opt-item[data-val="${tabVal}"]`);
-          if (targetOpt) {
-            targetOpt.click();
-          }
-        });
       });
     }
   }

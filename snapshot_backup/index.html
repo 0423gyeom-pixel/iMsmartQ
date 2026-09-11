@@ -27,15 +27,11 @@
           
           <!-- iM Bank 로고타입 구성 (동일 폰트/굵기 및 자간 간격 축소) -->
           <span class="logo-im-bank" style="font-family: 'Inter', sans-serif; font-weight: 800; color: #2c3e50; font-size: clamp(14.5px, 2.1cqh, 19px); letter-spacing: -0.6px;">iM Bank</span>
-          <span class="logo-smartq" style="font-family: 'Pretendard', sans-serif; font-weight: 800; color: var(--brand-mint-dark); font-size: clamp(12px, 1.75cqh, 15.5px); letter-spacing: -0.5px; margin-left: 5px; padding-left: 6px; border-left: 1.5px solid #dcdde1; display: inline-flex; align-items: center; white-space: nowrap;">SmartQ</span>
+          <span class="logo-smartq" style="font-family: 'Pretendard', sans-serif; font-weight: 800; color: var(--brand-mint-dark); font-size: clamp(12px, 1.75cqh, 15.5px); letter-spacing: -0.5px; margin-left: 5px; padding-left: 6px; border-left: 1.5px solid #dcdde1; display: inline-flex; align-items: center; white-space: nowrap;">SmartQ (똑똑한 대기열)</span>
         </h1>
         
-        <!-- 우측 상단 영역: 쉬운모드 토글 버튼 + 시간 안내문구 -->
-        <div class="header-right-group" style="display: flex; align-items: center; gap: 8px; flex-shrink: 0;">
-          <button type="button" id="easy-mode-toggle-btn" class="header-easy-mode-btn" aria-label="고령층을 위한 쉬운 모드 전환">
-            <i class="fa-solid fa-glasses"></i>
-            <span class="easy-btn-text">쉬운모드</span>
-          </button>
+        <!-- 우측 상단 영역: 시간 안내문구 -->
+        <div class="header-right-group" style="display: flex; align-items: center; gap: 10px; flex-shrink: 0;">
           <div class="header-bottom" style="margin: 0; display: flex; align-items: center; gap: 6px; flex-shrink: 0;">
             <div class="live-indicator" style="margin: 0;"></div>
             <span class="timestamp" id="live-timestamp" style="font-size: clamp(10px, 1.42cqh, 13.5px); color: var(--cool-gray); font-weight: 500; white-space: nowrap;">오후 3:37 기준</span>
@@ -108,14 +104,8 @@
               </svg>
             </div>
             <div class="hub-card-text-box">
-              <strong class="hub-card-title">
-                <span class="normal-text">서류 챙기기</span>
-                <span class="easy-text">서류 챙기기</span>
-              </strong>
-              <span class="hub-card-desc">
-                <span class="normal-text">업무별 필수서류 안내</span>
-                <span class="easy-text">필요한 서류 확인</span>
-              </span>
+              <strong class="hub-card-title">서류 챙기기</strong>
+              <span class="hub-card-desc">업무별 필수서류 안내</span>
             </div>
           </button>
 
@@ -129,14 +119,8 @@
               </svg>
             </div>
             <div class="hub-card-text-box">
-              <strong class="hub-card-title">
-                <span class="normal-text">서류 진위확인</span>
-                <span class="easy-text">신분증·서류 확인</span>
-              </strong>
-              <span class="hub-card-desc">
-                <span class="normal-text">신분증·등본 원본 판별</span>
-                <span class="easy-text">원본 판별 검증</span>
-              </span>
+              <strong class="hub-card-title">서류 진위확인</strong>
+              <span class="hub-card-desc">신분증·등본 원본 판별</span>
             </div>
           </button>
 
@@ -149,14 +133,8 @@
               </svg>
             </div>
             <div class="hub-card-text-box">
-              <strong class="hub-card-title">
-                <span class="normal-text">미리작성</span>
-                <span class="easy-text">미리작성</span>
-              </strong>
-              <span class="hub-card-desc">
-                <span class="normal-text">입출금·송금 모바일 전표</span>
-                <span class="easy-text">신청서 미리 쓰기</span>
-              </span>
+              <strong class="hub-card-title">미리작성</strong>
+              <span class="hub-card-desc">입출금·송금 모바일 전표</span>
             </div>
           </button>
 
@@ -171,14 +149,8 @@
               </svg>
             </div>
             <div class="hub-card-text-box">
-              <strong class="hub-card-title foreigner-banner-action">
-                <span class="normal-text">Foreigner Help</span>
-                <span class="easy-text">외국어 통역 도우미</span>
-              </strong>
-              <span class="hub-card-desc foreigner-banner-greeting">
-                <span class="normal-text">Translate for Teller</span>
-                <span class="easy-text">은행 직원과 다른 나라 말로 대화해요</span>
-              </span>
+              <strong class="hub-card-title foreigner-banner-action">Foreigner Help</strong>
+              <span class="hub-card-desc foreigner-banner-greeting">Translate for Teller</span>
             </div>
           </button>
 
@@ -193,39 +165,23 @@
               </div>
               <div class="sub-banner-text-box">
                 <div class="sub-banner-subtitle-row">
-                  <span class="sub-banner-pill fraud-pill">
-                    <span class="fraud-live-dot"></span>
-                    <span class="normal-text">500만원 이상 송금</span>
-                    <span class="easy-text">큰 돈(500만원 이상) 보낼 때</span>
-                  </span>
-                  <span class="sub-banner-desc fraud-desc">
-                    <span class="normal-text">창구 대기시간 80% 단축!</span>
-                    <span class="easy-text">보이스피싱 사기 예방하고 시간도 아껴요</span>
-                  </span>
+                  <span class="sub-banner-pill fraud-pill"><span class="fraud-live-dot"></span>500만원 이상 송금</span>
+                  <span class="sub-banner-desc fraud-desc">창구 대기시간 80% 단축!</span>
                 </div>
                 <div class="sub-banner-title-row">
-                  <strong class="sub-banner-main-title fraud-title">
-                    <span class="normal-text">금융사기예방진단표</span>
-                    <span class="easy-text">금융사기(보이스피싱) 예방 확인</span>
-                  </strong>
-                  <span class="sub-banner-action-text fraud-action">
-                    <span class="normal-text">미리 작성하기</span>
-                    <span class="easy-text">미리 체크하기</span>
-                  </span>
+                  <strong class="sub-banner-main-title fraud-title">금융사기예방진단표</strong>
+                  <span class="sub-banner-action-text fraud-action">미리 작성하기</span>
                 </div>
               </div>
             </div>
             <div class="sub-banner-right">
-              <span class="sub-banner-badge fraud-badge">
-                <span class="normal-text">사전작성</span>
-                <span class="easy-text">확인하기</span>
-              </span>
+              <span class="sub-banner-badge fraud-badge">사전작성</span>
               <i class="fa-solid fa-chevron-right sub-banner-arrow fraud-arrow"></i>
             </div>
           </button>
         </div>
 
-        <!-- [전표인식 특화] 송금전표 사진찍기 서브 배너 (쉬운모드에서 최상단 1순위 메인으로 배치) -->
+        <!-- [전표인식 특화] 송금전표 사진찍기 서브 배너 -->
         <div class="service-sub-banner-container scan-banner-container">
           <button type="button" class="scan-service-banner common-sub-banner" id="btn-easy-scan">
             <div class="sub-banner-left">
@@ -234,32 +190,17 @@
               </div>
               <div class="sub-banner-text-box">
                 <div class="sub-banner-subtitle-row">
-                  <span class="sub-banner-pill scan-pill">
-                    <span class="normal-text">종이전표 스캔</span>
-                    <span class="easy-text">추천</span>
-                  </span>
-                  <span class="sub-banner-desc scan-desc">
-                    <span class="normal-text">종이송금 전표 들고 오셨나요?</span>
-                    <span class="easy-text">손으로 쓴 종이 전표를 찰칵 찍어보세요</span>
-                  </span>
+                  <span class="sub-banner-pill scan-pill">종이전표 스캔</span>
+                  <span class="sub-banner-desc scan-desc">종이송금 전표 들고 오셨나요?</span>
                 </div>
                 <div class="sub-banner-title-row">
-                  <strong class="sub-banner-main-title scan-title">
-                    <span class="normal-text">송금전표 사진찍기</span>
-                    <span class="easy-text">송금전표 사진찍기</span>
-                  </strong>
-                  <span class="sub-banner-action-text scan-action">
-                    <span class="normal-text">업무 시간 단축</span>
-                    <span class="easy-text">창구 대기 단축</span>
-                  </span>
+                  <strong class="sub-banner-main-title scan-title">송금전표 사진찍기</strong>
+                  <span class="sub-banner-action-text scan-action">업무 시간 단축</span>
                 </div>
               </div>
             </div>
             <div class="sub-banner-right">
-              <span class="sub-banner-badge scan-badge sub-banner-btn-text">
-                <span class="normal-text">스캔하기</span>
-                <span class="easy-text">사진찍기</span>
-              </span>
+              <span class="sub-banner-badge scan-badge sub-banner-btn-text">스캔하기</span>
               <i class="fa-solid fa-chevron-right sub-banner-arrow scan-arrow"></i>
             </div>
           </button>
@@ -274,32 +215,17 @@
               </div>
               <div class="sub-banner-text-box">
                 <div class="sub-banner-subtitle-row">
-                  <span class="sub-banner-pill quiz-pill">
-                    <span class="normal-text">대기시간 맞춤</span>
-                    <span class="easy-text">기다리는 동안</span>
-                  </span>
-                  <span class="sub-banner-desc quiz-desc">
-                    <span class="normal-text">대기 시간이 지루하시다면?</span>
-                    <span class="easy-text">순서 기다리면서 심심풀이로 풀어보세요!</span>
-                  </span>
+                  <span class="sub-banner-pill quiz-pill">대기시간 맞춤</span>
+                  <span class="sub-banner-desc quiz-desc">대기 시간이 지루하시다면?</span>
                 </div>
                 <div class="sub-banner-title-row">
-                  <strong class="sub-banner-main-title quiz-title">
-                    <span class="normal-text">나의 금융성향 알아보기</span>
-                    <span class="easy-text">내 돈 관리 성향 알아보기</span>
-                  </strong>
-                  <span class="sub-banner-action-text quiz-action">
-                    <span class="normal-text">맞춤 금융 매칭</span>
-                    <span class="easy-text">재미있는 퀴즈</span>
-                  </span>
+                  <strong class="sub-banner-main-title quiz-title">나의 금융성향 알아보기</strong>
+                  <span class="sub-banner-action-text quiz-action">맞춤 금융 매칭</span>
                 </div>
               </div>
             </div>
             <div class="sub-banner-right">
-              <span class="sub-banner-badge quiz-badge sub-banner-btn-text">
-                <span class="normal-text">진단하기</span>
-                <span class="easy-text">시작하기</span>
-              </span>
+              <span class="sub-banner-badge quiz-badge sub-banner-btn-text">진단하기</span>
               <i class="fa-solid fa-chevron-right sub-banner-arrow quiz-arrow"></i>
             </div>
           </button>
@@ -365,7 +291,6 @@
       <section class="notice-section">
         <h4><i class="fa-solid fa-circle-info"></i> 이용 안내 및 유의사항</h4>
         <ul>
-          <li>화면에 표시되는 예상 대기 시간은 참고용이며, 현장 상황에 따라 실제 대기 시간과 차이가 발생할 수 있습니다.</li>
           <li>대기인원은 매순간의 영업점 혼잡도에 따라 실시간 변동될 수 있습니다.</li>
           <li>창구에서 호출 시 부재중일 경우, 자동 취소처리되어 다시 번호표를 발급받으셔야 합니다.</li>
           <li>소리 및 진동 알림은 브라우저 탭 활성화 상태 및 권한 허용 여부에 따라 원활하지 않을 수 있으니 주기적으로 화면을 확인해 주세요.</li>
@@ -746,39 +671,11 @@
             </svg>
           </div>
           <div class="doc-verify-header-titles">
-            <h3 class="doc-verify-title">
-              <span class="normal-text">공공기관 서류 진위확인</span>
-              <span class="easy-text">신분증 · 서류 원본 확인</span>
-            </h3>
-            <p class="doc-verify-desc">
-              <span class="normal-text">정부24 · 대법원 전산망 실시간 연동 원본 검증</span>
-              <span class="easy-text">가져오신 신분증이나 종이 서류가 진짜인지 확인해 드려요</span>
-            </p>
+            <h3 class="doc-verify-title">공공기관 서류 진위확인</h3>
+            <p class="doc-verify-desc">정부24 · 대법원 전산망 실시간 연동 원본 검증</p>
           </div>
         </div>
         <button type="button" class="close-btn" id="close-doc-verify-modal-btn">&times;</button>
-      </div>
-
-      <!-- [쉬운모드 전용] 어르신들이 자주 쓰는 3대 대표 서류 원터치 퀵 바 -->
-      <div class="easy-verify-quick-grid easy-only" style="margin: 0 16px 12px 16px;">
-        <div style="font-size: 13.5px; font-weight: 800; color: #0f172a; margin-bottom: 6px; display: flex; align-items: center; gap: 6px;">
-          <i class="fa-solid fa-file-circle-check" style="color: #7c3aed;"></i>
-          <span>확인하실 서류를 골라주세요:</span>
-        </div>
-        <div class="easy-verify-quick-buttons" style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 6px;">
-          <button type="button" class="btn-easy-doc-quick active" data-doc="idcard">
-            <i class="fa-solid fa-id-card"></i>
-            <span>신분증 (주민증)</span>
-          </button>
-          <button type="button" class="btn-easy-doc-quick" data-doc="resident">
-            <i class="fa-solid fa-file-lines"></i>
-            <span>주민등록등본</span>
-          </button>
-          <button type="button" class="btn-easy-doc-quick" data-doc="biz_reg">
-            <i class="fa-solid fa-building"></i>
-            <span>사업자등록증</span>
-          </button>
-        </div>
       </div>
 
       <!-- 검증 대상 서류 업무 카테고리 및 세부 서류 선택 영역 -->
@@ -829,10 +726,7 @@
               <div class="doc-mock-content" id="doc-mock-content">
                 <i class="fa-regular fa-id-card doc-preview-icon" id="doc-preview-icon"></i>
                 <span id="doc-preview-text">주민등록증 / 운전면허증</span>
-                <span class="doc-preview-sub">
-                  <span class="normal-text">문서의 위변조 방지 2차원 바코드 및 확인번호를 사각형 안에 맞춰주세요</span>
-                  <span class="easy-text">네모 칸 안에 신분증이나 서류를 비추고 아래 사진찍기 버튼을 누르세요</span>
-                </span>
+                <span class="doc-preview-sub">문서의 위변조 방지 2차원 바코드 및 확인번호를 사각형 안에 맞춰주세요</span>
               </div>
             </div>
 
@@ -855,29 +749,20 @@
             <!-- 1. 뷰파인더 즉시 스캔 촬영 버튼 -->
             <button type="button" class="btn-doc-scan-action" id="btn-start-doc-verify">
               <i class="fa-solid fa-camera"></i>
-              <span id="doc-scan-btn-text">
-                <span class="normal-text">서류 촬영 및 자동 진위확인</span>
-                <span class="easy-text">사진 찍어서 진짜인지 확인하기</span>
-              </span>
+              <span id="doc-scan-btn-text">서류 촬영 및 자동 진위확인</span>
             </button>
             
             <!-- 2. 휴대폰 기본 카메라 어플 열기 버튼 -->
             <button type="button" class="btn-doc-app-camera" id="btn-open-camera-app">
               <i class="fa-solid fa-mobile-screen-button"></i>
-              <span>
-                <span class="normal-text">휴대폰 카메라 앱으로 촬영하기</span>
-                <span class="easy-text">내 핸드폰 카메라로 크게 찍기</span>
-              </span>
+              <span>휴대폰 카메라 앱으로 촬영하기</span>
             </button>
           </div>
 
           <!-- 번호 직접 입력 진위조회 간편 영역 (사업자번호 / 16자리 발급번호) -->
           <div class="doc-manual-input-box" id="doc-manual-input-box">
             <div class="manual-input-header">
-              <span id="manual-input-title">
-                <span class="normal-text"><i class="fa-solid fa-keyboard"></i> 확인번호 직접 입력 진위확인</span>
-                <span class="easy-text"><i class="fa-solid fa-keyboard"></i> 번호를 직접 적어서 확인하기</span>
-              </span>
+              <span id="manual-input-title"><i class="fa-solid fa-keyboard"></i> 확인번호 직접 입력 진위확인</span>
             </div>
             <div class="manual-input-row">
               <input type="text" id="doc-direct-input-val" class="doc-direct-input" placeholder="사업자등록번호 10자리 입력 (예: 504-85-12345)">
@@ -894,14 +779,8 @@
           <div class="verify-result-header success" id="res-header-badge">
             <i class="fa-solid fa-circle-check" id="res-header-icon"></i>
             <div class="verify-result-badge-text">
-              <strong id="res-header-title">
-                <span class="normal-text">진위 검증 완료 (정상 원본 서류)</span>
-                <span class="easy-text">진짜 원본 서류가 맞습니다! (정상)</span>
-              </strong>
-              <span id="res-header-sub">
-                <span class="normal-text">국세청 · 대법원 · 정부24 전산 원장 실시간 일치</span>
-                <span class="easy-text">3개월 이내 발급된 유효한 서류입니다. 창구에 그대로 제출해 주세요.</span>
-              </span>
+              <strong id="res-header-title">진위 검증 완료 (정상 원본 서류)</strong>
+              <span id="res-header-sub">국세청 · 대법원 · 정부24 전산 원장 실시간 일치</span>
             </div>
           </div>
 
@@ -943,17 +822,11 @@
           <div class="verify-result-footer-actions">
             <button type="button" class="btn-verify-retry" id="btn-doc-verify-retry">
               <i class="fa-solid fa-rotate-left"></i>
-              <span>
-                <span class="normal-text">다시 조회/스캔</span>
-                <span class="easy-text">다시 찍기</span>
-              </span>
+              <span>다시 조회/스캔</span>
             </button>
             <button type="button" class="btn-verify-submit" id="btn-doc-verify-submit">
               <i class="fa-solid fa-check"></i>
-              <span>
-                <span class="normal-text">창구 직원에 전달 접수</span>
-                <span class="easy-text">창구 직원에게 접수하기</span>
-              </span>
+              <span>창구 직원에 전달 접수</span>
             </button>
           </div>
         </div>
@@ -1224,10 +1097,7 @@
       <div class="modal-header">
         <div class="modal-header-title">
           <i class="fa-solid fa-file-invoice-dollar" style="color: var(--brand-mint); font-size: 16px;"></i>
-          <h3 style="font-size: 15px; font-weight: 700;">
-            <span class="normal-text">업무 서류 미리작성</span>
-            <span class="easy-text">은행 서류 미리 적어두기</span>
-          </h3>
+          <h3 style="font-size: 15px; font-weight: 700;">업무 서류 미리작성</h3>
         </div>
         <button class="close-btn" id="close-pre-writing-modal-btn">&times;</button>
       </div>
@@ -1236,60 +1106,39 @@
           <!-- 1. 서류 직접 작성 내용 -->
           <div class="pre-tab-content" id="pre-tab-content-form">
             <form id="pre-writing-form" onsubmit="event.preventDefault();">
-              <p class="form-desc">
-                <span class="normal-text">창구 방문 전에 미리 작성하시면 업무 처리 시간을 크게 줄일 수 있어요.</span>
-                <span class="easy-text">창구 가시기 전에 미리 써두시면 기다리는 시간 없이 빠르게 처리해 드려요.</span>
-              </p>
+              <p class="form-desc">창구 방문 전에 미리 작성하시면 업무 처리 시간을 크게 줄일 수 있어요.</p>
               
               <!-- 업무 대분류 선택 (4대 핵심 업무 2x2 그리드) -->
               <div class="form-group" style="margin-bottom: 25px;">
-                <label class="form-label" style="position: relative; display: block; margin-top: 14px; font-size: 14px; font-weight: 800;">
-                  <span class="normal-text">작성할 업무 선택</span>
-                  <span class="easy-text">보실 업무를 골라주세요</span>
-                </label>
+                <label class="form-label" style="position: relative; display: block; margin-top: 14px; font-size: 14px; font-weight: 800;">작성할 업무 선택</label>
                 <div class="form-radio-group-4way">
                   <label class="radio-card cif-radio-card" style="position: relative;">
-                    <div class="tooltip-bubble">
-                      <span class="normal-text">첫 이용 고객이라면</span>
-                      <span class="easy-text">처음 오신 분</span>
-                    </div>
+                    <div class="tooltip-bubble">첫 이용 고객이라면</div>
                     <input type="radio" name="pre-work-type" value="cif" checked>
                     <span class="radio-content-small">
                       <i class="fa-solid fa-file-signature"></i>
-                      <span>
-                        <span class="normal-text">신규 신청</span>
-                        <span class="easy-text">통장·카드 만들기</span>
-                      </span>
+                      <span>신규 신청</span>
                     </span>
                   </label>
                   <label class="radio-card">
                     <input type="radio" name="pre-work-type" value="report">
                     <span class="radio-content-small">
                       <i class="fa-solid fa-pen-to-square"></i>
-                      <span>
-                        <span class="normal-text">제신고 & 변경</span>
-                        <span class="easy-text">정보 바꾸기·재발급</span>
-                      </span>
+                      <span>제신고 & 변경</span>
                     </span>
                   </label>
                   <label class="radio-card">
                     <input type="radio" name="pre-work-type" value="autodebit">
                     <span class="radio-content-small">
                       <i class="fa-solid fa-money-bill-transfer"></i>
-                      <span>
-                        <span class="normal-text">자동이체 등록</span>
-                        <span class="easy-text">매달 돈 보내기</span>
-                      </span>
+                      <span>자동이체 등록</span>
                     </span>
                   </label>
                   <label class="radio-card">
                     <input type="radio" name="pre-work-type" value="security">
                     <span class="radio-content-small">
                       <i class="fa-solid fa-key"></i>
-                      <span>
-                        <span class="normal-text">창구 보안 업무</span>
-                        <span class="easy-text">비밀번호 찾기·변경</span>
-                      </span>
+                      <span>창구 보안 업무</span>
                     </span>
                   </label>
                 </div>
@@ -1300,51 +1149,39 @@
 
                 <!-- 1. 신규 신청 세부항목 (cif) -->
                 <div class="form-group report-detail-group" id="detail-cif">
-                  <label class="form-label">
-                    <span class="normal-text">세부 항목</span>
-                    <span class="easy-text">세부 종류 선택</span>
-                  </label>
+                  <label class="form-label">세부 항목</label>
                   <div class="chip-group">
-                    <label class="chip-item"><input type="radio" name="detail-cif-val" value="예/적금 신규" checked><span>예/적금 통장</span></label>
-                    <label class="chip-item"><input type="radio" name="detail-cif-val" value="체크/신용카드 신규"><span>체크/신용카드</span></label>
-                    <label class="chip-item"><input type="radio" name="detail-cif-val" value="전자금융 신규"><span>인터넷·스마트뱅킹</span></label>
+                    <label class="chip-item"><input type="radio" name="detail-cif-val" value="예/적금 신규" checked><span>예/적금 신규</span></label>
+                    <label class="chip-item"><input type="radio" name="detail-cif-val" value="체크/신용카드 신규"><span>체크/신용카드 신규</span></label>
+                    <label class="chip-item"><input type="radio" name="detail-cif-val" value="전자금융 신규"><span>전자금융 신규</span></label>
                   </div>
                 </div>
 
                 <!-- 2. 제신고 & 변경 세부항목 (report) -->
                 <div class="form-group report-detail-group hidden" id="detail-report">
-                  <label class="form-label">
-                    <span class="normal-text">세부 항목</span>
-                    <span class="easy-text">세부 종류 선택</span>
-                  </label>
+                  <label class="form-label">세부 항목</label>
                   <div class="chip-group">
-                    <label class="chip-item"><input type="radio" name="detail-report-val" value="고객정보 변경" checked><span>주소·전화번호 변경</span></label>
+                    <label class="chip-item"><input type="radio" name="detail-report-val" value="고객정보 변경" checked><span>고객정보 변경</span></label>
                     <label class="chip-item"><input type="radio" name="detail-report-val" value="카드 재발급"><span>카드 재발급</span></label>
-                    <label class="chip-item"><input type="radio" name="detail-report-val" value="결제계좌/결제일 변경"><span>결제계좌·날짜 변경</span></label>
+                    <label class="chip-item"><input type="radio" name="detail-report-val" value="결제계좌/결제일 변경"><span>결제계좌/결제일 변경</span></label>
                   </div>
                 </div>
 
                 <!-- 3. 자동이체 등록 세부항목 (autodebit) -->
                 <div class="form-group report-detail-group hidden" id="detail-autodebit">
-                  <label class="form-label">
-                    <span class="normal-text">세부 항목</span>
-                    <span class="easy-text">세부 종류 선택</span>
-                  </label>
+                  <label class="form-label">세부 항목</label>
                   <div class="chip-group">
-                    <label class="chip-item"><input type="radio" name="detail-autodebit-val" value="계좌간 자동이체 신청" checked><span>계좌간 자동이체</span></label>
-                    <label class="chip-item"><input type="radio" name="detail-autodebit-val" value="공과금 자동이체 신청"><span>공과금·지로 납부</span></label>
+                    <label class="chip-item"><input type="radio" name="detail-autodebit-val" value="계좌간 자동이체 신청" checked><span>계좌간 자동이체 신청</span></label>
+                    <label class="chip-item"><input type="radio" name="detail-autodebit-val" value="공과금 자동이체 신청"><span>공과금 자동이체 신청</span></label>
                   </div>
                 </div>
 
                 <!-- 4. 창구 보안 업무 세부항목 (security) -->
                 <div class="form-group report-detail-group hidden" id="detail-security">
-                  <label class="form-label">
-                    <span class="normal-text">세부 항목</span>
-                    <span class="easy-text">세부 종류 선택</span>
-                  </label>
+                  <label class="form-label">세부 항목</label>
                   <div class="chip-group">
-                    <label class="chip-item"><input type="radio" name="detail-security-val" value="비밀번호 변경/초기화" checked><span>비밀번호 재설정</span></label>
-                    <label class="chip-item"><input type="radio" name="detail-security-val" value="OTP/보안매체 재발급"><span>보안카드·OTP 재발급</span></label>
+                    <label class="chip-item"><input type="radio" name="detail-security-val" value="비밀번호 변경/초기화" checked><span>비밀번호 변경/초기화</span></label>
+                    <label class="chip-item"><input type="radio" name="detail-security-val" value="OTP/보안매체 재발급"><span>OTP/보안매체 재발급</span></label>
                   </div>
                 </div>
 
@@ -1352,37 +1189,22 @@
                 <div id="dynamic-report-fields" style="margin-top: 16px; margin-bottom: 8px;"></div>
 
                 <div class="form-group">
-                  <label for="report-user-name" class="form-label">
-                    <span class="normal-text">고객 성명</span>
-                    <span class="easy-text">어르신 성함 (이름)</span>
-                  </label>
-                  <input type="text" id="report-user-name" class="form-input" placeholder="성함을 입력해 주세요" required>
+                  <label for="report-user-name" class="form-label">고객 성명</label>
+                  <input type="text" id="report-user-name" class="form-input" placeholder="성명을 입력해 주세요" required>
                 </div>
               </div>
 
               <!-- 개인정보 안전 고지 배너 -->
               <div class="info-alert-box" style="background-color: #F4FBFB; border: 1px solid rgba(0, 186, 174, 0.2); border-radius: 8px; padding: 12px; font-size: 11.5px; color: var(--brand-mint-dark); line-height: 1.5; margin-top: 25px; margin-bottom: 12px; text-align: left; box-sizing: border-box;">
-                <div class="normal-text">
-                  <div style="display: flex; align-items: center; gap: 6px; margin-bottom: 4px; font-weight: 700;">
-                    <i class="fa-solid fa-shield-halved" style="color: var(--brand-mint); font-size: 13px;"></i>
-                    <span>개인정보 보호 및 보안 안심 고지</span>
-                  </div>
-                  본 서비스는 주민등록번호 전체나 계좌 비밀번호 등 금융 식별정보 및 보안 매체 정보를 사전에 절대 수집하지 않으므로 안심하고 작성하셔도 좋습니다. 해당 실명 검증 및 실물 대조는 창구에서 행원을 통해 최종 처리됩니다.
+                <div style="display: flex; align-items: center; gap: 6px; margin-bottom: 4px; font-weight: 700;">
+                  <i class="fa-solid fa-shield-halved" style="color: var(--brand-mint); font-size: 13px;"></i>
+                  <span>개인정보 보호 및 보안 안심 고지</span>
                 </div>
-                <div class="easy-text" style="font-size: 13.5px; font-weight: 700; line-height: 1.5;">
-                  <div style="display: flex; align-items: center; gap: 6px; margin-bottom: 4px; font-size: 14.5px; color: #008772;">
-                    <i class="fa-solid fa-shield-halved" style="color: var(--brand-mint); font-size: 15px;"></i>
-                    <span>안심하세요!</span>
-                  </div>
-                  비밀번호나 주민등록번호 뒷자리는 여기서 절대 묻지 않으니 안심하고 작성하세요.
-                </div>
+                본 서비스는 주민등록번호 전체나 계좌 비밀번호 등 금융 식별정보 및 보안 매체 정보를 사전에 절대 수집하지 않으므로 안심하고 작성하셔도 좋습니다. 해당 실명 검증 및 실물 대조는 창구에서 행원을 통해 최종 처리됩니다.
               </div>
 
               <button type="submit" class="submit-form-btn">
-                <span>
-                  <span class="normal-text">서류 임시 제출 완료</span>
-                  <span class="easy-text">✅ 다 적었어요! 번호표에 등록하기</span>
-                </span>
+                <span>서류 임시 제출 완료</span>
                 <i class="fa-solid fa-arrow-right"></i>
               </button>
             </form>
@@ -1392,14 +1214,8 @@
               <div class="success-icon-wrapper">
                 <i class="fa-solid fa-circle-check"></i>
               </div>
-              <h3>
-                <span class="normal-text">서류 미리작성 완료!</span>
-                <span class="easy-text">신청서가 잘 접수되었습니다!</span>
-              </h3>
-              <p>
-                <span class="normal-text">번호표 호출 시 직원에 알려주시면 <br>빠르게 처리가 완료됩니다.</span>
-                <span class="easy-text">내 번호가 불리면 창구 직원에게<br><strong>"미리 작성했어요"</strong>라고 말씀해 주세요.</span>
-              </p>
+              <h3>서류 미리작성 완료!</h3>
+              <p>번호표 호출 시 직원에 알려주시면 <br>빠르게 처리가 완료됩니다.</p>
               <div class="submitted-info">
                 <div class="info-row">
                   <span>작성자</span>
@@ -1590,11 +1406,11 @@
           </div>
 
           <div style="display: flex; flex-direction: column; gap: 8px;">
-            <button type="button" class="submit-form-btn" id="go-to-capture-btn" style="margin-top: 0; width: 100%; height: 44px; font-size: 13.5px; font-weight: 800;">
+            <button type="button" class="submit-form-btn" id="go-to-capture-btn" style="margin-top: 0; width: 100%; height: 44px; font-size: 13.5px;">
               <span>선택한 유형으로 촬영 시작</span>
               <i class="fa-solid fa-chevron-right"></i>
             </button>
-            <button type="button" id="go-to-manual-mass-btn" style="width: 100%; height: 42px; background-color: #f8fafc; border: 1.5px solid var(--brand-mint); border-radius: 10px; color: var(--brand-mint-dark); font-size: 13px; font-weight: 800; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 6px; transition: all 0.2s;">
+            <button type="button" id="go-to-manual-mass-btn" class="hidden" style="width: 100%; height: 42px; background-color: #f8fafc; border: 1.5px solid var(--brand-mint); border-radius: 8px; color: var(--brand-mint-dark); font-size: 13px; font-weight: 800; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 6px; transition: all 0.2s;">
               <i class="fa-solid fa-pen-to-square"></i>
               <span>전표 촬영 없이 직접 입력하기</span>
             </button>
@@ -2034,46 +1850,14 @@
       <div class="modal-header">
         <div class="modal-header-title">
           <i class="fa-solid fa-clipboard-check" style="color: var(--brand-mint); font-size: 18px;"></i>
-          <h3 style="font-size: 16px; font-weight: 800;">
-            <span class="normal-text">업무별 필요 서류 체크리스트</span>
-            <span class="easy-text">가져오실 서류 확인하기</span>
-          </h3>
+          <h3 style="font-size: 16px; font-weight: 800;">업무별 필요 서류 체크리스트</h3>
         </div>
         <button class="close-btn" id="close-checklist-modal-btn">&times;</button>
       </div>
       <div class="modal-body" style="padding: 16px 18px; overflow-y: auto; flex: 1; -webkit-overflow-scrolling: touch;">
         <div class="checklist-content" id="checklist-container" style="border-top: none; padding: 0;">
-          <p class="form-desc" style="font-size: 13.5px; margin-bottom: 14px;">
-            <span class="normal-text">방문하시는 업무에 필요한 서류가 준비되었는지 확인해 보세요.</span>
-            <span class="easy-text">은행 오실 때 꼭 챙겨야 할 서류를 한눈에 확인해 보세요.</span>
-          </p>
+          <p class="form-desc" style="font-size: 13.5px; margin-bottom: 14px;">방문하시는 업무에 필요한 서류가 준비되었는지 확인해 보세요.</p>
           
-          <!-- [쉬운모드 전용] 키보드 입력 없이 원터치로 선택하는 4대 대표 업무 퀵 카드 -->
-          <div class="easy-checklist-quick-grid easy-only" style="margin-bottom: 16px;">
-            <div style="font-size: 14px; font-weight: 800; color: #0f172a; margin-bottom: 8px; display: flex; align-items: center; gap: 6px;">
-              <i class="fa-solid fa-hand-pointer" style="color: #00c7a9; font-size: 15px;"></i>
-              <span>어떤 업무를 보러 오셨나요?</span>
-            </div>
-            <div class="easy-chk-quick-buttons" style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px;">
-              <button type="button" class="btn-easy-chk-quick active" data-val="personal_new">
-                <i class="fa-solid fa-book-bookmark"></i>
-                <span>통장 만들기</span>
-              </button>
-              <button type="button" class="btn-easy-chk-quick" data-val="home_loan">
-                <i class="fa-solid fa-house-chimney"></i>
-                <span>대출 상담</span>
-              </button>
-              <button type="button" class="btn-easy-chk-quick" data-val="proxy_work">
-                <i class="fa-solid fa-users"></i>
-                <span>가족 대신 방문</span>
-              </button>
-              <button type="button" class="btn-easy-chk-quick" data-val="inheritance_work">
-                <i class="fa-solid fa-file-lines"></i>
-                <span>상속 서류</span>
-              </button>
-            </div>
-          </div>
-
           <!-- 시안 맞춤형 업무 검색창 및 선택지 목록 (기존 탭 메뉴는 숨김 처리하여 완벽 호환) -->
           <div class="checklist-search-wrapper" style="position: relative; margin-bottom: 14px;">
             <div style="position: relative; display: flex; align-items: center;">
@@ -2131,23 +1915,14 @@
             <div style="display: grid; grid-template-columns: 1fr 1.25fr; gap: 8px;">
               <button type="button" class="btn-checklist-finish" id="btn-checklist-finish" style="background: var(--brand-mint); color: #ffffff; border: none; border-radius: 12px; padding: 13px; font-size: 14px; font-weight: 700; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 6px;">
                 <i class="fa-solid fa-check"></i>
-                <span>
-                  <span class="normal-text">준비 확인 완료</span>
-                  <span class="easy-text">✅ 서류 다 챙겼어요!</span>
-                </span>
+                <span>준비 확인 완료</span>
               </button>
               <button type="button" class="btn-checklist-to-verify" id="btn-checklist-to-verify" style="background: #f5f3ff; color: #7c3aed; border: 1.5px solid #c4b5fd; border-radius: 12px; padding: 13px; font-size: 13.5px; font-weight: 700; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 6px;">
                 <i class="fa-solid fa-file-shield"></i>
-                <span>
-                  <span class="normal-text">서류 진위확인 하기</span>
-                  <span class="easy-text">🔍 서류·신분증 진짜인지 확인</span>
-                </span>
+                <span>서류 진위확인 하기</span>
               </button>
             </div>
-            <p style="font-size: 11px; color: #64748b; text-align: center; margin: 4px 0 0 0;">
-              <span class="normal-text">* 은행 창구 방문 전 필요 서류를 미리 챙겨 빠른 처리를 받아보세요.</span>
-              <span class="easy-text">* 서류를 미리 준비해 오시면 창구에서 기다림 없이 바로 업무를 처리해 드립니다.</span>
-            </p>
+            <p style="font-size: 11px; color: #64748b; text-align: center; margin: 4px 0 0 0;">* 은행 창구 방문 전 필요 서류를 미리 챙겨 빠른 처리를 받아보세요.</p>
           </div>
         </div>
       </div>
@@ -2278,23 +2053,6 @@
   </div>
 
   </div> <!-- Ends .mobile-web-container (푸터/토스트/모달까지 모두 포함하여 PC 폰 프레임 안에 갇히도록 함) -->
-
-  <!-- [PC 송출/청중 접속 전용] 대기번호 & 스마트큐 접속 QR 배너 스탠드 (모바일에서는 100% 숨김) -->
-  <aside id="desktop-qr-stand" class="desktop-qr-stand">
-    <div class="qr-stand-card">
-      <div class="qr-stand-badge">
-        <i class="fa-solid fa-qrcode"></i>
-        <span>청중 현장 체험용</span>
-      </div>
-      <div class="qr-stand-img-box">
-        <img src="smartq_qr_ticket.png" alt="iM뱅크 SmartQ 접속 QR 티켓" class="qr-stand-img">
-      </div>
-      <div class="qr-stand-caption">
-        <p class="qr-stand-lead">스마트폰 카메라로 스캔하세요!</p>
-        <span class="qr-stand-sub">발표와 함께 실시간 모바일 모드로 연동 체험</span>
-      </div>
-    </div>
-  </aside>
 
   <!-- 발표자 전용 시연 리모컨 (PC/노트북 화면 송출용, 모바일에서는 100% 자동 숨김) -->
   <aside id="presenter-control-panel" class="presenter-panel">
